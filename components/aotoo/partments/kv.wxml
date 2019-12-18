@@ -1,0 +1,5 @@
+<wxs src="../util.wxs" module="util" />
+
+<block wx:if="{{item.k}}">
+  <include src="./parse_kv/object.wxml" />
+</block>

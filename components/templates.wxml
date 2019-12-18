@@ -1,0 +1,32 @@
+<wxs src="./aotoo/util.wxs" module="util" />
+
+<!-- <template name="audio"> <include src="./_components/audio.wxml" /> </template>
+<template name="button"> <include src="./_components/button.wxml" /> </template>
+<template name="camera"> <include src="./_components/camera.wxml" /> </template>
+<template name="canvas"> <include src="./_components/canvas.wxml" /> </template>
+<template name="checkbox"> <include src="./_components/checkbox.wxml" /> </template>
+<template name="coverimage"> <include src="./_components/coverimage.wxml" /> </template>
+<template name="icon"> <include src="./_components/icon.wxml" /> </template>
+<template name="image"> <include src="./_components/image.wxml" /> </template>
+<template name="input"> <include src="./_components/input.wxml" /> </template>
+<template name="liveplayer"> <include src="./_components/liveplayer.wxml" /> </template>
+<template name="livepusher"> <include src="./_components/livepusher.wxml" /> </template>
+<template name="map"> <include src="./_components/map.wxml" /> </template>
+<template name="navigator"> <include src="./_components/navigator.wxml" /> </template>
+<template name="progress"> <include src="./_components/progress.wxml" /> </template>
+<template name="radio"> <include src="./_components/radio.wxml" /> </template>
+<template name="richtext"> <include src="./_components/richtext.wxml" /> </template>
+<template name="slider"> <include src="./_components/slider.wxml" /> </template>
+<template name="switch"> <include src="./_components/switch.wxml" /> </template>
+<template name="text"> <include src="./_components/text.wxml" /> </template>
+<template name="textarea"> <include src="./_components/textarea.wxml" /> </template>
+<template name="video"> <include src="./_components/video.wxml" /> </template>
+<template name="view"> <include src="./_components/view.wxml" /> </template> -->
+
+
+<template name="button">
+  <button disabled="{{props.disabled}}" class="{{props.class||''}}" wx:if="{{props.style}}" style="{{props.style||''}}">{{props.value || props.title}}</button>
+  <block wx:else>
+    <button disabled="{{props.disabled}}" class="{{props.class||''}}">{{props.value || props.title}}</button>
+  </block>
+</template>

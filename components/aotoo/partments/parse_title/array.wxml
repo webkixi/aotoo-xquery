@@ -1,0 +1,46 @@
+<wxs src="../../util.wxs" module="util" />
+<import src="../parse_common/index.wxml" />
+<import src="../../templates/inner_templates.wxml" />
+
+
+<template name="titles-content">
+  <block wx:if="{{util.isString(item)}}">
+    <text class="htitle">{{item}}</text>
+  </block>
+  <block wx:else>
+    <template is="title-obj" data="{{ item }}" />
+    <!-- <block wx:if="{{util.isString(item.title)}}">
+      <template is="title-obj" data="{{ item }}"/>
+    </block>
+    <block wx:elif="{{util.isObject(item.title)}}">
+      <template is="title-obj" data="{{ item }}"/>
+    </block>
+    <block wx:else>
+      <template is="title-obj" data="{{ item }}"/>
+    </block> -->
+  </block>
+</template>
+
+<!-- 这个key要小心 -->
+<view class="htitles {{item.titleClass||''}}">
+  <block wx:for="{{item.title}}" wx:key="__key" wx:for-item="son">
+    <block wx:if="{{util.isString(son)}}">
+      <view class="t-item">
+        <text class="htitle">{{son}}</text>
+      </view>
+    </block>
+    <block wx:else>
+      <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), itemClass: son.itemClass ?  't-item ' + son.itemClass : 't-item'} }}" />
+    </block>
+  </block>
+  <!-- <block wx:for="{{item.title}}" wx:key="__key" wx:for-item="tItem">
+    <view class="{{tItem.itemClass||tItem.class}} t-item" wx:if="{{tItem.aim}}" catch:tap="aim" data-aim="{{tItem.aim}}">
+      <template is="titles-content" data="{{item: tItem}}" />
+    </view>
+    <block wx:else>
+      <view class="{{tItem.itemClass||tItem.class}} t-item">
+        <template is="titles-content" data="{{item: tItem}}" />
+      </view>
+    </block>
+  </block> -->
+</view>

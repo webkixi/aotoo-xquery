@@ -1,0 +1,12 @@
+<!-- 作者：天天修改 -->
+<!-- github: webkixi -->
+<!-- 小程序的模板真是又长又臭 -->
+<!-- <ui-item item="{{$item}}" class-name="{{myClass}}"/> -->
+<wxs src="../aotoo/util.wxs" module="util" />
+<import src="../aotoo/templates/list.wxml" />
+
+<block wx:if="{{$list.show}}">
+  {{fromComponent ? inner.store('fromComponent', fromComponent) : ''}}
+  {{uniqId ? inner.store('uniqId', uniqId) : ''}}
+  <template is="mylist" data="{{list: $list, id}}" />
+</block>

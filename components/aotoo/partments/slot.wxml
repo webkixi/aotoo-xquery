@@ -1,0 +1,123 @@
+<wxs src="../util.wxs" module="util"></wxs>
+<wxs module="tmp">
+  var excludeKeys = []
+  function execTemp(key, excludes){
+    var myExcludes = excludeKeys
+    if (excludes) {
+      myExcludes = excludeKeys.concat(excludes)
+    }
+    return myExcludes.indexOf(key) > -1 ? false : true
+  }
+
+  function isExtraTemp(tname){
+    if (tname.indexOf('@') == 0) {
+      return true
+    }
+  }
+  module.exports = {
+    execTemp: execTemp,
+    isExtraTemp: isExtraTemp
+  }
+</wxs>
+
+<import src="../templates/inner_templates.wxml" />
+
+<template name="extraTemp">
+  <block wx:if="{{tmp.isExtraTemp(tempname)}}">
+    <block wx:if="{{util.isObject(item[tempname]) || util.isArray(item[tempname]) }}">
+      <template is="{{tempname}}" data="{{props: {...item[tempname], treeid: util.treeid(item)}, keyword: tempname }}" />
+    </block>
+    <block wx:else>
+      <template is="{{tempname}}" data="{{props: item[tempname], keyword: tempname }}" />
+    </block>
+  </block>
+  <block wx:else>
+    <block wx:if="{{util.isObject(item[tempname]) || util.isArray(item[tempname]) }}">
+      <template is="{{'@'+tempname}}" data="{{item, props: {...item[tempname], treeid: util.treeid(item)}, keyword: tempname }}" />
+    </block>
+    <block wx:else>
+      <!-- <template is="{{'@'+tempname}}" data="{{item, props: item[tempname], keyword: tempname }}" /> -->
+      <template is="{{'@'+tempname}}" data="{{item, props: item, keyword: tempname }}" />
+    </block>
+  </block>
+</template>
+
+<template name="@title">
+  <include src="./title.wxml" />
+</template>
+
+<template name="@img">
+  <include src="./img.wxml" />
+</template>
+
+<template name="@li">
+  <include src="./li.wxml" />
+</template>
+
+<template name="@k">
+  <include src="./kv.wxml" />
+</template>
+
+<template name="@body">
+  <include src="./body.wxml" />
+</template>
+
+<template name="@footer">
+  <include src="./footer.wxml" />
+</template>
+
+<template name="@dot">
+  <include src="./dot.wxml" />
+</template>
+
+<template name="parse-part">
+  <block wx:if="{{util.isString(item)}}">
+    <text class="htitle">{{item}}</text>
+  </block>
+  <block wx:else>
+    <block wx:if="{{item['__sort']}}">
+      <block wx:for="{{item['__sort']}}" wx:key="__key" wx:for-item="tempname">
+        <block wx:if="{{tmp.execTemp(tempname)}}">
+          <template is="extraTemp" data="{{tempname, item}}" />
+        </block>
+      </block>
+    </block>
+    <block wx:else>
+      <block wx:if="{{item.body || item.footer || item.dot}}">
+        <view class="hheader">
+          <block wx:if="{{item.title}}"> <include src="./title.wxml" /> </block>
+          <block wx:if="{{item.img}}"> <include src="./img.wxml" /> </block>
+          <block wx:if="{{item.li }}"><include src="./li.wxml" /></block>
+          <block wx:if="{{item.k }}"><include src="./kv.wxml" /></block>
+        </view>
+        <block wx:if="{{item.body}}"><include src="./body.wxml" /></block>
+        <block wx:if="{{item.footer}}"><include src="./footer.wxml" /></block>
+        <block wx:if="{{item.dot}}"><include src="./dot.wxml" /></block>
+      </block>
+      <block wx:else>
+        <block wx:if="{{item.title}}"> <include src="./title.wxml" /> </block>
+        <block wx:if="{{item.img}}"> <include src="./img.wxml" /> </block>
+        <block wx:if="{{item.li }}"><include src="./li.wxml" /></block>
+        <block wx:if="{{item.k }}"><include src="./kv.wxml" /></block>
+        <block wx:if="{{item.body}}"><include src="./body.wxml" /></block>
+        <block wx:if="{{item.footer}}"><include src="./footer.wxml" /></block>
+        <block wx:if="{{item.dot}}"><include src="./dot.wxml" /></block>
+      </block>
+    </block>
+  </block>
+</template>
+
+<slot name="top"></slot>
+
+<block wx:if="{{util.isObject(item)}}">
+  <template is="parse-part" data="{{item}}" />
+</block>
+
+<block wx:elif="{{util.isArray(item)}}">
+  <block wx:for="{{item}}" wx:key="__key" wx:for-item="son">
+    <template is="parse-part" data="{{son}}" />
+  </block>
+</block>
+
+<slot ></slot>
+<slot name="bottom"></slot>

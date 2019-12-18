@@ -1,0 +1,17 @@
+<wxs src="../util.wxs" module="util" />
+
+<block wx:if="{{util.isArray(item.img)}}">
+  <include src="./parse_img/array.wxml" />
+</block>
+
+
+
+<block wx:elif="{{util.isObject(item.img)}}">
+  <include src="./parse_img/object.wxml" />
+</block>
+
+
+
+<block wx:else="{{util.isString(item.img)}}">
+  <include src="./parse_img/string.wxml" />
+</block>

@@ -1,0 +1,5 @@
+<import src="../parse_common/index.wxml" />
+<!-- <template is="title-obj" data="{{item: item.title}}" /> -->
+<template is="title-obj" data="{{item}}" />
+
+<!-- 其他的组件 -->

@@ -1,0 +1,106 @@
+.calendar {
+  width: 100%;
+  height: 80vh;
+  position: relative;
+}
+.calendar-nav {
+  background: #fff;
+  width: 100%;
+  height: 86rpx;
+  line-height: 86rpx;
+  font-size: 30rpx;
+  color: #666;
+  white-space: nowrap;
+}
+.calendar-nav .calendar-nav-item {
+  display: inline-block;
+  text-align: center;
+  margin: 0 30rpx;
+}
+.calendar-nav .calendar-nav-item:first-child {
+  margin: 0 30rpx 0 40rpx;
+}
+.calendar-nav .calendar-nav-item.selected {
+  color: #333;
+  font-weight: bold;
+  position: relative;
+}
+.calendar-nav .calendar-nav-item.selected:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 6rpx;
+  border-radius: 3rpx;
+  background: #2773f5;
+}
+.calendar-list {
+  height: calc(100% - 136rpx);
+  position: relative;
+  background: #fff;
+}
+.calendar-list .calendar-list-item {
+  height: calc(114rpx * 5 + 92rpx);
+}
+.calendar-list .calendar-list-item .invalid {
+  color: #ccc;
+}
+.calendar-list .calendar-list-item .valid.selected {
+  background-color: #2773f5;
+  border-radius: 6rpx;
+}
+.calendar-list .calendar-list-item .valid.selected {
+  color: #fff;
+}
+.calendar-list .calendar-list-item .valid.selected.range {
+  background: #eef6ff;
+  border-radius: 0;
+}
+.calendar-list .calendar-list-item .valid.selected.range {
+  color: #333;
+}
+.calendar-list .calendar-list-item .valid.invalid {
+  color: #ccc;
+}
+.calendar-list .calendar-header {
+  height: 92rpx;
+  line-height: 92rpx;
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+.calendar-tils {
+  background: #f5f5f5;
+  color: #666;
+  height: 50rpx;
+  font-size: 28rpx;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+.calendar-tils .calendar-tils-item {
+  flex: 1;
+  text-align: center;
+}
+.date-list {
+  background: #fff;
+  width: 100%;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+}
+.date-list .date-item {
+  width: calc(100% / 7);
+  height: 114rpx;
+  text-align: center;
+  padding: 15rpx 0;
+  box-sizing: border-box;
+}
+.date-list {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}

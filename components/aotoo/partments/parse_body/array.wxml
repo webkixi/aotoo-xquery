@@ -1,0 +1,27 @@
+<wxs src="../../util.wxs" module="util" />
+<import src="../parse_common/index.wxml" />
+<import src="../../templates/inner_templates.wxml" />
+
+<template name="hb-content">
+  <block wx:if="{{util.isString(item)}}">
+    <text>{{item}}</text>
+  </block>
+
+  <block wx:elif="{{util.isObject(item)}}">
+    <template is="tik" data="{{item}}" />
+  </block>
+</template>
+<!-- 这个key要小心 -->
+
+<view class="hbody {{item.bodyClass||''}}">
+  <block wx:for="{{item.body}}" wx:key="__key" wx:for-item="son">
+    <block wx:if="{{util.isString(son)}}">
+      <view class="hb-item">
+        <text>{{son}}</text>
+      </view>
+    </block>
+    <block wx:else>
+      <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), itemClass: son.itemClass ?  'hb-item ' + son.itemClass : 'hb-item'} }}" />
+    </block>
+  </block>
+</view>

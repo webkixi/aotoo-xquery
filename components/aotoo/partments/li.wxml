@@ -1,0 +1,5 @@
+<wxs src="../util.wxs" module="util" />
+
+<block wx:if="{{item.li && util.isArray(item.li)}}">
+  <include src="./parse_li/array.wxml" />
+</block>

@@ -1,0 +1,5 @@
+<wxs src="../util.wxs" module="util" />
+
+<block wx:if="{{item.dot && util.isArray(item.dot)}}">
+  <include src="./parse_dot/array.wxml" />
+</block>

@@ -1,0 +1,8 @@
+<!-- 作者：天天修改 -->
+<!-- github: webkixi -->
+<!-- 小程序的模板真是又长又臭 -->
+<wxs src="../util.wxs" module="util" />
+<import src="../templates/item.wxml" />
+<block wx:if="{{(util.isObject(item) && $item.show) || util.isString($item) || util.isNumber($item)}}">
+  <template is="item" data="{{item: $item}}" />
+</block>

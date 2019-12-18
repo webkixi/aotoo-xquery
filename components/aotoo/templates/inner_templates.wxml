@@ -1,0 +1,159 @@
+<wxs src="../util.wxs" module="util" />
+<wxs module="inner">
+  function has(item, type){
+    if (item.form) return item.form[type]
+  }
+  function mixprops(input, profile){
+    if (typeof input == 'object') {
+      input.profile = profile
+    }
+    return input
+  }
+  module.exports = { 
+    has: has,
+    mixprops: mixprops
+  }
+</wxs>
+<import src="../../templates.wxml" />
+
+<!-- <template name="temp">
+  <template is="{{tempName}}" data="{{stuff}}" />
+</template> -->
+
+<!-- <template name="@button">
+  <block wx:if="{{input || profile}}">
+    <template is="button" data="{{props: inner.mixprops(input, profile) }}" />
+  </block>
+  <block wx:else>
+    <template is="button" data="{{ props }}" />
+  </block>
+</template> -->
+
+<template name="@component">
+  <block wx:if="{{util.isString(props.is)}}">
+    <template is="{{props.is}}" data="{{item: props, props}}" />
+  </block>
+</template>
+
+<template name="a">
+  <view class="htitle {{item.class || item.itemClass}}" wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" bind:tap="aim" data-aim="{{item.aim}}">{{item.title}}</view>
+  <block wx:else>
+    <view class="htitle {{item.class || item.itemClass}}" bind:tap="aim" data-aim="{{item.aim}}">{{item.title}}</view>
+  </block>
+</template>
+
+<template name="img">
+  <image catch:tap="catchItemMethod" data-evt="{{util.dataEvt(item, ['catchtap', 'tap', 'longpress', 'aim', 'touchstart', 'tourchend', 'touchmove', 'touchcancel'])}}" wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" lazy-load="{{true}}" class="himg {{ item.class || item.itemClass }}" mode="{{item.mode || 'widthFix'}}" src="{{item.src}}" />
+  <block wx:else>
+    <image catch:tap="catchItemMethod" data-evt="{{util.dataEvt(item, ['catchtap', 'tap', 'longpress', 'aim', 'touchstart', 'tourchend', 'touchmove', 'touchcancel'])}}" class="himg {{ item.class || item.itemClass }}" mode="{{item.mode || 'widthFix'}}" lazy-load="{{true}}" src="{{item.src}}" />
+  </block>
+</template>
+
+<template name="@item">
+  <block wx:if="{{util.isObject(props)}}">
+    <block wx:if="{{props.text}}">
+      <text 
+        class="{{props.itemClass||''}}"
+        style="{{props.itemStyle||''}}"
+        id="{{props.id||''}}" 
+        data-treeid="{{props && util.isObject(props.attr) && (props.attr['data-treeid']||props.attr['treeid']||'')}}"
+        data-id="{{(props && util.isObject(props.attr) && (props.attr['id'] || props.attr['data-id']) || '')}}"
+        selectable="{{props.selectable||''}}"
+        space="{{props.space||''}}"
+        decode="{{props.decode||''}}"
+      >{{props.text}}</text>
+    </block>
+    <block wx:elif="{{props.fromComponent}}">
+      <ui-item class="ui-item" item="{{props}}" fromComponent="{{props.fromComponent}}"/>
+    </block>
+    <block wx:else>
+      <ui-item class="ui-item" item="{{props}}"/>
+    </block>
+  </block>
+</template>
+
+<template name="@list">
+  <block wx:if="{{util.isObject(props)}}">
+    <block wx:if="{{props.fromComponent || props.fromTree}}">
+      <ui-list list="{{props}}" fromComponent="{{props.fromComponent||props.fromTree}}"/>
+    </block>
+    <block wx:else>
+      <ui-list list="{{props}}"/>
+    </block>
+  </block>
+</template>
+
+<template name="@tree">
+  <block wx:if="{{util.isObject(props)}}">
+    <block wx:if="{{props.fromComponent}}">
+      <ui-tree class="ui-tree" list="{{props}}" fromComponent="{{props.fromComponent}}"/>
+    </block>
+    <block wx:else>
+      <ui-tree class="ui-tree" list="{{props}}"/>
+    </block>
+  </block>
+</template>
+
+<template name="@icon">
+  <block wx:if="{{util.isString(props)}}">
+    <icon class="iconfont {{props}}" />
+  </block>
+  <block wx:elif="{{util.isObject(props)}}">
+    <icon 
+      class="iconfont {{props.itemClass || props.class}}" 
+      catch:tap="{{props.aim||''}}" 
+      style="{{props.style||''}}" 
+    />
+  </block>
+</template>
+
+<template name="@form">
+  <block wx:if="{{util.isObject(props)}}">
+    <ui-form class="ui-form" dataSource="{{props}}" />
+  </block>
+</template>
+
+<template name="@slip">
+  <ui-slip class="ui-slip" dataSource="{{props}}" />
+</template>
+
+<template name="@html">
+  <ui-markit dataSource="{{props}}" textType="html" />
+</template>
+
+<template name="@md">
+  <ui-markit dataSource="{{props}}" textType="md" />
+</template>
+
+<template name="@switch">
+  <ui-switch item="{{props}}" />
+</template>
+
+<template name="@url">
+  <block wx:if="{{props && props.url && props.title}}">
+    <navigator 
+      target="{{props.target||''}}"
+      url="{{props.url||''}}"
+      open-type="{{props['open-type']||'navigate'}}"
+      delta="{{props.delta||''}}"
+      app-id="{{props['app-id']||''}}"
+      path="{{props.path||''}}"
+      extra-data="{{props['extra-data']||''}}"
+      version="{{props.version||''}}"
+      hover-class	="{{props['hover-class']||''}}"
+      hover-stop-propagation="{{props['hover-stop-propagation']||''}}"
+      hover-start-time="{{props['hover-start-time']||''}}"
+      hover-stay-time="{{props['hover-stay-time']||''}}"
+      bindsuccess="{{props['bindsuccess']||''}}"
+      bindfail="{{props['bindfail']||''}}"
+      bindcomplete="{{props['bindcomplete	']||''}}"
+      class="{{props.itemClass||props.class||''}}"
+      style="{{props.itemStyle||props.style||''}}"
+    >
+      <block wx:if="{{util.isString(props.title)}}"><text>{{props.title}}</text></block>
+      <block wx:else>
+        <ui-item item="{{props.title}}" />
+      </block>
+    </navigator>
+  </block>
+</template>

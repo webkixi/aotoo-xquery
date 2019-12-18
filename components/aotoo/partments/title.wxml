@@ -1,0 +1,17 @@
+<wxs src="../util.wxs" module="util" />
+
+<block wx:if="{{util.isArray(item.title)}}">
+  <include src="./parse_title/array.wxml" />
+</block>
+
+
+
+<block wx:elif="{{util.isObject(item.title)}}">
+  <include src="./parse_title/object.wxml" />
+</block>
+
+
+
+<block wx:else="{{util.isString(item.title) || util.isNumber(item.title)}}">
+  <include src="./parse_title/string.wxml" />
+</block>

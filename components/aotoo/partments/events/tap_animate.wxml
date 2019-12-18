@@ -1,0 +1,131 @@
+<wxs src="../../util.wxs" module="util" />
+
+<block wx:if="{{util.dataset(item, 'data-treeid')}}">
+  <!--  -->
+  <!--  -->
+  <!-- item.tap -->
+  <block wx:if="{{item.tap}}">
+    <view 
+      data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
+      data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+      id="{{item.id || id}}" 
+      animation="{{item.animation}}"
+      wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" 
+      class="{{item.class||item.itemClass}}"  
+      bind:tap="itemMethod" 
+      data-evt="{{util.dataEvt(item, ['tap'])}}"
+    >
+      <include src="../slot.wxml" />
+    </view>
+    <block wx:else>
+      <view 
+        data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
+        data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+        id="{{item.id || id}}" 
+        animation="{{item.animation}}"
+        class="{{item.class||item.itemClass}}"  
+        bind:tap="itemMethod" 
+        data-evt="{{util.dataEvt(item, ['tap'])}}"
+      >
+        <include src="../slot.wxml" />
+      </view>
+    </block>
+  </block>
+
+  <!--  -->
+  <!--  -->
+  <!-- item.catchtap -->
+  <block wx:elif="{{item.catchtap}}">
+    <view 
+      data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
+      data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+      id="{{item.id || id}}" 
+      animation="{{item.animation}}"
+      wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" 
+      class="{{item.class||item.itemClass}}"  
+      catch:tap="catchItemMethod" 
+      data-evt="{{util.dataEvt(item, ['catchtap'])}}"
+    >
+        <include src="../slot.wxml" />
+    </view>
+    <block wx:else>
+      <view 
+        data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
+        data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}" 
+        id="{{item.id || id}}" 
+        animation="{{item.animation}}"
+        class="{{item.class||item.itemClass}}"  
+        catch:tap="catchItemMethod" 
+        data-evt="{{util.dataEvt(item, ['catchtap'])}}"
+      >
+        <include src="../slot.wxml" />
+      </view>
+    </block>
+  </block>
+
+
+
+</block> 
+<block wx:else>
+
+
+
+  <!--  -->
+  <!--  -->
+  <!-- item.tap -->
+  <block wx:if="{{item.tap}}">
+    <view 
+      data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+      id="{{item.id || id}}" 
+      animation="{{item.animation}}"
+      wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" 
+      class="{{item.class||item.itemClass}}"  
+      bind:tap="itemMethod" 
+      data-evt="{{util.dataEvt(item, ['tap'])}}"
+    >
+      <include src="../slot.wxml" />
+    </view>
+    <block wx:else>
+      <view 
+        data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+        id="{{item.id || id}}" 
+        animation="{{item.animation}}"
+        class="{{item.class||item.itemClass}}"  
+        bind:tap="itemMethod" 
+        data-evt="{{util.dataEvt(item, ['tap'])}}"
+      >
+        <include src="../slot.wxml" />
+      </view>
+    </block>
+  </block>
+
+  <!--  -->
+  <!--  -->
+  <!-- item.catchtap -->
+  <block wx:elif="{{item.catchtap}}">
+    <view 
+      data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+      id="{{item.id || id}}" 
+      animation="{{item.animation}}"
+      wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" 
+      class="{{item.class||item.itemClass}}"  
+      catch:tap="catchItemMethod" 
+      data-evt="{{util.dataEvt(item, ['catchtap'])}}"
+    >
+      <include src="../slot.wxml" />
+    </view>
+    <block wx:else>
+      <view 
+        data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+        id="{{item.id || id}}" 
+        animation="{{item.animation}}"
+        class="{{item.class||item.itemClass}}"  
+        catch:tap="catchItemMethod" 
+        data-evt="{{util.dataEvt(item, ['catchtap'])}}"
+      >
+        <include src="../slot.wxml" />
+      </view>
+    </block>
+  </block>
+
+</block>

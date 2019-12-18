@@ -1,0 +1,265 @@
+<wxs src="../../util.wxs" module="util" />
+<import src="../../templates/inner_templates.wxml" />
+
+<wxs module="tmp">
+  var excludeKeys = ['li', 'v']
+  function execTemp(key, excludes){
+    var myExcludes = excludeKeys
+    if (excludes) {
+      myExcludes = excludeKeys.concat(excludes)
+    }
+    return myExcludes.indexOf(key) > -1 ? false : true
+  }
+
+  function isExtraTemp(tname){
+    if (tname.indexOf('@') == 0) {
+      return true
+    }
+  }
+  module.exports = {
+    execTemp: execTemp,
+    isExtraTemp: isExtraTemp
+  }
+</wxs>
+
+<template name="mytemp">
+  <template is="temp" data="{{tempName: item.template, stuff: item}}" />
+</template>
+
+<template name="extraTemp">
+  <block wx:if="{{tmp.isExtraTemp(tempname)}}">
+    <block wx:if="{{util.isObject(item[tempname]) || util.isArray(item[tempname]) }}">
+      <template is="{{tempname}}" data="{{props: {...item[tempname], treeid: util.treeid(item)}, keyword: tempname }}" />
+    </block>
+    <block wx:else>
+      <template is="{{tempname}}" data="{{props: item[tempname], keyword: tempname }}" />
+    </block>
+  </block>
+  <block wx:else>
+    <block wx:if="{{util.isObject(item[tempname]) || util.isArray(item[tempname]) }}">
+      <template is="{{'@'+tempname}}" data="{{item, props: {...item[tempname], treeid: util.treeid(item)}, keyword: tempname }}" />
+    </block>
+    <block wx:else>
+      <!-- <template is="{{tempname}}" data="{{props: item[tempname], keyword: tempname }}" /> -->
+      <template is="{{tempname}}" data="{{props: item, keyword: tempname }}" />
+    </block>
+  </block>
+</template>
+
+<template name="extraTemp-itk">
+  <block wx:if="{{tmp.isExtraTemp(tempname)}}">
+    <template is="{{tempname}}" data="{{props: item[tempname], keyword: tempname }}" />
+  </block>
+  <block wx:else>
+    <template is="{{'@'+tempname}}" data="{{item, props: item[tempname], keyword: tempname }}" />
+  </block>
+</template>
+
+<template name="@title">
+  <block wx:if="{{item.title}}">
+    <include src="../title.wxml" />
+  </block>
+</template>
+
+<template name="@img">
+  <block wx:if="{{item.img}}">
+    <include src="../img.wxml" />
+  </block>
+</template>
+
+<template name="@k">
+  <block wx:if="{{item.k}}">
+    <include src="../kv.wxml" />
+  </block>
+</template>
+
+<template name="@body">
+  <block wx:if="{{item.body && util.isArray(item.body)}}">
+    <include src="../parse_body/array.wxml" />
+  </block>
+</template>
+
+<template name="@footer">
+  <block wx:if="{{item.footer && util.isArray(item.footer)}}">
+    <include src="../parse_footer/array.wxml" />
+  </block>
+</template>
+
+<template name="@dot">
+  <block wx:if="{{item.dot && util.isArray(item.dot)}}">
+    <include src="../parse_dot/array.wxml" />
+  </block>
+</template>
+
+<!-- title img -->
+<template name="@ti">
+  <block wx:for="{{item['__sort']}}" wx:key="__key" wx:for-item="tempname">
+    <block wx:if="{{tmp.execTemp(tempname, exclude)}}">
+      <block wx:if="{{tmp.isExtraTemp(tempname)}}">
+        <template is="{{tempname}}" data="{{props: item[tempname], keyword: tempname }}" />
+      </block>
+      <block wx:else>
+        <template is="{{'@'+tempname}}" data="{{item, props: item[tempname], keyword: tempname }}" />
+      </block>
+    </block>
+  </block>
+  
+</template>
+
+<!-- title img kv -->
+<template name="@tik">
+  <block wx:if="{{item['__sort']}}">
+    <block wx:for="{{item['__sort']}}" wx:key="__key" wx:for-item="tempname">
+      <block wx:if="{{tmp.execTemp(tempname)}}">
+        <template is="extraTemp" data="{{tempname, item}}" />
+        <!-- <template is="{{'@'+tempname}}" data="{{item}}"/> -->
+      </block>
+    </block>
+  </block>
+</template>
+
+<!-- title img kv -->
+<!-- 为了避免li模板的递归回调， 展开extraTemp模板至此-->
+<template name="@itk">
+  <block wx:if="{{item['__sort']}}">
+    <block wx:for="{{item['__sort']}}" wx:key="__key" wx:for-item="tempname">
+      <block wx:if="{{tmp.execTemp(tempname)}}">
+        <block wx:if="{{tmp.isExtraTemp(tempname)}}">
+          <template is="{{tempname}}" data="{{props: item[tempname], keyword: tempname }}" />
+        </block>
+        <block wx:else>
+          <template is="{{'@'+tempname}}" data="{{item, props: item[tempname], keyword: tempname }}" />
+        </block>
+        <!-- <template is="extraTemp-itk" data="{{tempname, item}}" /> -->
+        <!-- <template is="{{'@'+tempname}}" data="{{item}}"/> -->
+      </block>
+    </block>
+  </block>
+</template>
+
+<!-- container -->
+<template name="tik">
+  <block wx:if="{{item.template}}">
+    <template is="mytemp" data="{{item}}" />
+  </block>
+  <block wx:else>
+    <template is="{{item['__templateName']||'@tik'}}" data="{{item}}"/>
+  </block>
+</template>
+
+<template name="for-title-obj-string">
+  <text wx:if="{{item.itemDataRoot}}" class="htitle">{{item.title}}</text>
+  <block wx:else>
+    <template is="make-title" data="{{item}}" />
+    <!-- <text wx:if="{{item.itemStyle || item.style}}" style="{{item.itemStyle||item.style}}" class="htitle {{item.itemClass||item.class}}">{{item.title}}</text>
+    <block wx:else>
+      <text class="htitle {{item.itemClass||item.class}}">{{item.title}}</text>
+    </block> -->
+  </block>
+</template>
+
+
+
+<template name="make-title">
+  <!-- <block wx:if="{{util.hasEvent(item, 'aim')||util.hasEvent(item, 'tap') || util.hasEvent(item, 'longtap') || util.hasEvent(item, 'touchstart') || util.hasEvent(item, 'touchend')}}"> -->
+  <block wx:if="{{util.hasEvent(item) || item.$$id}}">
+    <template is="@item" data="{{props: item}}" />
+  </block>
+  <block wx:else>
+    <block wx:if="{{item.url}}">
+      <template is="{{@url}}" data="{{props: item}}"></template>
+    </block>
+    <view 
+      wx:else
+      class="htitle {{item.itemClass||item.class||''}}"
+      style="{{item.itemStyle||item.style||''}}"
+    ><text>{{item.title}}</text></view>
+    <!-- <view 
+      class="htitle {{item.itemClass||item.class||''}}"
+      style="{{item.itemStyle||item.style||''}}"
+    >{{item.title}}</view> -->
+  </block>
+</template>
+
+<template name="for-title-obj-object">
+  <block wx:if="{{item.template}}">
+    <template is="mytemp" data="{{item}}" />
+  </block>
+  <block wx:else>
+    <block wx:if="{{item['__sort']}}">
+      <block wx:for="{{item['__sort']}}" wx:key="__key" wx:for-item="tempname">
+        <block wx:if="{{tmp.execTemp(tempname, exclude)}}">
+          <block wx:if="{{tempname=='title'}}">
+            <template is="make-title" data="{{item: {id: item.id, url: item.url, $$id: item.$$id, treeid: treeid, __fromParent: item.__fromParent, fromComponent: item.fromComponent, fromTree: item.fromTree, title: item.title,  itemClass: item.itemClass||item.class, style: item.itemStyle||item.style, aim: item.aim, tap: item.tap, catchtap: item.catchtap, longpress: item.longpress, catchlongpress: item.catchlongpress, touchstart: item.touchstart, touchmove: item.touchmove, touchcancel: item.touchcancel, touchend: item.touchend} }}"/>
+          </block>
+          <block wx:else>
+            <template is="extraTemp" data="{{tempname, item}}" />
+          </block>
+        </block>
+      </block>
+    </block>
+    <block wx:else>
+      <template is="make-title" data="{{item}}"/>
+    </block>
+  </block>
+</template>
+
+<!--  ../title.wxml -->
+<!-- 必须终止，否则就递归了 -->
+<template name="title-obj">
+  <block wx:if="{{item.template}}">
+    <template is="mytemp" data="{{item}}" />
+  </block>
+  <block wx:else>
+    <block wx:if="{{util.isString(item.title) ||  util.isNumber(item.title)}}">
+      <template is="for-title-obj-string" data="{{item}}"/>
+    </block>
+    <block wx:elif="{{util.isObject(item.title)}}">
+      <template is="for-title-obj-object" data="{{item: item.title, treeid: util.treeid(item)}}" />      
+    </block>
+    <block wx:else>
+      <template is="for-title-obj-object" data="{{item}}"/>
+    </block>
+  </block>
+</template>
+
+<!--  ../img.wxml -->
+<template name="target-object-img">
+  <block wx:if="{{item.template}}">
+    <template is="mytemp" data="{{item}}" />
+  </block>
+  <block wx:else>
+    <block wx:if="{{util.isString(item.src)}}">
+      <image 
+        style="{{item.style||item.itemStyle||''}}" 
+        lazy-load="{{true}}" 
+        class="himg {{item.class||item.itemClass||''}}" 
+        mode="{{item.mode || 'widthFix'||''}}" 
+        src="{{item.src}}" 
+        bind:tap="{{item.tap ? 'itemMethod' : ''}}" 
+        bind:longtap="{{item.longtap ? 'itemMethod' : ''}}" 
+        bind:longpress="{{item.longpress ? 'itemMethod' : ''}}"
+        bind:touchstart="{{item.touchstart ? 'itemMethod' : ''}}"
+        bind:touchmove="{{item.touchmove ? 'itemMethod' : ''}}"
+        bind:touchend="{{item.touchend ? 'itemMethod' : ''}}"
+        bind:cancel="{{item.cancel ? 'itemMethod' : ''}}"
+        catch:tap="{{(item.aim||item.catchtap) ? 'catchItemMethod' : ''}}"
+        catch:longpress="{{item.catchlongpress ? 'catchItemMethod' : ''}}"
+        catch:longtap="{{item.catchlongtap ? 'catchItemMethod' : ''}}"
+        data-evt="{{util.dataEvt(item, ['tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel'])}}"
+      />
+
+      <!-- <block wx:if="{{util.hasEvent(item)}}">
+        <template is="img" data="{{item}}" />
+      </block>
+      <block wx:else>
+        <image wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" lazy-load="{{true}}" class="himg {{item.class||item.itemClass}}" mode="{{item.mode || 'widthFix'}}" src="{{item.src}}" />
+        <block wx:else>
+          <image 
+            class="himg {{item.class||item.itemClass}}"
+            mode="{{item.mode || 'scaleToFill'}}" lazy-load="{{true}}" src="{{item.src}}" />
+        </block>
+      </block> -->
+    </block>
+  </block>
+</template>

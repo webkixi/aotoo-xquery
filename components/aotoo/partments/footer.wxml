@@ -1,0 +1,5 @@
+<wxs src="../util.wxs" module="util" />
+
+<block wx:if="{{item.footer && util.isArray(item.footer)}}">
+  <include src="./parse_footer/array.wxml" />
+</block>

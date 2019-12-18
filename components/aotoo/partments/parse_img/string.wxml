@@ -1,0 +1,2 @@
+<image class="himg" mode="scaleToFill" lazy-load="{{true}}" src="{{item.img}}" />
+<!-- 其他的组件 -->

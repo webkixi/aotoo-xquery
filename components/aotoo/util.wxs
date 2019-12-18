@@ -1,0 +1,911 @@
+
+var templates = [
+  'audio',
+  'button',
+  'camera',
+  'canvas',
+  'checkbox',
+  'icon',
+  'image',
+  'input',
+  'liveplayer',
+  'livepusher',
+  'map',
+  'navigator',
+  'progress',
+  'radio',
+  'richtext',
+  'slider',
+  'switch',
+  'text',
+  'textarea',
+  'video',
+  'view',
+
+  // 不一样的解析模板
+  'swiper',
+  'form',
+  'label',
+  'coverview',
+  'coverimage'
+]
+
+function isString(title){
+  return typeof title == 'string'
+}
+
+function objTypeof(obj) {
+  if (obj) return obj.constructor.toLowerCase()
+}
+
+function isObject(obj) {
+  return objTypeof(obj) == 'object'
+}
+
+function isArray(obj) {
+  return objTypeof(obj) == 'array'
+}
+
+function isNumber(obj) {
+  return objTypeof(obj) == 'number' || obj === 0 ? true : false
+}
+
+function isFunction(obj) {
+  return objTypeof(obj) == 'function'
+}
+
+function delItem(ary, target) {
+  var willAry = []
+  ary.forEach(function (item){
+    if (item !== target) {
+      willAry.push(item)
+    }
+  })
+  return willAry
+}
+
+function sClone(obj) {
+  if (obj) {
+    return JSON.parse(JSON.stringify(obj))
+  }
+}
+
+// 简单数组去重，只针对字符串，数字
+// function unique(arr) {
+//   return arr.reduce((prev, cur) => prev.includes(cur) ? prev : [...prev, cur], []);
+// }
+
+function log(what){
+  console.log(JSON.stringify(what))
+}
+
+function equal(item, equalwhat){
+  if (item.title ==  equalwhat) {
+    console.log(item)
+  }
+}
+
+function getItemClass(item) {
+  // var cItemClass = (item.itemClass || item.class || item.className || 'class-name')
+  var cItemClass = (item.itemClass || item.class || item.className)
+  return cItemClass ? 'item '+cItemClass : 'item'
+}
+
+function getItemStyle(item) {
+  var cItemStyle = (item.itemStyle||item.style)
+  return cItemStyle ? cItemStyle : ''
+}
+
+
+function existTemp(item, excludeTmp) {
+  var tmpName = ''
+  var _tmpName
+  var noopRet = {
+    temp: 'noop',
+    data: {}
+  }
+  for (var ii = 0; ii < templates.length; ii++) {
+    var tmp = templates[ii]
+    if (item[tmp]) {
+      tmpName = tmp
+    }
+  }
+
+  if ((isString(excludeTmp) && tmpName)) {
+    if (tmpName == excludeTmp) return noopRet
+  }
+
+  _tmpName = tmpName
+  var data = item[tmpName]
+
+  switch (tmpName) {
+    case 'label':
+      tmpName = 'parse-label'
+      data = item
+      break;
+    case 'form':
+      tmpName = 'parse-form'
+      data = item
+      break;
+    case 'swiper':
+      tmpName = 'parse-swiper'
+      data = item
+      break;
+  }
+
+  return tmpName ? {
+    temp: tmpName,
+    data: data
+  } : noopRet
+}
+
+function customCustom(item, key, attrName) {
+  var comp = item[key]
+  var compOption = comp && comp.option || {}
+  var compChildren = comp && comp.children || []
+
+  if (attrName) {
+    return compOption[attrName]
+  }
+  if (isArray(comp)) {
+    return {
+      option: compOption,
+      children: comp
+    }
+  }
+  if (isObject(comp)) {
+    return {
+      option: compOption,
+      children: compChildren
+    }
+  }
+}
+
+var innerCount = -1
+function suid(prefix) {
+  innerCount++
+  if (typeof prefix == 'string') {
+    return prefix + innerCount
+  } else {
+    return '_' + innerCount
+  }
+}
+
+function hasEvent(props, key) {
+  var keys = ['url', 'tap', 'catchtap', 'longpress', 'catchlongpress', 'touchstart', 'touchend', 'touchmove', 'touchcancel', 'catchtouchstart', 'catchtouchend', 'catchtouchmove', 'catchtouchcancel']
+  if (props) {
+    if (key == 'tap') {
+      return (props.tap || props.catchtap) ? true : false
+    }
+    else if (key == 'longtap') {
+      return (props.longtap || props.catchlongtap) ? true : false
+    }
+    else if (key == 'longpress') {
+      return (props.longpress || props.catchlongpress) ? true : false
+    }
+    else {
+      if (key) {
+        return props[key] ? true : false
+      } else {
+        var state = false
+        for (var ii=0; ii<keys.length; ii++) {
+          var mykey = keys[ii]
+          if (props[mykey]) {
+            state = true
+            break;
+          }
+        }
+        return state
+      }
+    }
+
+  }
+}
+
+function dataset(item, key) {
+  if (item && item.attr && isObject(item.attr)) {
+    if (key) {
+      if (item.attr[key] || item.attr[key]==0) {
+        return true
+      }
+    } else {
+      return item.attr['id'] || item.attr['data-id'] || 0
+    }
+  } else {
+    return ''
+  }
+}
+
+function dataEvt(item, selects) {
+  var evtStr = ''
+  if (selects && isArray(selects)) {
+    selects.forEach(function(evtName, ii) {
+      if (item[evtName]) {
+        var val = item[evtName]
+        if (isArray(val)) val = val.join(';;')
+        if ((ii+1)==selects.length) {
+          evtStr += evtName+'='+val
+        } else {
+          evtStr += evtName+'='+val + ','
+        }
+      }
+    })
+  }
+  return evtStr
+}
+
+function getClass(item, prefix){
+  prefix = prefix || 'htitle'
+  item = item || {}
+  var myClass = prefix
+  if (item) {
+    var _class = item.class || item.className || item.itemClass
+    myClass =  _class ? prefix+' '+_class : prefix
+  }
+  return myClass
+}
+
+function formatQuery(url) {
+  var aim = url
+  var query={};
+  if (url) {
+    var urls = url.split('?')
+    aim = urls[0]
+    if (urls[1]) {
+      var params = urls[1].split('&')
+      params.forEach(function (param) {
+        var attrs = param.split('=')
+        query[attrs[0]] = attrs[1] ? attrs[1] : true
+      })
+    }
+  }
+  return {url: aim, query: query}
+}
+
+var storeEvts = {}
+function rightEvent(dsetEvt) {
+  if (isString(dsetEvt)) {
+    var _id = suid('rightEvent_')
+
+    // if (storeEvts[_id]) {
+    //   return storeEvts[_id]
+    // }
+
+    var rightEvt
+    if (dsetEvt.indexOf('?') > -1) {
+      var myQuery = {}
+      var params = dsetEvt.split('@@')
+      var evtType = params[0]
+      dsetEvt = params[1]
+      var evts = dsetEvt.split(',')
+      evts.forEach(function (item) {
+        if (item) {
+          var its = item.split('=')
+          var itName = its.splice(0, 1)
+          var itQuery = its.join('=')
+          var evtObj = formatQuery(itQuery)
+          myQuery[itName] = {
+            fun: evtObj.url,
+            param: evtObj.query,
+          }
+        }
+      })
+      rightEvt = myQuery[evtType] || {fun: '', param: {}}
+      rightEvt.allParam = myQuery
+    } else {
+      dsetEvt = dsetEvt.replace('@@', '?').replace(getRegExp(",", "g"), '&')
+      var evtObj = formatQuery(dsetEvt)
+      var evtType = evtObj.url
+      var evtQuery = evtObj.query
+      var evtSelect = evtQuery[evtType]
+      var selObj = formatQuery(evtSelect)
+      var selFun = selObj.url
+      var selParam = selObj.query
+      rightEvt = {
+        fun: selFun,
+        param: selParam,
+        allParam: evtQuery
+      }
+    }
+    // storeEvts[_id] = rightEvt
+    return rightEvt || {}
+  }
+}
+
+// slip props
+
+// [20, 'u', 120]
+// [20, 'n', 120]
+// [20, '<', 120]
+// [20, '>', 120]
+// [20, '<>', 120]
+// [20, 'un', 120]
+// [20, 'un<>', 120]
+// [0, '@', 0]
+
+var tpos = {
+  instance: undefined,
+  start: { x: 0, y: 0 },
+  current: {x: 0, y: 0, pos: 0},
+  distance: 0,
+  events: {},
+  moving: false,
+  timeStamp: {
+    gap: 500,
+    start: 0,
+    end: 0
+  },
+  _siblingIds: []
+}
+
+var touchMethods = ['touchstart', 'touchmove', 'touchend']
+var catchTouchMethods = ['catchtouchstart', 'catchtouchmove', 'catchtouchend']
+function isFakeEvent(allParam) {
+  var isFake = true
+  for (var ii=0; ii<touchMethods.length; ii++) {
+    var mtd = allParam[ii]
+    if (mtd) {
+      isFake = false
+      break;
+    }
+  }
+  for (var ii = 0; ii < catchTouchMethods.length; ii++) {
+    var mtd = allParam[ii]
+    if (mtd) {
+      isFake = false
+      break;
+    }
+  }
+
+  if (allParam.__slip) {
+    isFake = false
+  }
+  return isFake
+}
+
+function chooseTouchFun(e, ins, stopPropagation) {
+  var evtType = e.type
+  var currentTarget = e.currentTarget
+  var dataset = currentTarget.dataset
+  var dsetEvt = e.type + '@@' + dataset['evt']
+  var slipObj = {
+    direction: 'a',
+    min: 20,
+    width: 60,
+    height: 0,
+    find: '.move-it'
+  }
+
+  tpos.events = {}
+
+  var tmp = rightEvent(dsetEvt)
+  var allParam = tmp.allParam
+  
+  if (allParam) {
+    tpos.events.tap = allParam._tap ? allParam._tap : allParam.tap ? allParam.tap : undefined
+    tpos.events.catchtap = allParam._aim ? allParam._aim : allParam._catchtap ? allParam._catchtap : allParam.catchtap ? allParam.catchtap : undefined
+    tpos.events.longpress = allParam._longpress ? allParam._longpress : allParam.longpress ? allParam.longpress : undefined
+    tpos.events.catchlongpress = allParam._catchlongpress ? allParam._catchlongpress : allParam.catchlongpress ? allParam.catchlongpress : undefined
+
+    tpos.events.touchstart = allParam.touchstart || allParam.catchtouchstart
+    tpos.events.touchmove = allParam.touchmove || allParam.catchtouchmove
+    tpos.events.touchend = allParam.touchend || allParam.catchtouchend
+    tpos.events.touchcancel = allParam.touchcancel || allParam.catchtouchcancel
+
+    if (allParam.__slip) {
+      var slip = allParam.__slip.fun ? allParam.__slip.fun.split(';;') : allParam.__slip.split(';;')
+      var slip2 = slip[2] && slip[2].split(':')
+      var wid = slip2[0]
+      var hgt = slip2[1]
+      slipObj = {
+
+        // 定义移动方向, 有 
+        // a => 允许左移  d => 允许右移  ad => 允许左右移动  
+        // w => 允许上移 s => 允许下移 ws =>允许上下移
+        // wsad/adws/asdw => 允许上下左右移动，
+        // -- 根据手指滑动的位移距离，判断移动方向，
+        // -- 当垂直移动距离 > 水平移动距离时，限定移动为上下
+        // -- 当水平移动距离 > 垂直移动距离时，限定移动为左右
+        direction: slip[0] || slipObj.direction,
+
+        // 设置最小位移值，用于触发子元素的移动
+        min: slip[1] || slipObj.min,
+
+        // 子菜单的最小宽度
+        width: wid || slipObj.width,
+
+        // 子元素的类名
+        find: slip[3] || slipObj.find,
+
+        // 上下移动时一定需要高度值
+        height: hgt || slipObj.height,  
+
+        // 子菜单的个数，如：删除，关注等
+        length: 0,  
+
+        // 存放treeid的数组
+        siblingIds: [],  
+
+        siblings: {},
+      }
+
+      if (touchMethods.indexOf(evtType) > -1) {
+        var allInst = ins.selectAllComponents(slipObj.find)
+
+        // 将每一个子实例及其treeid存放于数组
+        // treeid数组，子实例数组
+        // 可以通过当前操作实例的treeid判定哪些是兄弟节点实例
+        
+        var tmpCount = -1
+        for (var ii = 0; ii < allInst.length; ii++) {
+          var oneInst = allInst[ii]
+          var treeid = oneInst.getDataset().treeid
+          slipObj.siblingIds[ii] = treeid // 将所有子元素的treeid存储于数组，并与实例数组的下标对应
+          slipObj.siblings[treeid] = oneInst // 实例数组，当上下移动时，控制相邻实例的运动
+          if (!tpos._siblingIds[ii]) {
+            tpos._siblingIds[ii] = treeid // 将所有子元素的treeid存储于数组，并与实例数组的下标对应
+          }
+
+          if (tpos._siblingIds.indexOf(treeid) == -1) {
+            tmpCount ++
+          }
+        }
+
+        if (tmpCount > -1) {
+          tpos._siblingIds = slipObj.siblingIds
+        }
+
+        // 批量设置子菜单的宽度
+        var myfind = slipObj.find + '>>> .li-item'
+        var sonsInst = ins.selectAllComponents(myfind)
+        var liItems = e.instance.selectAllComponents('.li-item')
+        slipObj.length = liItems.length
+        for (var ii = 0; ii < sonsInst.length; ii++) {
+          var myInst = sonsInst[ii]
+          myInst.setStyle('width: ' + slipObj.width + 'px')
+        }
+        slipObj.max = slipObj.width * slipObj.length
+      }
+    }
+    
+     e.__query = tmp.param
+     tpos.__allParam = allParam
+     switch (evtType) {
+       case 'touchstart':
+         tStart(e, slipObj, ins, stopPropagation)
+         break;
+       case 'touchmove':
+         tMove(e, slipObj, ins, stopPropagation)
+         break;
+       case 'touchend':
+         tEnd(e, slipObj, ins, stopPropagation)
+         break;
+     }
+  } else {
+    return true
+  }
+}
+
+function iMethod(e, ins) {
+  var res = chooseTouchFun(e, ins)
+}
+
+function ciMethod(e, ins) {
+  var res = chooseTouchFun(e, ins, 'catch')
+}
+
+function setStyle(inst, distance, distanceY) {
+  tpos.distance = distance
+  inst.setStyle('transform: translate3d('+distance+'px, '+distanceY+'px, 0)')
+}
+
+function tStart(e, slip, ins, stopPropagation) {
+  var currentTarget = e.currentTarget
+  var dataset = currentTarget.dataset
+  var treeid = dataset.treeid
+  var param = e.__query
+  var allParam = tpos.__allParam
+  var target = e.touches[0] || e.changedTouches[0]
+  var pageX = target.pageX
+  var pageY = target.pageY
+  tpos.timeStamp.start = e.timeStamp
+
+  var cb = param.cb
+  var h = parseInt(slip.height)
+  var ddd = slip.direction
+  var min = slip.min
+  var width = slip.width
+  var max = slip.max
+  var find = slip.find
+  var inst = e.instance
+  var tmpTarget = tpos.instance
+
+  if (allParam.__slip) {
+    if (tmpTarget) {
+      var tmpSlip = tmpTarget.slip
+      var tmpInst = tmpTarget.inst
+      var tmpTreeid = tmpTarget.treeid
+      // 确定是同一组操作对象，所有slip属性一致
+      if (tmpSlip.direction == ddd && tmpSlip.min == min && tmpSlip.width == width && tmpSlip.find == slip.find) {
+        if (treeid && tmpTreeid !== treeid) {
+          if (ddd.indexOf('a')>-1 || ddd.indexOf('d')>-1) {
+            if (tmpTarget.moving) {
+              var siblingIds = slip.siblingIds
+              var _siblingIds = tpos._siblingIds
+              var oIdx = siblingIds.indexOf(tmpTreeid)
+              var cIdx = _siblingIds.indexOf(tmpTreeid)
+              var cpos = (cIdx-oIdx)*h
+              setStyle(tmpInst, 0, cpos)
+            }
+          } else {
+            // if (ddd.indexOf('w')>-1||ddd.indexOf('s') > -1) { }
+          }
+        }
+      } else {
+        // 当选择的slip对象不相同时，清空栈数据
+        tpos._siblingIds = slip.siblingIds
+      }
+    }
+    tpos.instance = {
+      slip: slip,
+      inst: inst,
+      treeid: treeid,
+      direction: ddd,
+      prev: tmpTarget
+    }
+  
+    tpos.start = {
+      x: pageX,
+      y: pageY
+    }
+  
+    if (cb) {
+      ins.callMethod(cb, e)
+    }
+  } else {
+    /** */
+  }
+  var tevent = tpos.events.touchstart
+  if (tevent && (tevent !== 'true' || tevent.fun !== 'true')) {
+    stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
+  }
+}
+
+/**
+ * 'a'  左  <-
+ * 's'  下
+ * 'd'  右  ->
+ * 'w'  上
+ * 'ad'  左右
+ * 'ws'  上下
+ * 'wsad' 上下左右
+ * '@'  全方位
+ */
+function tMove(e, slip, ins, stopPropagation) {
+  var currentTarget = e.currentTarget
+  var dataset = currentTarget.dataset
+  var treeid = dataset.treeid
+  var param = e.__query
+  var allParam = tpos.__allParam
+  var cb = param.cb
+  var ddd = slip.direction || 'a'
+  var min = slip.min || 30
+  var max = slip.max || 120
+  var find = slip.find || '.move-it'
+  var absMax = Math.abs(max)
+  var absMin = Math.abs(min)
+
+  // var allInst = ins.selectAllComponents(find)
+  var inst = e.instance
+  var target = e.touches[0] || e.changedTouches[0]
+  var pageX = target.pageX
+  var pageY = target.pageY
+  var startX = tpos.start.x
+  var startY = tpos.start.y
+  var curX = tpos.current.x
+  var curY = tpos.current.y
+  var diffX = pageX - startX
+  var diffY = pageY - startY
+  var absDiffx = Math.abs(diffX)
+  var absDiffy = Math.abs(diffY)
+  var toX = pageX - curX
+  var toY = pageY - curY
+
+  tpos.moving = false
+  tpos.instance && (tpos.instance.moving = false)
+  if (absDiffx > 10 || absDiffy > 10) {
+    tpos.moving = true
+    if (allParam.__slip) tpos.instance && (tpos.instance.moving = true)
+  }
+  
+  var h = parseInt(slip.height)
+  if (allParam.__slip) {
+    var oriIndex = slip.siblingIds.indexOf(treeid)
+    var curIndex = tpos._siblingIds.indexOf(treeid)
+    var curPos  = curIndex*h
+
+    var startTime = tpos.timeStamp.start
+    var nowTime = e.timeStamp
+    var gapTime = nowTime - startTime
+
+    // 纵向移动  
+    if (absDiffy > absDiffx && gapTime > 1000) {
+      if ((ddd.indexOf('w')>-1||ddd.indexOf('s') > -1) && slip.height > 0 && absDiffy > min) {
+        var diffPos = (curIndex - oriIndex) * h
+        var moveY = diffPos + diffY
+        
+        var offY  = curPos + diffY
+        var computIndex = parseInt(offY/h)
+        var threshold = computIndex*h + parseInt(h/2)
+        
+        var nxIndex
+        var nxTreeid
+        var oriNxIndex
+        var diffNx
+        var nxSibling
+        var cPos
+
+        // 向下
+        if (offY > curPos) {
+          inst.setStyle('transform: translateY(' + moveY + 'px)')
+          if (offY >= threshold) {
+            nxIndex = computIndex+1
+            // nxIndex = curIndex + 1
+            nxTreeid = tpos._siblingIds[nxIndex]
+            oriNxIndex = slip.siblingIds.indexOf(nxTreeid)
+            diffNx = (nxIndex - oriNxIndex)*h - h
+            nxSibling = slip.siblings[nxTreeid]
+            cPos = nxIndex*h
+          } else {
+            nxIndex = computIndex + 1
+            nxTreeid = tpos._siblingIds[nxIndex]
+            oriNxIndex = slip.siblingIds.indexOf(nxTreeid)
+            diffNx = (nxIndex - oriNxIndex) * h
+            nxSibling = slip.siblings[nxTreeid]
+            cPos = (nxIndex-1) * h
+          }
+        }
+        
+        // 向上
+        else if (offY < curPos) {
+          if (computIndex != curIndex) {
+            inst.setStyle('transform: translateY(' + moveY + 'px)')
+            if (offY < threshold) {
+              nxIndex = computIndex
+              // nxIndex = curIndex - 1
+              nxTreeid = tpos._siblingIds[nxIndex]
+              oriNxIndex = slip.siblingIds.indexOf(nxTreeid)
+              diffNx = (nxIndex - oriNxIndex) * h + h
+              nxSibling = slip.siblings[nxTreeid]
+              cPos = nxIndex * h
+            } else {
+              nxIndex = computIndex
+              nxTreeid = tpos._siblingIds[nxIndex]
+              oriNxIndex = slip.siblingIds.indexOf(nxTreeid)
+              diffNx = (nxIndex - oriNxIndex) * h
+              nxSibling = slip.siblings[nxTreeid]
+              cPos = (nxIndex+1) * h
+            }
+          }
+        }
+
+        if (nxSibling) {
+          nxSibling.setStyle('transform: translateY(' + diffNx + 'px)')
+          tpos.current.pos = cPos
+        }
+      }
+
+    } 
+    // 横向移动
+    else {
+      var runtimePos = (curIndex-oriIndex)*h
+      if (ddd.indexOf('a') > -1) {
+        if (diffX < 0) {
+          if (absDiffx < absMax) {
+            setStyle(inst, diffX, runtimePos)
+          } else {
+            setStyle(inst, -(absMax), runtimePos)
+          }
+        } else {
+          if (absDiffx > absMin) {
+            setStyle(inst, 0, runtimePos)
+          }
+        }
+      }
+    
+      if (ddd.indexOf('d')>-1) {
+        if (diffX > 0) {
+          if (absDiffx < absMax) {
+            setStyle(inst, diffX, runtimePos)
+          } else {
+            setStyle(inst, absMax, runtimePos)
+          }
+        } else {
+          if (absDiffx > absMin) {
+            setStyle(inst, 0, runtimePos)
+          }
+        }
+      }
+    }
+
+    if (cb) {
+      ins.callMethod(cb, e)  // 不要执行本对象setData方法，会中断move方法，但可以执行其他对象的渲染方法
+    }
+  } else {
+    /** */
+  }
+  tpos.current.x = pageX
+  tpos.current.y = pageY
+  var tevent = tpos.events.touchmove
+  if (tevent && (tevent !== 'true' || tevent.fun !== 'true')) {
+    stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
+  }
+}
+
+function tEnd(e, slip, ins, stopPropagation) {
+  var currentTarget = e.currentTarget
+  var dataset = currentTarget.dataset
+  var treeid = dataset.treeid
+
+  var param = e.__query
+  var allParam = tpos.__allParam
+  var cb = param.cb
+  var ddd = slip.direction || 'a'
+  var width = slip.width
+  var min = slip.min || 30
+  var max = slip.max || 120
+  var find = slip.find || '.move-it'
+  var absMin = Math.abs(min)
+  var absMax = Math.abs(max)
+  tpos.timeStamp.end = e.timeStamp
+  var gapTime = tpos.timeStamp.end - tpos.timeStamp.start
+
+  var myInst = tpos.instance
+  var inst = e.instance
+  var target = e.touches[0] || e.changedTouches[0]
+  var pageX = target.pageX
+  var pageY = target.pageY
+  var startX = tpos.start.x
+  var startY = tpos.start.y
+  var curX = tpos.current.x
+  var curY = tpos.current.y
+  var curPos = tpos.current.pos
+  var diffX = pageX - startX
+  var diffY = pageY - startY
+  var absDiffx = Math.abs(diffX)
+  var absDiffy = Math.abs(diffY)
+  
+  if (allParam.__slip && tpos.moving) {
+    var h = slip.height  // height
+    var oriIndex = slip.siblingIds.indexOf(treeid)
+    var curIndex = tpos._siblingIds.indexOf(treeid)
+    
+    if (absDiffy > absDiffx) {
+      var _offset = curPos && parseInt(curPos/h)
+      var offset = _offset - curIndex
+      var slipDone = {
+        index: curIndex,
+        offset: _offset || 0
+      }
+      e.currentTarget.dataset.slipDone = slipDone
+      if ((ddd.indexOf('w')>-1 || ddd.indexOf('s')>-1) && slip.height > 0) {
+        if (typeof curPos == 'number') {
+          var rightPos = curPos - oriIndex*h
+          inst.setStyle('transform: translateY(' + rightPos + 'px)')
+          var _s = tpos._siblingIds
+          var __siblingIds = JSON.parse(JSON.stringify(tpos._siblingIds))
+
+          if (offset) {
+            if (offset > 0) {
+              __siblingIds.splice((_offset+1), 0, _s[curIndex])
+              __siblingIds.splice(curIndex, 1)
+            } else {
+              if (offset < 0) {
+                __siblingIds.splice((curIndex + offset), 0, _s[curIndex])
+                __siblingIds.splice((curIndex + 1), 1)
+              }
+            }
+          }
+          
+          tpos._siblingIds = __siblingIds
+        }
+      }
+    } else {
+      var runtimePos = (curIndex - oriIndex)*h
+      if (ddd.indexOf('a') > -1) {
+        if (diffX < 0) {
+          if (absDiffx < absMin) {
+            setStyle(inst, 0, runtimePos)
+          } else {
+            setStyle(inst, -(absMax), runtimePos)
+          }
+        }
+      }
+  
+      if (ddd.indexOf('d') > -1) {
+        if (diffX > 0) {
+          if (absDiffx < absMin) {
+            setStyle(inst, 0, runtimePos)
+          } else {
+            setStyle(inst, absMax, runtimePos)
+          }
+        }
+      }
+    }
+    
+    if (cb) {
+      ins.callMethod(cb, e)
+    }
+  } 
+
+  var isFake = isFakeEvent(allParam)
+  var newE = JSON.parse(JSON.stringify(e))
+  var tevent = tpos.events.touchend
+
+  if (tevent && (tevent !== 'true' || tevent.fun !== 'true')) {
+    stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
+  }
+
+  if (!tpos.moving) {
+    if (gapTime > tpos.timeStamp.gap) {
+      if (tpos.events.longpress || tpos.events.catchlongpress) {
+        newE.type = 'longpress'
+        newE.__stopPropagation = tpos.events.catchlongpress ? true : false
+      }
+    } else {
+      if (tpos.events.tap || tpos.events.catchtap) {
+        newE.type = 'tap'
+        newE.__stopPropagation = tpos.events.catchtap ? true : false
+      }
+    }
+
+    if (newE.type.indexOf('touch') == -1) {
+      if (isFake) {
+        callMethod(newE, ins)
+      } else {
+        // if (parseInt(absDiffx) == 0 && parseInt(absDiffy) == 0 && tpos.distance == 0) {
+        if (parseInt(absDiffx) == 0 && parseInt(absDiffy) == 0 ) {
+          callMethod(newE, ins)
+        }
+      }
+    }
+  }
+  tpos.moving = false
+}
+
+function callMethod(e, ins) {
+  e.__stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
+}
+
+// 获取item的treeid属性
+function treeid(item) {
+  return item&&item.attr&&(item.attr['data-treeid']||item.attr['treeid'])
+}
+
+module.exports = {
+  hasEvent: hasEvent,
+  dataset: dataset,
+  dataEvt: dataEvt,
+  getClass: getClass,
+
+  isString: isString,
+  isObject: isObject,
+  isArray: isArray,
+  log: log,
+  isFunction: isFunction,
+  isNumber: isNumber,
+  sClone: sClone,
+  delItem: delItem,
+
+  existTemp: existTemp,
+  getItemClass: getItemClass,
+  getItemStyle: getItemStyle,
+
+  iMethod: iMethod,
+  ciMethod: ciMethod,
+  tStart: tStart,
+  tMove: tMove,
+  tEnd: tEnd,
+
+  treeid: treeid
+}

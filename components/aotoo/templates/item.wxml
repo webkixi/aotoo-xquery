@@ -1,0 +1,11 @@
+<wxs src="../util.wxs" module="util" />
+<import src="../partments/parse_common/index.wxml" />
+
+<template name="item">
+  <block wx:if="{{item.template}}">
+    <template is="mytemp" data="{{item}}" />
+  </block>
+  <block wx:else>
+    <include src="./parse_item.wxml" />
+  </block>
+</template>
