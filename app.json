@@ -1,13 +1,6 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/demo/index",
-    "pages/menus/index",
-    "pages/readme/index",
-    "pages/demo/item",
-    "pages/demo/form",
-    "pages/demo/popup",
-    "pages/demo/list"
   ],
   "usingComponents": {
     "ui-item": "/components/aotoo/item/index",

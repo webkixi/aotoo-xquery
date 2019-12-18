@@ -361,11 +361,12 @@ function adapter(source={}) {
         let theHeader = header || {}
         let allMonths = that.allMonths.map(item=>{
           let ymd = getYmd(item)
-          let myDate = `${ymd.year}-${ymd.month}`
+          let myDate = `${ymd.year}-${ymd.month}-1`
+          let attrDate = `${ymd.year}-${ymd.month}`
           return {
             title: `${ymd.year}-${ymd.month}`,
             aim: `gotoMonth?ym=${myDate}`,
-            attr: {date: myDate}
+            attr: {date: attrDate}
           }
         })
         theHeader['@list'] = {
