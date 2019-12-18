@@ -21,19 +21,19 @@ clone或下载本项目，将目录放置在小程序项目中即可
 #### components
 基础目录  
 
-#### aotoo
+#### components/aotoo
 核心代码目录  
 
-#### actionSide
+#### components/actionSide
 弹窗组件  
 
-#### calendar
+#### components/calendar
 日历组件  
 
-#### form
+#### components/form
 表单组件  
 
-#### markit
+#### components/markit
 markdown/html组件  
 
 #### css
@@ -42,3 +42,6 @@ markdown/html组件
 #### app.json
 文件中`usingComponents`字段必须设置，否则无法使用(可以根据需求删减)  
 
+## DEMO小程序 
+
+![DEMO小程序](./css/xquery.png)
