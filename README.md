@@ -1,3 +1,11 @@
+<!--
+ * @Author: 天天修改
+ * @Date: 2019-12-18 10:17:43
+ * @LastEditTime : 2019-12-19 12:01:15
+ * @LastEditors  : Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /xquery/README.md
+ -->
 # XQUERY
 xquery是一个开发库(小程序原生)，剥离自原项目aotoo-hub，xquery基于小程序类似于jquery基于web，可以方便的融入到现有的小程序项目中  
 
@@ -14,7 +22,9 @@ xquery包含以下这些特性
 * 方便扩展内置/外部插件 
 
 ## 如何使用  
-clone或下载本项目，将目录放置在小程序项目中即可  
+clone或下载本项目，将目录放置在小程序项目中即可，如下图所示  
+
+![](./css/structor.jpeg)
 
 ## 文件及目录说明  
 
