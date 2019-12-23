@@ -143,130 +143,38 @@
 </template>
 
 <template name="@button">
-  <block wx:if="{{input['open-type']=='contact'}}">
-    <button 
-      type="{{input.typeset||'default'}}" 
-      size="{{input.size||'mini'}}"
-      plain="{{input.plain}}"
-      disabled="{{input.disabled}}"
-      loading="{{input.loading}}"      
-      open-type="{{input['open-type']}}"
-      lang="{{input.lang||'en'}}"
-      session-from="{{input['session-from']}}"
-      send-message-title="{{input['send-message-title']}}"
-      send-message-path="{{input['send-message-path']}}"
-      send-message-img="{{input['send-message-img']}}"
-      show-message-card	="{{input['show-message-card']}}"
-      bindcontact	="inputBtnMethod"
-      class="{{input.itemClass}}"
-      style="{{input.itemStyle}}"
-      id="{{input.id}}"
-      data-address="{{input.uAddress}}"
-      data-evt="{{util.dataEvt(input, ['bindcontact'])}}"
-    >
-    {{input.value}}
-    </button>
-  </block>
-  <block wx:elif="{{input['open-type']=='getPhoneNumber'}}">
-    <button 
-      type="{{input.typeset||'default'}}" 
-      size="{{input.size||'mini'}}"
-      plain="{{input.plain}}"
-      disabled="{{input.disabled}}"
-      loading="{{input.loading}}"
-      open-type="{{input['open-type']}}"
-      lang="{{input.lang||'en'}}"
-      bindgetphonenumber="inputBtnMethod"
-      class="{{input.itemClass}}"
-      style="{{input.itemStyle}}"
-      id="{{input.id}}"
-      data-address="{{input.uAddress}}"
-      data-evt="{{util.dataEvt(input, ['bindgetphonenumber'])}}"
-    >
-    {{input.value}}
-    </button>
-  </block>
-  <block wx:elif="{{input['open-type']=='getUserInfo'}}">
-    <button 
-      type="{{input.typeset||'default'}}" 
-      size="{{input.size||'mini'}}"
-      plain="{{input.plain}}"
-      disabled="{{input.disabled}}"
-      loading="{{input.loading}}"
-      open-type="{{input['open-type']}}"
-      lang="{{input.lang||'en'}}"
-      bindgetuserinfo="inputBtnMethod"
-      class="{{input.itemClass}}"
-      style="{{input.itemStyle}}"
-      id="{{input.id}}"
-      data-address="{{input.uAddress}}"
-      data-evt="{{util.dataEvt(input, ['bindgetuserinfo'])}}"
-    >
-    {{input.value}}
-    </button>
-  </block>
-  <block wx:elif="{{input['open-type']=='openSetting'}}">
-    <button 
-      type="{{input.typeset||'default'}}" 
-      size="{{input.size||'mini'}}"
-      plain="{{input.plain}}"
-      disabled="{{input.disabled}}"
-      loading="{{input.loading}}"
-      open-type="{{input['open-type']}}"
-      lang="{{input.lang||'en'}}"
-      bindopensetting="inputBtnMethod"
-      class="{{input.itemClass}}"
-      style="{{input.itemStyle}}"
-      id="{{input.id}}"
-      data-address="{{input.uAddress}}"
-      data-evt="{{util.dataEvt(input, ['bindopensetting'])}}"
-    >
-    {{input.value}}
-    </button>
-  </block>
-  <block wx:elif="{{input['open-type']=='launchApp'}}">
-    <!-- bindlaunchapp="{{input['bindlaunchapp']}}"
-    binderror="{{input['binderror']}}" -->
-    <button 
-      type="{{input.typeset||'default'}}" 
-      size="{{input.size||'mini'}}"
-      plain="{{input.plain}}"
-      disabled="{{input.disabled}}"
-      loading="{{input.loading}}"
-      open-type="{{input['open-type']}}"
-      lang="{{input.lang||'en'}}"
-      app-parameter	="{{input['app-parameter']}}"
-      bindlaunchapp="inputBtnMethod"
-      binderror="inputBtnMethod"
-      class="{{input.itemClass}}"
-      style="{{input.itemStyle}}"
-      id="{{input.id}}"
-      data-address="{{input.uAddress}}"
-      data-evt="{{util.dataEvt(input, ['bindlaunchapp', 'binderror'])}}"
-    >
-    {{input.value}}
-    </button>
-  </block>
-  <block wx:else>
-    <button 
-      type="{{input.typeset||'default'}}" 
-      size="{{input.size||'mini'}}"
-      plain="{{input.plain}}"
-      disabled="{{input.disabled}}"
-      loading="{{input.loading}}"
-      form-type="{{input['form-type']}}"
-      lang="{{input.lang||'en'}}"
+  <button 
+    type="{{input.typeset||'default'}}" 
+    size="{{input.size||'mini'}}"
+    plain="{{input.plain||''}}"
+    disabled="{{input.disabled||''}}"
+    loading="{{input.loading||''}}"    
+    lang="{{input.lang||'en'}}"
 
-      bind:tap="{{input['form-type'] ? undefined : 'inputItemMethod'}}"
-      class="{{input.itemClass}}"
-      style="{{input.itemStyle}}"
-      id="{{input.id}}"
-      data-address="{{input.uAddress}}"
-      data-evt="{{util.dataEvt(input, ['tap'])}}"
-    >
+    open-type="{{input['open-type']||''}}"
+    session-from="{{input['session-from']||''}}"
+    send-message-title="{{input['send-message-title']||''}}"
+    send-message-path="{{input['send-message-path']||''}}"
+    send-message-img="{{input['send-message-img']||''}}"
+    show-message-card	="{{input['show-message-card']||''}}"
+    bindcontact="{{input['open-type']=='contact' ? 'inputBtnMethod' : ''}}"
+    bindgetphonenumber="{{input['open-type']=='getPhoneNumber' ? 'inputBtnMethod' : ''}}"
+    bindgetuserinfo="{{input['open-type']=='getUserInfo' ? 'inputBtnMethod' : ''}}"
+    bindopensetting="{{input['open-type']=='openSetting' ? 'inputBtnMethod' : ''}}"
+    bind:tap="{{input['form-type'] ? '' : 'inputItemMethod'}}"
+
+    app-parameter	="{{input['app-parameter']||''}}"
+    bindlaunchapp="{{input['open-type']=='launchApp' ? 'inputBtnMethod' : ''}}"
+    binderror="{{input['open-type']=='launchApp' ? 'inputBtnMethod' : ''}}"
+
+    class="{{input.itemClass||''}}"
+    style="{{input.itemStyle||''}}"
+    id="{{input.id||''}}"
+    data-address="{{input.uAddress}}"
+    data-evt="{{util.dataEvt(input, ['bindcontact', 'bindgetphonenumber', 'bindgetuserinfo', 'bindopensetting', 'bindlaunchapp', 'binderror', 'tap'])}}"
+  >
     {{input.value}}
-    </button>
-  </block>
+  </button>
 </template>
 
 <template name="@slider">

@@ -702,24 +702,23 @@ Component({
         let curDate = getYmd(date)
         let curStamp = newDate(date).getTime()
         let instId = `${this.calenderId}-${curDate.year}-${curDate.month}`
-        let monInst = activePage.getElementsById(instId)  //测试一下 ？？？？
-
+        let monInst = activePage.getElementsById(instId)
+        
         // 单选
         if (type === 'single') {
-          monInst && monInst.hooks.emit('emptyChecked')
-          // this.hooks.emit('emptyMonthChecked')  // 先清空所有已选项
-          // this.hooks.one('emptyMonthChecked', function () {
-          //   monInst && monInst.hooks.emit('emptyChecked')
-          // })
+          this.hooks.emit('emptyMonthChecked')  // 先清空所有已选项
+          this.hooks.one('emptyMonthChecked', function () {
+            monInst && monInst.emptyChecked()
+          })
           value = [date]
         }
-
+        
         // 多选
         // ????
         if (type === 'multiple') {
           if (value.indexOf(date) === -1) {
-            this.hooks.one('emptyMonthChecked', function () {
-              monInst && monInst.hooks.emit('emptyChecked')
+            this.hooks.one('empty-multiple-checked', function () {
+              monInst && monInst.unChecked(date)
             })
             value.push(date)
           } else {
@@ -733,28 +732,30 @@ Component({
         // 选择范围
         if (type === 'range') {
           if (len === 0 || len === 2) {
-            value = [date]
+            this.value = value = [date]
+            len = 1
             this.hooks.emit('empty-month-checked') // 清空所有选择日期
             this.hooks.emit('monthShowStat')
-          } else {
-            if (len === 1) {
-              if (value[0] !== date) {
-                let zeroStamp = newDate(value[0]).getTime()
-                if (curStamp > zeroStamp) {
-                  value[1] = date
-                } else {
-                  if (curStamp < zeroStamp) {
-                    let theMon = this.$month(zeroStamp)
-                    if (theMon) {
-                      theMon.unChecked(zeroStamp)
-                    }
-                    value[0] = date
+          } 
+
+          if (len === 1) {
+            if (value[0] !== date) {
+              let zeroStamp = newDate(value[0]).getTime()
+              if (curStamp > zeroStamp) {
+                value[1] = date
+              } else {
+                if (curStamp < zeroStamp) {
+                  let theMon = this.$month(zeroStamp)
+                  if (theMon) {
+                    theMon.emptyChecked()
                   }
+                  value[0] = date
                 }
               }
-              // tintRange.call(this, value)
             }
+            // tintRange.call(this, value)
           }
+
         }
 
         this.value = value

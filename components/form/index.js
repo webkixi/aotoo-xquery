@@ -718,6 +718,7 @@ Component({
                   } else {
                     if (lib.isObject(myval)) {
                       let resault = Object.assign({}, res.inputData, myval)
+                      res.inputData = result
                       willUpdate[res.address] = resault
                     }
                   }

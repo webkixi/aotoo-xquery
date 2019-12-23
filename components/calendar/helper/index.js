@@ -245,18 +245,25 @@ export function completeMonth(timestart) {
       //   ori.itemClass = 'valid invalid'
       //   delete ori.tap
       // }
-
-      return ori
+      // return ori
     } else {
       if (_num <= theMonthCount) {
         ori.itemClass = 'valid invalid'
         ori.valid = false
         ori.tap = undefined
-        return ori
+        // return ori
+      } else {
+        // return {title: num, itemClass: 'valid invalid'}
+        ori =  {itemClass: 'valid invalid', ...num}
       }
-      // return {title: num, itemClass: 'valid invalid'}
-      return {itemClass: 'valid invalid', ...num}
     }
+    // return {originalDate: JSON.stringify(ori), ...ori}
+    // return {originalDate: lib.clone(ori), ...ori}
+    
+    return ori
+
+    // _ori = {originalDate: JSON.stringify(_ori), ...ori,}
+    // return _ori
   })
 
   res = [].concat(preArr, currentMonth, nextArr);
@@ -283,6 +290,7 @@ export function oneMonthListConfig(timestart) {
     let edgePoint = over || {}
     let others = []
     let nexts = []
+    let preset = []
     let firstStat = false
     let findStat = false
     for (let ii=0; ii<allMonths.length; ii++) {
@@ -291,18 +299,29 @@ export function oneMonthListConfig(timestart) {
       if (mon.year === firstPoint.year && mon.month === firstPoint.month) {
         firstStat = ii
       }
-      if ((firstStat || firstStat === 0) && ii>firstStat && (findStat === false)) {
-        nexts.push(`${that.calenderId}-${mon.year}-${mon.month}`)
+      
+      if ( 
+        firstStat === false || 
+        (~firstStat && ii >= firstStat && (findStat === false))
+
+        // ((firstStat || firstStat === 0) && ii>firstStat && (findStat === false))
+      ) {
+        preset.push(`${that.calenderId}-${mon.year}-${mon.month}`)
+
+        if ( (firstStat || firstStat===0) && ii >= firstStat) {
+          nexts.push(`${that.calenderId}-${mon.year}-${mon.month}`)
+        }
       }
 
       if (mon.year === edgePoint.year && mon.month === edgePoint.month) {
         findStat = ii
       }
+
       if ((findStat || findStat===0) && ii > findStat) {
         others.push(`${that.calenderId}-${mon.year}-${mon.month}`)
       }
     }
-    return { others, nexts }
+    return { others, nexts, preset }
   }
   
 
@@ -319,6 +338,7 @@ export function oneMonthListConfig(timestart) {
     let follow = getFollowMonths(curPoint, edgePoint)
     let others = follow.others
     let nexts = follow.nexts
+    let preset = follow.preset
 
     // that.calendar.children.forEach(child=>{
     //   child.visible(true)
@@ -332,7 +352,7 @@ export function oneMonthListConfig(timestart) {
     others.forEach(monInstId => {
       let handle = that.activePage.getElementsById(monInstId)
       if (handle) {
-        handle.visible(false)
+        // handle.visible(false)
         handle.hide()
         // let parent = handle.parent()
         // if (parent) {
@@ -344,7 +364,7 @@ export function oneMonthListConfig(timestart) {
     if (!nexts.length) {
       nexts.push(that.calenderId + '-' + edgeMonth)
     } else {
-      nexts.unshift(`${that.calenderId}-${curPoint.year}-${curPoint.month}`)
+      // nexts.unshift(`${that.calenderId}-${curPoint.year}-${curPoint.month}`)
     }
 
     let newEdgeDate = null // 自定义边界日期
@@ -378,8 +398,15 @@ export function oneMonthListConfig(timestart) {
         let edgeId = that.calenderId + '-' + edgeMonth
         let handle = that.activePage.getElementsById(monInstId)
         if (handle) {
+          // handle.visible(true)
+          handle.show()
+          let handleData = handle.getData().data
+          if (!handleData.length) {
+            handle.fillMonth()
+          }
           if (edgeId === monInstId) {
             // handle.hooks.emit('emptyChecked', {itemClass: 'invalid'})
+            handle.hooks.emit('restore-month-days')
             handle.tint(edgeDate, null, 'invalid')
           }
         }
@@ -423,17 +450,25 @@ export function oneMonthListConfig(timestart) {
            * 清空该月所有日期的选择状态
            */
           theMon.hooks.once('emptyChecked', function(cls={itemClass: 'selected'}) {
-            theMon.forEach(item => {
-              if (item.data && item.data.date) {
-                let date = item.data.date
-                let stamp = newDate(date).getTime()
-                if (stamp >= that.validStartDay && stamp <= that.validEndDay) {
-                  if (item.hasClass(cls.itemClass)) {
-                    item.removeClass(`${cls.itemClass} range`)
-                  }
-                }
-              }
-            })
+            theMon.hooks.emit('restore-month-days')
+            // theMon.forEach(item => {
+            //   if (item.data && item.data.date) {
+            //     let date = item.data.date
+            //     let stamp = newDate(date).getTime()
+            //     if (stamp >= that.validStartDay && stamp <= that.validEndDay) {
+            //       if (item.hasClass(cls.itemClass)) {
+            //         // let $data = originalMonthDays.find(function(it){
+            //         //   return it.date === date
+            //         // })
+            //         // if ($data) {
+            //         //   $data = lib.clone($data)
+            //         //   item.reset($data)
+            //         // }
+            //         item.removeClass(`${cls.itemClass} range`)
+            //       }
+            //     }
+            //   }
+            // })
           })
 
           that.hooks.on('update-month-days', function(param){
@@ -452,7 +487,12 @@ export function oneMonthListConfig(timestart) {
 
           // 批量恢复初始月数据
           that.hooks.on('restore-month-days', function(param={}) {
-            monthDays = originalMonthDays
+            theMon.hooks.emit('restore-month-days')
+          })
+
+          // 当前月实例恢复初始数据
+          theMon.hooks.once('restore-month-days', function(params) {
+            monthDays = lib.clone(originalMonthDays)
             if (theMon.lazyDisplay) {
               theMon.fillMonth()
             }
@@ -469,7 +509,7 @@ export function oneMonthListConfig(timestart) {
 
         // 恢复初始月数据
         restore(){
-          monthDays = originalMonthDays
+          monthDays = lib.clone(originalMonthDays)
         },
 
         // 当月是否可见
@@ -583,14 +623,16 @@ export function oneMonthListConfig(timestart) {
           let theMon = this
           let date = param.date
           that.setValue(date, function (val) {
+            inst.removeClass('range')
             if (checkType === 'multiple' && inst.hasClass('selected')) {
-              inst.removeClass('selected range')
+              inst.removeClass('selected')
             } else {
               inst.addClass('selected')
               
               // 开始选择时间段，类似携程的入住，离店
               if (rangeMode === 2) {
                 if (that.value.length === 1 && checkType === 'range') {
+                  // that.calendar.addClass('adjust-calendar-list-item')
                   periodValidDays(param, rangeCount)
                 }
               }
@@ -621,7 +663,12 @@ export function oneMonthListConfig(timestart) {
           // }, 100);
         },
 
+        emptyChecked(){
+          this.hooks.emit('emptyChecked')
+        },
+
         unChecked(targetDate){
+          // this.hooks.emit('emptyChecked')
           this.forEach(item=>{
             let data = item.data
             let date = data.date
@@ -738,7 +785,8 @@ export function calendarDays(timestart, total=30) {
   if (startPoint.year === endPoint.year) {
     count = endPoint.month - startPoint.month + 1
   } else {
-    count = 12 - startPoint.month + 1 + endPoint.month
+    let diffMonth = (endPoint.year - startPoint.year - 1) * 12
+    count = 12 - startPoint.month + 1 + endPoint.month + diffMonth
   }
 
   this.validStartDay = nowTime
