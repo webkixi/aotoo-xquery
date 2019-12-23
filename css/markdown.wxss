@@ -218,15 +218,15 @@
   margin: 15px 0;
   overflow: hidden;
 }
-.markdown-body .hr:before {
+/* .markdown-body .hr:before {
   content: "";
   display: table;
-}
-.markdown-body .hr:after {
+} */
+/* .markdown-body .hr:after {
   clear: both;
   content: "";
   display: table;
-}
+} */
 .markdown-body .table {
   border-collapse: collapse;
   border-spacing: 0;
@@ -303,6 +303,11 @@
 .markdown-body .dd {
   margin-left: 0;
 }
+
+.markdown-body .code {
+  display: inline;
+}
+
 .markdown-body .code,
 .markdown-body .pre {
   font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
@@ -394,15 +399,15 @@
 .markdown-body .text-bold {
   font-weight: 600 !important;
 }
-.markdown-body:before {
+/* .markdown-body:before {
   content: "";
   display: table;
-}
-.markdown-body:after {
+} */
+/* .markdown-body:after {
   clear: both;
   content: "";
   display: table;
-}
+} */
 .markdown-body .a:not([href]) {
   color: inherit;
   text-decoration: none;
