@@ -21,10 +21,30 @@ xquery包含以下这些特性
 * html支持
 * 方便扩展内置/外部插件 
 
-## 如何使用  
-clone或下载本项目，将目录放置在小程序项目中即可，如下图所示  
+> xquery源码中有`.styl`类型的样式文件，使用stylus命令行编译
 
+## 如何使用  
+clone或下载本项目，如下所示  
+
+### 源码目录
+    components 
+        ├─ aotoo ✔︎核心代码必须有
+        ├─ actionSide  弹窗组件
+        ├─ form  表单组件
+        ├─ calendar  日历组件
+        ├─ markit  文档组件
+        ├─ templates ✔︎模板
+        │
+       css  日历、文档、表单样式
+        │
+      app.json  注册全局组件
+
+ > 勾选文件必须有，属于核心文件，组件可以按照需求增减    
+
+#### 小程序放置目录
 ![](./css/structor.jpeg)
+
+
 
 ## 文件及目录说明  
 
