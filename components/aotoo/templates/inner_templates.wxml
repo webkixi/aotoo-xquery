@@ -125,8 +125,39 @@
   <ui-markit dataSource="{{props}}" textType="md" />
 </template>
 
-<template name="@switch">
-  <ui-switch item="{{props}}" />
+<template name="@button">
+  <button 
+    type="{{props.typeset||'default'}}" 
+    size="{{props.size||'mini'}}"
+    plain="{{props.plain||''}}"
+    disabled="{{props.disabled||''}}"
+    loading="{{props.loading||''}}"    
+    lang="{{props.lang||'en'}}"
+
+    open-type="{{props['open-type']||''}}"
+    session-from="{{props['session-from']||''}}"
+    send-message-title="{{props['send-message-title']||''}}"
+    send-message-path="{{props['send-message-path']||''}}"
+    send-message-img="{{props['send-message-img']||''}}"
+    show-message-card	="{{props['show-message-card']||''}}"
+    bindcontact="{{props['open-type']=='contact' ? 'inputBtnMethod' : ''}}"
+    bindgetphonenumber="{{props['open-type']=='getPhoneNumber' ? 'inputBtnMethod' : ''}}"
+    bindgetuserinfo="{{props['open-type']=='getUserInfo' ? 'inputBtnMethod' : ''}}"
+    bindopensetting="{{props['open-type']=='openSetting' ? 'inputBtnMethod' : ''}}"
+    bind:tap="{{props['form-type'] ? '' : 'inputItemMethod'}}"
+
+    app-parameter	="{{props['app-parameter']||''}}"
+    bindlaunchapp="{{props['open-type']=='launchApp' ? 'inputBtnMethod' : ''}}"
+    binderror="{{props['open-type']=='launchApp' ? 'inputBtnMethod' : ''}}"
+
+    class="{{props.itemClass||''}}"
+    style="{{props.itemStyle||''}}"
+    id="{{props.id||''}}"
+    data-address="{{props.uAddress}}"
+    data-evt="{{util.dataEvt(props, ['bindcontact', 'bindgetphonenumber', 'bindgetuserinfo', 'bindopensetting', 'bindlaunchapp', 'binderror', 'tap'])}}"
+  >
+    {{props.value}}
+  </button>
 </template>
 
 <template name="@url">

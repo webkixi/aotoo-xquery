@@ -66,6 +66,16 @@ export function _addClass(key, params, data) {
   }
 }
 
+export function _css(key, params, data) {
+  let upData = {}
+  if (data) {
+    let itStyle = params
+    data.itemStyle = itStyle
+    upData[key] = data
+    return upData
+  }
+}
+
 export function _removeClass(key, params, data) {
   if (!lib.isString(params)) return
   let upData = {}
@@ -192,6 +202,23 @@ export function listInstDelegate(treeid, listInst, from){
       getData(){
         return lib.clone(data)
       },
+      reset(param){
+        if (!param) return
+        let upData = {}
+        if (data) {
+          if (lib.isFunction(param)) {
+            data = param(data) || data
+          } else {
+            data = param
+          }
+          upData[key] = data
+          if (from === 'foreach') {
+            listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
+          } else {
+            listInst.update(upData)
+          }
+        }
+      },
       parent(param){
         if (!param) return listInst
         else {
@@ -200,6 +227,18 @@ export function listInstDelegate(treeid, listInst, from){
             return listInst.parent(param)
           }
           return listInst
+        }
+      },
+      css(params) {
+        // if (!lib.isString(params)) return
+        if (typeof params !== 'string') return
+        let styData = _css(key, params, data)
+        if (styData) {
+          if (from === 'foreach') {
+            listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, styData)
+          } else {
+            listInst.update(styData)
+          }
         }
       },
       toggleClass(cls) {
@@ -243,41 +282,24 @@ export function listInstDelegate(treeid, listInst, from){
       removeClass(params) {
         if (!lib.isString(params)) return
         let clsData = _removeClass(key, params, data)
-        // if (clsData) listInst.update(clsData)
         if (from === 'foreach') {
           listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, clsData)
         } else {
           listInst.update(clsData)
         }
-
-        // if (!lib.isString(params)) return
-        // let upData = {}
-        // if (data) {
-        //   params = params.replace(/\./g, '')
-        //   let cls = params.split(' ')
-        //   let itCls = (data.itemClass || ' ').split(' ')
-        //   let _cls = itCls.filter(c => cls.indexOf(c) === -1)
-        //   itCls = _cls
-        //   data.itemClass = (itCls.join(' ') || ' ')
-        //   upData[key] = data
-        //   listInst.update(upData)
-        // }
       },
       hasClass(params) {
         return _hasClass(params, data)
-        // if (data) {
-        //   let cls = params.split(' ')
-        //   let itCls = (data.itemClass || ' ').split(' ')
-        //   let _cls = cls.filter(c => itCls.indexOf(c) !== -1)
-        //   return cls.length === _cls.length
-        // }
       },
       update(params) {
         let upData = {}
         if (data) {
-          data = Object.assign({}, data, params)
+          if (lib.isFunction(params)) {
+            data = params(data) || data
+          } else {
+            data = Object.assign({}, data, params)
+          }
           upData[key] = data
-          // listInst.update(upData)
           if (from === 'foreach') {
             listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
           } else {
@@ -703,10 +725,14 @@ export const commonBehavior = (app, mytype) => {
 
       css: function (param = {}) {
         let cssStr = ''
-        Object.keys(param).forEach(attr => {
-          const val = param[attr]
-          cssStr += `${attr}: ${val};`
-        })
+        if (typeof param === 'string') {
+          cssStr = param
+        } else {
+          Object.keys(param).forEach(attr => {
+            const val = param[attr]
+            cssStr += `${attr}: ${val};`
+          })
+        }
         if (this.$$is == 'item') {
           this.setData({
             '$item.itemStyle': cssStr

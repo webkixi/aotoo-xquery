@@ -120,7 +120,7 @@ function core(params) {
       
       this.getElementsById = function(key) {
         if (key) {
-          return this.elements[key] || this.selectComponent('#'+key)
+          return this.elements[key] || this.selectComponent('#'+key) || this.selectComponent('.'+key)
         } else {
           return this.elements
         }

@@ -262,14 +262,14 @@ class _hooks {
         let hooksActionUniqId = fun.hooksActionUniqId || fun.name
         if (hooksActionUniqId) {
           let theFuns = this.actions[key]
-          let selectFunIndex
+          let selectFunIndex=-1
           if (theFuns) {
             theFuns.forEach(($f, ii) => {
               if ($f['hooksActionUniqId'] == hooksActionUniqId || $f.name === hooksActionUniqId) {
                 selectFunIndex = ii
               }
             })
-            if (selectFunIndex) {
+            if (~selectFunIndex) {
               theFuns.splice(selectFunIndex, 1)
             }
           }

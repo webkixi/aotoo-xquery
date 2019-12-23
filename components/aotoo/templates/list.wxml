@@ -35,6 +35,9 @@
     <block wx:elif="{{type && util.isObject(type) && type.isItem}}">
       <ui-item item="{{item}}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
     </block>
+    <block wx:elif="{{item.type && util.isObject(item.type) && item.type.isItem}}">
+      <ui-item item="{{item}}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+    </block>
     <block wx:elif="{{item.$$id}}">
       <ui-item item="{{item}}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
     </block>
