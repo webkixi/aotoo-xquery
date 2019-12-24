@@ -213,7 +213,7 @@ class htmlparser {
   }
 
   md(content, param={}){
-    param.listClass = 'markdown-body ' + (param.itemClass||param.class||'')
+    param.listClass = 'markdown-body ' + (param.listClass||param.class||'')
     marked.setOptions({
       highlight: function (code) {
         let val = hl.highlightAuto(code).value
