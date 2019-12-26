@@ -1,0 +1,8 @@
+<view class="container">
+  <view wx:if="{{mask}}" class="masker" bind:tap="closePop"></view>
+  <ui-item item="{{popConfig}}" />
+  <view class="func-btns" >
+    <view class="btn" bind:tap="showPop">显示</view>
+    <view class="btn" bind:tap="closePop">隐藏</view>
+  </view>
+</view>

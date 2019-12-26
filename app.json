@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/itempop/index",
     "pages/markdown/index",
     "pages/list/index",
     "pages/popup/index",
