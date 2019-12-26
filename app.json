@@ -1,22 +1,26 @@
 {
   "pages": [
-    "pages/index/index",
+    "pages/list/index",
+    "pages/popup/index",
+    "pages/item/index",
+    "pages/calendar/index",
+    "pages/markdown/index",
+    "pages/html/index"
   ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "xquery",
+    "navigationBarTextStyle": "black"
+  },
   "usingComponents": {
     "ui-item": "/components/aotoo/item/index",
     "ui-list": "/components/aotoo/list/index",
     "ui-tree": "/components/aotoo/tree/index",
     "ui-pop": "/components/actionSide/index",
     "ui-form": "/components/form/index",
-    "ui-slip": "/components/slip/index",
     "ui-markit": "/components/markit/index",
     "ui-calendar": "/components/calendar/index"
-  },
-  "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "xquery",
-    "navigationBarTextStyle": "black"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

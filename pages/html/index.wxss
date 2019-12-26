@@ -1,0 +1,75 @@
+@import '../../css/markdown.wxss';
+
+.boxer {
+  width: 100%;
+  position: relative;
+}
+.card-it {
+  width: 100vw;
+  margin: 0 auto;
+  background-color: #f5f5f5;
+  padding: 20px 0;
+}
+.card-container {
+  position: relative;
+  z-index: 1;
+  width: 234px;
+  height: 260px;
+  margin: 0 auto;
+  margin-bottom: 14px;
+  background: #fff;
+  padding: 20px 0;
+  transition: all 0.2s linear;
+}
+.card-container .for-img {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 18px;
+}
+.card-container .for-img .card-img {
+  width: 160px;
+  height: 160px;
+}
+.card-container .for-img .card-img image {
+  width: 160px;
+  height: 160px;
+}
+.card-container .for-title {
+  display: block;
+  font-size: 16px;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  font-weight: 400;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 0 10px 2px;
+}
+.card-container .for-desc {
+  display: block;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 0 10px 10px;
+  height: 18px;
+  font-size: 12px;
+  color: #b0b0b0;
+}
+.card-container .for-price {
+  display: block;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  text-align: center;
+  color: #ff6700;
+  margin: 0 10px 14px;
+}

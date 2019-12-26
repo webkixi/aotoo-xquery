@@ -1,0 +1,5 @@
+@import '../../css/markdown.wxss';
+
+.markdown-body .img{
+  padding-left: 0;
+}

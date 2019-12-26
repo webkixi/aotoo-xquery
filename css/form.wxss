@@ -1,0 +1,280 @@
+@font-face {
+  font-family: 'iconfont'; /* project id 1074841 */
+  src: url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.eot");
+  src: url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.eot?#iefix") format('embedded-opentype'), url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.woff2") format('woff2'), url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.woff") format('woff'), url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.ttf") format('truetype'), url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.svg#iconfont") format('svg');
+}
+/**
+  自定义radio checkbox
+*/
+.icon-dot,
+.icon-dot-small {
+  background: #f00;
+  background: #f00;
+  color: #fff;
+  font-size: 10px;
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 20rpx;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
+.icon-dot-small {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 16rpx;
+}
+.form-arrows:after {
+  content: '▲';
+  color: #999;
+  font-size: 22rpx;
+  margin-left: 10rpx;
+}
+.form-arrows-x:after {
+  content: '▼';
+  color: #4b9afc;
+  font-size: 22rpx;
+  margin-left: 10rpx;
+}
+.form-close-eye:before {
+  content: '\e65e';
+  color: #4b9afc;
+  font-size: 15rpx;
+  margin-left: 10rpx;
+}
+.form-eye:before {
+  content: '\e65d';
+  color: #999;
+  font-size: 15rpx;
+  margin-left: 10rpx;
+}
+.icon-arrows-r:after {
+  content: '\e618';
+  color: $arrow-default-color;
+}
+.icon-arrows-t:before {
+  content: '\e617';
+}
+.icon-arrows-b:before {
+  content: '\e616';
+}
+.icon-silence:before {
+  content: '\e74d';
+}
+.icon-eye:before {
+  content: '\e65d';
+}
+.icon-close-eye:before {
+  content: '\e65e';
+}
+.icon-right:before {
+  content: '\e660';
+}
+.input-container {
+  width: 96%;
+  margin: 0 auto;
+}
+.input-placeholder {
+  color: #ccc;
+  font-size: 28rpx;
+}
+input {
+  height: 3.34rem;
+  min-height: 3.34rem;
+  padding: 0 10px;
+}
+.input-profile-item-title,
+.input-item .profile-item-title {
+  color: #333;
+  font-size: 40rpx;
+  height: 104rpx;
+  line-height: 104rpx;
+}
+.input-profile-item-title.item-bb,
+.input-item .profile-item-title.item-bb,
+.input-item .profile-item-title {
+  border-bottom: 1px solid #e3e3e3;
+}
+.input-item {
+  display: block;
+}
+.input-item .profile-item-desc {
+  font-size: 30rpx;
+  color: #999;
+}
+.input-item .profile-item-required {
+  font-size: 30rpx;
+}
+.input-item .streamAims {
+  display: flex;
+  font-size: 22rpx;
+}
+.input-item .streamAims .streamAims-item {
+  margin-right: 30rpx;
+}
+.input-item-content {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  position: relative;
+  font-size: 28rpx;
+  padding: 18rpx 0;
+  border-bottom: 1px solid #ccc;
+  background: #fff;
+}
+.input-item-content.noborder {
+  border-bottom: none;
+}
+.input-item-content:last-child {
+  border-bottom: none;
+}
+.input-item-content .input-item-desc {
+  font-size: 24rpx;
+  padding-left: 10px;
+  color: #999;
+}
+.input-item-content .input-item-error {
+  font-size: 24rpx;
+  padding-left: 10px;
+  margin-top: 20rpx;
+  color: #f00;
+}
+.input-item-content .input-item-area {
+  color: #333;
+}
+.input-item-content .input-item-input {
+  color: #333;
+}
+.input-item-content .input-item-picker view {
+  flex: 1;
+}
+.input-item-content .input-item-passwd-eye {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.input-item-content .input-item-label {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye view.item-input-dropdown {
+  margin: 15px 10px;
+}
+.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye .input-item-dropdown {
+  font-size: 28rpx;
+}
+.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye .input-item-dropdown-options {
+  width: calc(100% - 80rpx);
+  min-height: 100px;
+  max-height: 100px;
+  background-color: #fff;
+  border: 1px solid #e3e3e3;
+  color: #666;
+  line-height: 80rpx;
+  position: absolute;
+  left: 10px;
+  top: calc(100% - 10px);
+  max-height: 200px;
+  height: 200px;
+  overflow: auto;
+}
+.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye .input-item-dropdown-options-item {
+  padding: 0 20rpx;
+}
+.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye .input-item-dropdown-options-item.active {
+  background-color: #2585cf;
+  color: #fff;
+}
+.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye .input-item-dropdown-options-item.disabled {
+  background-color: #ccc;
+  color: #fff;
+}
+.input-item-content .input-item-title {
+  min-width: 112rpx;
+  color: #333;
+  font-weight: bold;
+  height: 3.34rem;
+  line-height: 3.34rem;
+}
+.input-item-content .input-item-rc-group {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+}
+.input-item-content .input-item-rc-group .input-item-rc {
+  font-size: 28rpx;
+  position: relative;
+  margin-right: 40rpx;
+  display: flex;
+}
+.input-item-content .input-item-rc-group .input-item-checkbox,
+.input-item-content .input-item-rc-group .input-item-radio {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 2;
+}
+.input-item-content .input-item-rc-group .input-item-checkbox-after,
+.input-item-content .input-item-rc-group .input-item-radio-after {
+  margin-right: 10rpx;
+  order: -1;
+}
+.input-item-content .input-item-rc-group .input-item-checkbox-after:before,
+.input-item-content .input-item-rc-group .input-item-radio-after:before {
+  color: #e3e3e3;
+  font-size: 36rpx;
+}
+.input-item-content .input-item-rc-group .input-item-checkbox-after.checked:before,
+.input-item-content .input-item-rc-group .input-item-radio-after.checked:before {
+  color: #4b9afc;
+}
+.input-item-content .input-item-rc-group .input-item-checkbox-after:before {
+  content: '\e70b';
+}
+.input-item-content .input-item-rc-group .input-item-checkbox-after.checked:before {
+  content: '\e70c';
+}
+.input-item-content .input-item-rc-group .input-item-radio-after:before {
+  content: '\e76a';
+}
+.input-item-content .input-item-rc-group .input-item-radio-after.checked:before {
+  content: '\e624';
+}
+/*原生swtich样式调整-start*/
+/*swtich整体大小*/
+.wx-switch-input {
+  height: 62rpx !important;
+}
+.wx-switch-input:before {
+  height: 58rpx !important;
+}
+.wx-switch-input:after {
+  height: 58rpx !important;
+}
+.switch-sm .wx-switch-input {
+  zoom: 0.8;
+}
+.dingwei:after {
+  content: '♚';
+  font-size: 32px;
+}
+.star:after {
+  content: '★';
+  font-size: 32px;
+}
+.dd-demo {
+  border: 10px solid #f00;
+  box-sizing: border-box;
+  padding: 10px;
+}
+.dd-demo .input-item-area {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 10px;
+}

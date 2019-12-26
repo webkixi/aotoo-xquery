@@ -1,0 +1,4 @@
+<!--index.wxml-->
+<view class="container">
+  <ui-calendar dataSource="{{calendarConfig}}" />
+</view>

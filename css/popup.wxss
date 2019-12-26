@@ -1,0 +1,18 @@
+@import './page.wxss';
+
+.bot-body .hb-item {
+  padding: 10px;
+}
+
+.bot-body .hb-item:nth-child(odd){
+  background-color: #ccc;
+}
+
+.as-common-tb.bar,
+.actionSide-bot.bar,
+.actionSide-top.bar {
+  max-height: 60vh;
+  height: 50vh;
+}
+
+

@@ -1,0 +1,4 @@
+.anyClassName{
+  font-size: 40rpx;
+  font-weight: bold;
+}

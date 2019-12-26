@@ -83,16 +83,18 @@ ss-display-flex($flex-flow = row nowrap, $justify-content = flex-start, $align-i
 //iconfont
 .form-arrows
   &:after
-    content: '\e6b0'
+    content: '▲'
+    // content: '\e6b0'
     color: #999
-    font-size: 15rpx
+    font-size: 22rpx
     margin-left: 10rpx
 
 .form-arrows-x
   &:after
-    content: '\e794'
+    content: '▼'
+    // content: '\e794'
     color: $color-primary
-    font-size: 15rpx
+    font-size: 22rpx
     margin-left: 10rpx
 
 .form-close-eye
@@ -138,6 +140,11 @@ ss-display-flex($flex-flow = row nowrap, $justify-content = flex-start, $align-i
 
 
 $inputBC = $placeholderColor
+
+.input-container
+  width 96%
+  margin 0 auto
+
 //小程序自带bug 指定的类(.phcolor)目前不能起作用，需要用它的默认值.input-placeholder
 .input-placeholder      
   color: $placeholderColor
@@ -145,6 +152,7 @@ $inputBC = $placeholderColor
 input 
   height: $inputHeight
   min-height: @height
+  padding 0 10px
 
 //input title
 .input-profile-item-title
@@ -163,6 +171,7 @@ input
       @extends .input-profile-item-title.item-bb
     &-desc
       font-size 30rpx
+      color #999
     &-required
       font-size 30rpx  
   .streamAims
@@ -186,29 +195,22 @@ input
   .input-item
     // &-switch
     //   width: 82rpx !important
+    &-desc
+      font-size 24rpx
+      padding-left 10px
+      color #999
+    &-error
+      font-size 24rpx
+      padding-left 10px
+      margin-top 20rpx
+      color red
+    &-area
+      color: $inputColor
     &-input
       color: $inputColor
     &-picker 
       view
         flex: 1
-    &-dropdown
-      font-size 28rpx
-    &-dropdown-options
-      width calc(100% - 80rpx)
-      min-height 100px
-      max-height 100px
-      background-color #ffffff
-      border 1px solid #e3e3e3
-      color: #666
-      line-height 80rpx
-      position absolute
-      left 0
-      top calc(100% + 7px)
-      &-item
-        padding 0 20rpx
-        &:active
-          color: #fff
-          background-color #2585cf
     &-passwd-eye
       width 100%
       display flex
@@ -216,6 +218,41 @@ input
     &-label
       position relative
       flex: 1
+      display flex
+      flex-direction column
+      &.input-type-dropdown
+        .input-item-passwd-eye
+          view.item-input-dropdown
+            margin 15px 10px
+          .input-item
+            &-dropdown
+              font-size 28rpx
+            &-dropdown-options
+              width calc(100% - 80rpx)
+              min-height 100px
+              max-height 100px
+              background-color #ffffff
+              border 1px solid #e3e3e3
+              color: #666
+              line-height 80rpx
+              position absolute
+              left 10px
+              top calc(100% - 10px)
+              max-height: 200px;
+              height 200px
+              overflow auto
+              &-item
+                padding 0 20rpx
+                &.active
+                  background-color #2585cf
+                  // background-color blue
+                  color #fff
+                &.disabled
+                  background-color #ccc
+                  color #fff
+
+
+
     if ($isShowInputTitle)
       &-title
         min-width $labelMinwidth
@@ -226,21 +263,7 @@ input
         // margin-right: $labelMr
       // &-required
       //   font-size 30rpx
-    &-desc
-      flex 1
-      font-size 20rpx
-      // position absolute
-      // top: calc(100%)
-      // right: 0
-      // z-index 2
-    &-error
-      font-size 22rpx
-      color red
-      margin-top 20rpx
-      // position absolute
-      // top: calc(100%)
-      // left: 0
-      // z-index 2
+
     &-rc-group
       ss-display-flex(row wrap, flex-start)
       .input-item
@@ -292,3 +315,95 @@ input
 .switch-sm
   .wx-switch-input
     zoom: .8
+
+// ===============  
+
+
+
+$inputHeight = 2.34rem
+$inputLHeight = 3.34rem
+
+.dingwei
+  &:after
+    content: '♚'
+    font-size 32px
+
+.star
+  &:after
+    content: '★'
+    font-size 32px
+
+
+.dd-demo
+  border 10px solid red
+  box-sizing border-box
+  padding: 10px
+  .input-item-area
+    border-bottom 1px solid #eee
+    margin-bottom 10px
+
+// .switcher, .picker, .pickers
+//   .input-item-content
+//     .input-item-label
+//       height: $inputHeight
+//       line-height: $inputLHeight
+
+// .ckboxer, .rdboxer
+//   .input-item-content
+//     .input-item-label
+//       display flex
+//       flex-direction column
+//       justify-content: center
+
+
+// .input-item-content
+//   view.item-input-dropdown
+//     width: 100%;
+//     height: $inputHeight
+//     line-height: $inputLHeight
+//     // padding: 0 10px;
+    
+//   .input-item-rc-group 
+//     .input-item-rc
+//       margin-right 10px
+
+//   .input-type-rating
+//     display flex
+//     align-items: center
+//   .input-item
+//     .profile-item
+//     &-rating
+//       color red
+//       margin-right 10px
+//       &:after
+//         content: '☆'
+//         font-size 28px
+//       &.active
+//         &:after
+//           content: '★'
+//     &-title
+//       margin-bottom 10px
+//       height: $inputHeight
+//       line-height: $inputLHeight
+//     &-label
+//       font-family "iconfont" !important
+//       padding-left 20px
+//     &-dropdown-masker
+//       position: fixed; 
+//       left: 0; 
+//       top: 0; 
+//       width: 100%; 
+//       height: 100%; 
+//       box-sizing: border-box; 
+//       // border: 3px solid red
+
+// .icon-dot, .icon-arrows-r, .icon-arrows-t, .icon-arrows-b, .icon-silence,.icon-close-eye, .icon-right
+//   // font-family "iconfont" !important
+//   &:after
+//     font-size 16px
+//   &:before
+//     font-size 16px
+
+// .form-close-eye, .form-eye
+//   &:before
+//     font-size 18px
