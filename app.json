@@ -1,10 +1,10 @@
 {
   "pages": [
+    "pages/markdown/index",
     "pages/list/index",
     "pages/popup/index",
     "pages/item/index",
     "pages/calendar/index",
-    "pages/markdown/index",
     "pages/html/index"
   ],
   "window": {
