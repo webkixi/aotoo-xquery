@@ -624,11 +624,10 @@ export function oneMonthListConfig(timestart) {
           let date = param.date
           that.setValue(date, function (val) {
             inst.removeClass('range')
+            
             if (checkType === 'multiple' && inst.hasClass('selected')) {
               inst.removeClass('selected')
             } else {
-              inst.addClass('selected')
-              
               // 开始选择时间段，类似携程的入住，离店
               if (rangeMode === 2) {
                 if (that.value.length === 1 && checkType === 'range') {
@@ -636,11 +635,9 @@ export function oneMonthListConfig(timestart) {
                   periodValidDays(param, rangeCount)
                 }
               }
+              inst.addClass('selected')
             }
-            that.selectDate(e, param, inst)
-
-            // tap=selected?date=2019-11-21
-            // that.itemMethod.call(inst, e)
+            that.selectDate(e, param, inst) // tap=selected?date=2019-11-21 that.itemMethod.call(inst, e)
           })
         },
 

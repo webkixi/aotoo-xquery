@@ -97,11 +97,12 @@ function tintSelected(value=[]) {
   let val = value || this.value
   val.forEach(date => {
     if (date) {
-      let ymd = getYmd(date)
-      let id = `${that.calenderId}-${ymd.year}-${ymd.month}`
-      let inst = that.activePage.getElementsById(id)
+      let inst = that.$month(date)
       if (inst) {
         inst.setChecked(date)
+        that.hooks.one('emptyMonthChecked', function () {
+          inst && inst.emptyChecked()
+        })
       }
     }
   })
@@ -123,22 +124,31 @@ function tintRange(fromInit) {
   let endInst = activePage.getElementsById(endInstId)
 
   if (!value[1] && fromInit) {
-    // console.log(value[0], startInst);
     setTimeout(() => {
       startInst.setChecked(value[0])
     }, 300);
     return
   }
 
-  // let endInst = monInst
   this.hooks.off('empty-month-checked')
   this.hooks.one('empty-month-checked', function () {
-    if (!startInst) {
-      startInst = activePage.getElementsById(startInstId)
-      endInst = activePage.getElementsById(endInstId)
+    // if (!startInst) {
+    //   startInst = activePage.getElementsById(startInstId)
+    //   endInst = activePage.getElementsById(endInstId)
+    // }
+
+    if (startInst && endInst) {
+      let smDate = startInst.getDate()
+      let emDate = endInst.getDate()
+
+      // 同年、同月的场景下，只执行一次，避免性能损耗
+      if (smDate.year === emDate.year && smDate.month === emDate.month) {
+        startInst.hooks.emit('emptyChecked')
+      } else {
+        startInst.hooks.emit('emptyChecked')
+        endInst.hooks.emit('emptyChecked')
+      }
     }
-    startInst && startInst.hooks.emit('emptyChecked')
-    endInst && endInst.hooks.emit('emptyChecked')
   })
 
   let startStamp = newDate(value[0]).getTime()
@@ -502,10 +512,6 @@ Component({
         // scroll-view跳转
         that.hooks.once('scroll-into-view', function(param={}){
           that.calendar.update({ "type.scroll-into-view": param.id })
-          // let theCalendar = that.activePage.getElementsById(that.calenderId)
-          // if (theCalendar) {
-          //   theCalendar.update({ "type.scroll-into-view": param.id })
-          // }
         })
 
         // swiper 跳转
@@ -518,10 +524,6 @@ Component({
 
           if (param.index || param.index === 0){
             that.calendar.update({"type.current": param.index})
-            // let theCalendar = that.activePage.getElementsById(that.calenderId)
-            // if (theCalendar) {
-            //   theCalendar.update({ "type.current": param.index })
-            // }
           }
         })
 
@@ -717,7 +719,7 @@ Component({
         // ????
         if (type === 'multiple') {
           if (value.indexOf(date) === -1) {
-            this.hooks.one('empty-multiple-checked', function () {
+            this.hooks.one('emptyMonthChecked', function () {
               monInst && monInst.unChecked(date)
             })
             value.push(date)
