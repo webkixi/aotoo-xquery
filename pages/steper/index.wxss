@@ -1,0 +1,55 @@
+.container{
+  margin-top: 80px;
+  align-items: center;
+  justify-content: center;
+}
+
+.steper-class .htitles{
+  width: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 26px;
+}
+.steper-class .steper-reduce {
+  border: 1px solid #ccc;
+  border-right: none;
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all ease .3;
+}
+
+.steper-class .steper-reduce:active {
+  transform: scale(.96, .96);
+}
+
+.steper-class .steper-reduce.disable {
+  background-color: #efefef;
+  color: #999;
+}
+
+.steper-class .steper-counter {
+  border: 1px solid #ccc;
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.steper-class .steper-plus {
+  border: 1px solid #ccc;
+  border-left: none;
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.steper-class .steper-plus:active {
+  transform: scale(.96, .96);
+}
+.steper-class .steper-plus.disable {
+  background-color: #efefef;
+  color: #999;
+}

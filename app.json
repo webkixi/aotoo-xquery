@@ -1,7 +1,8 @@
 {
   "pages": [
-    "pages/itempop/index",
     "pages/markdown/index",
+    "pages/steper/index",
+    "pages/itempop/index",
     "pages/list/index",
     "pages/popup/index",
     "pages/item/index",

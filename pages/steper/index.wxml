@@ -1,0 +1,3 @@
+<view class="container">
+  <ui-item item="{{steperConfig}}" />
+</view>
