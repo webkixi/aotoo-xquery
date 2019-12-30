@@ -155,7 +155,7 @@ function core(params) {
         }
       })
 
-      wx.find = function(param, context) {
+      wx.$$find = function(param, context) {
         let id, cls
         let vars = app['_vars']
         if (param) {

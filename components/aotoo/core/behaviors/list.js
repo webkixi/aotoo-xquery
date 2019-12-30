@@ -403,7 +403,7 @@ export const listBehavior = function(app, mytype) {
       },
 
       find: function (params, bywhat) {
-        return wx.find(params, this)
+        return wx.$$find(params, this)
         // let index
         // if (lib.isString(params)) {
         //   let strNum = parseInt(params)

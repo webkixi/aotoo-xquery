@@ -195,7 +195,7 @@ export const itemBehavior = function(app, mytype) {
 
       // 根据类名查找子元素
       find(param){
-        return wx.find(param, this)
+        return wx.$$find(param, this)
         // let that = this
         // let id, cls
         // if (param && lib.isString(param)) {
