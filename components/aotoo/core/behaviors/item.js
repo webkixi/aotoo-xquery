@@ -191,7 +191,78 @@ export const itemBehavior = function(app, mytype) {
         }
 
         return this
-      }
+      },
+
+      // 根据类名查找子元素
+      find(param){
+        return wx.find(param, this)
+        // let that = this
+        // let id, cls
+        // if (param && lib.isString(param)) {
+        //   if (param.charAt(0) === '#') {
+        //     id = param.replace('#', '')
+        //   } else {
+        //     cls = param
+        //   }
+        // } else {
+        //   return this.children
+        // }
+
+        // function loopFindChildren(children) {
+        //   let childs = []
+        //   if (children.length) {
+        //     children.forEach(child => {
+        //       let childData = child.getData()
+        //       if ((id && childData.id === id) || (cls && child.hasClass(cls))) {
+        //         childs = childs.concat(child)
+        //       }
+        //       if (child.children) {
+        //         if (child.$$is === 'list') {
+        //           childs = childs.concat(child.find(param))
+        //         } else {
+        //           childs = childs.concat(loopFindChildren((child.children || [])))
+        //         }
+        //       }
+        //     })
+        //   }
+        //   return childs
+        // }
+
+        // if (this.children.length) {
+        //   let mychilds = loopFindChildren(this.children)
+        //   return {
+        //     data: mychilds,
+        //     length: mychilds.length,
+        //     forEach(cb){
+        //       if (lib.isFunction(cb)) {
+        //         mychilds.forEach(function(cld) {
+        //           cb.call(that, cld)
+        //         })
+        //       }
+        //     },
+        //     addClass(cls){
+        //       this.forEach(function(cld) {
+        //         cld.addClass(cls)
+        //       })
+        //     },
+        //     removeClass(cls){
+        //       this.forEach(function(cld) {
+        //         cld.removeClass(cls)
+        //       })
+        //     },
+        //     reset(param){
+        //       this.forEach(function(cld) {
+        //         cld.reset(param)
+        //       })
+        //     },
+        //     update(param){
+        //       this.forEach(function(cld) {
+        //         cld.update(param)
+        //       })
+        //     }
+        //   }
+        // }
+      },
     }
   })
 }

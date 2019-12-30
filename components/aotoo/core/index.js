@@ -10,7 +10,8 @@ import {
   listComponentBehavior,
   treeBehavior,
   treeComponentBehavior,
-  reactFun
+  reactFun,
+  fakeListInstance
 } from "./behaviors/index";
 
 import { 
@@ -153,6 +154,157 @@ function core(params) {
           }
         }
       })
+
+      wx.find = function(param, context) {
+        let id, cls
+        let vars = app['_vars']
+        if (param) {
+          if (lib.isString(param)) {
+            if (param.charAt(0) === '#') {
+              id = param.replace('#', '')
+            } else {
+              cls = param
+            }
+          }
+
+          function findChilds(ctx) {
+            if (!ctx) return null
+            let xxx = []
+            if (lib.isArray(ctx)) {
+              ctx.forEach(item=>{
+                if (item) {
+                  if (item.$$is === 'fakelist') {
+                    if (item.length) xxx = xxx.concat(findChilds(item.parentInst))
+                  } else {
+                    xxx = xxx.concat(findChilds(item))
+                  }
+                }
+              })
+            } else {
+              xxx = [ctx]
+              if (ctx.children && ctx.children.length) {
+                ctx.children.forEach(cld => {
+                  if (cld.children&&cld.children.length) {
+                    xxx = xxx.concat(findChilds(cld))
+                  } else {
+                    xxx = xxx.concat(cld)
+                  }
+                })
+              }
+            }
+            return xxx
+          }
+
+          let findScope = findChilds(context) || Object.entries(vars).map(item => item[1])
+          let findIt = []
+          findScope.forEach(inst => {
+            // let inst = item[1] 
+            let $data = inst.getData()
+            if ($data) {
+              if ((inst.$$is === 'list' || inst.$$is === 'fakelist') && !$data.isItem) {
+                let listInst = inst
+                let index = null
+                let bywhat = 'attr'
+                if (param && lib.isString(param)) {
+                  if (id) {
+                    bywhat = 'id'
+                  }
+                  if (param.charAt(0) === '.') {
+                    bywhat = 'class'
+                  }
+                }
+                if (inst.$$is === 'fakelist') {
+                  listInst = inst.parentInst
+                }
+                index = listInst.findIndex(param, bywhat)
+                if (index || index === 0) {
+                  if (!lib.isArray(index)) index = [index]
+                  if (lib.isArray(index)) {
+                    let datas = {}
+                    index.forEach(idx => {
+                      let item = listInst.data.$list.data[idx]
+                      item.__realIndex = idx
+                      if (item.$$id) {
+                        /** item作为实例来处理 */
+                      } else if (item.isItem) {
+                        /** item作为实例来处理 */
+                      } else {
+                        /** 此处的数据为非实例处理数据，需要封装 */
+                        datas[`data[${idx}]`] = item
+                      }
+                    })
+                    let tmpData = lib.clone(datas)
+                    findIt = findIt.concat(fakeListInstance(tmpData, listInst))
+                  }
+                }
+              }
+
+              if (id) {
+                if (id === $data.$$id || id === $data.id || id === inst.data.id) {
+                  findIt = findIt.concat(inst)
+                }
+              }
+
+              if (cls) {
+                if (inst.hasClass && inst.hasClass(cls)) {
+                  findIt = findIt.concat(inst)
+                } else {
+                  /** form及其他实例方法暂未有对应解决方案 */
+                }
+              }
+
+              if (param && lib.isObject(param)) {
+                let tmp = Object.entries(param)
+                let target = tmp[0]
+                if ($data[target[0]] && $data[target[0]] === target[1]) {
+                  findIt = findIt.concat(inst)
+                }
+              }
+            }
+          })
+
+          // 没有考虑form及非item/list的情况
+          if (findIt.length) {
+            return {
+              data: findIt,
+              length: findIt.length,
+              getData(){
+                return this.data
+              },
+              find(param){
+                return wx.find(param, this.data)
+              },
+              forEach(cb) {
+                if (lib.isFunction(cb)) {
+                  findIt.forEach(function (cld) {
+                    cb.call(that, cld)
+                  })
+                }
+              },
+              addClass(cls) {
+                this.forEach(function (cld) {
+                  cld.addClass && cld.addClass(cls)
+                })
+              },
+              removeClass(cls) {
+                this.forEach(function (cld) {
+                  cld.removeClass && cld.removeClass(cls)
+                })
+              },
+              reset(param) {
+                this.forEach(function (cld) {
+                  cld.reset && cld.reset(param)
+                })
+              },
+              update(param) {
+                this.forEach(function (cld) {
+                  cld.update && cld.update(param)
+                })
+              }
+            }
+          }
+        } 
+      }
 
       
       if (typeof oldReady == 'function') {

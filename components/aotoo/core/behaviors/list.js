@@ -43,6 +43,8 @@ function updateSelf(params) {
     if (list.header || list.footer) {
       list.header = list.header && resetItem(list.header, this)
       list.footer = list.footer && resetItem(list.footer, this)
+      list.header ? list.header.__header = true : ''
+      list.footer ? list.footer.__footer = true : ''
     }
     
     let mylist = list
@@ -105,6 +107,14 @@ export const listBehavior = function(app, mytype) {
       },
 
       ready: function () { //组件布局完成，这时可以获取节点信息，也可以操作节点
+        let that = this
+        this.activePage.hooks.one('onReady', function(){
+          that.children.forEach(child=>{
+            let $data = child.getData()
+            if ($data.__header) that.header = child
+            if ($data.__footer) that.footer = child
+          })
+        })
       }
     },
     methods: {
@@ -325,6 +335,10 @@ export const listBehavior = function(app, mytype) {
       findIndex: function (params, bywhat='attr') {
         let $selectIndex
         if (params) {
+          if (lib.isNumber(params)) {
+            return params
+          }
+
           if (params.type && params.currentTarget && params.changedTouches) {
             const dataset = params.currentTarget.dataset
             const treeid = dataset.treeid
@@ -334,6 +348,7 @@ export const listBehavior = function(app, mytype) {
               return 
             }
           }
+          
           let $list = this.data.$list
           let $data = $list.data
           for (let ii = 0; ii < $data.length; ii++) {
@@ -388,41 +403,51 @@ export const listBehavior = function(app, mytype) {
       },
 
       find: function (params, bywhat) {
-        let index
-        if (lib.isString(params)) {
-          let strNum = parseInt(params)
-          if (strNum && lib.isNumber(strNum)) {
-            params = strNum
-          }
-        }
+        return wx.find(params, this)
+        // let index
+        // if (lib.isString(params)) {
+        //   let strNum = parseInt(params)
+        //   if (strNum && lib.isNumber(strNum)) {
+        //     params = strNum
+        //   }
+        // }
 
-        if (lib.isNumber(params)) {
-          let $list = this.data.$list
-          let $data = $list.data
-          return $data[params]
-        } 
+        // // if (lib.isNumber(params)) {
+        // //   let $list = this.data.$list
+        // //   let $data = $list.data
+        // //   return $data[params]
+        // // } 
 
-        index = this.findIndex(params, bywhat)
-        if (index || index === 0) {
-          if (!lib.isArray(index)) index = [index]
-          if (lib.isArray(index)) {
-            // listInstDelegate
-            // return index.map((idx) => this.data.$list.data[idx])
+        // if (params && lib.isString(params)) {
+        //   if (params.charAt(0) === '#') {
+        //     bywhat = 'id'
+        //   } 
+        //   if (params.charAt(0) === '.') {
+        //     bywhat = 'class'
+        //   }
+        // }
 
-            let datas = {}
-            index.forEach(idx => {
-              let item = this.data.$list.data[idx]
-              item.__realIndex = idx
-              datas[`data[${idx}]`] = item
-            })
-            let tmpData = lib.clone(datas)
-            return fakeListInstance(tmpData, this)
-          }
+        // index = this.findIndex(params, bywhat)
+        // if (index || index === 0) {
+        //   if (!lib.isArray(index)) index = [index]
+        //   if (lib.isArray(index)) {
+        //     // listInstDelegate
+        //     // return index.map((idx) => this.data.$list.data[idx])
 
-          let res = this.data.$list.data[index]
-          res.__realIndex = index
-          return res
-        }
+        //     let datas = {}
+        //     index.forEach(idx => {
+        //       let item = this.data.$list.data[idx]
+        //       item.__realIndex = idx
+        //       datas[`data[${idx}]`] = item
+        //     })
+        //     let tmpData = lib.clone(datas)
+        //     return fakeListInstance(tmpData, this)
+        //   }
+
+        //   let res = this.data.$list.data[index]
+        //   res.__realIndex = index
+        //   return res
+        // }
       },
 
       findAndUpdate: function (params, cb) {

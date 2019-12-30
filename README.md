@@ -9,6 +9,9 @@
 # XQUERY
 xquery是一个开发库(小程序原生)，剥离自原项目aotoo-hub，xquery基于小程序类似于jquery基于web，可以方便的融入到现有的小程序项目中  
 
+小程序社区： https://developers.weixin.qq.com/community/personal/oCJUsw9JDs23M0Y9XuAMiTuUX214  
+更多说明及demo代码片段  
+
 xquery包含以下这些特性  
 
 * 组件选取
@@ -26,7 +29,7 @@ xquery包含以下这些特性
 ## 如何使用  
 clone或下载本项目  
 * 本项目本身是一个完整的小程序示例demo，引入小程序开发工具中即可直接打开  
-* 或者导入下例核心文件及配置，可以融入到已有项目中
+* 或者导入下例核心文件及配置，可以融入到已有项目中  
 
 ### 源码目录
     components 

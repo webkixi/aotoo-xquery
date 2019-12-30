@@ -93,6 +93,7 @@ export function _removeClass(key, params, data) {
 
 export function _hasClass(params, data) {
   if (data) {
+    params = params.replace(/\./g, '')
     let cls = params.split(' ')
     let itCls = (data.itemClass || ' ').split(' ')
     let _cls = cls.filter(c => itCls.indexOf(c) !== -1)
@@ -103,6 +104,8 @@ export function _hasClass(params, data) {
 // tmpData 数据格式 {"data[1]": {}, "data[2]": {}}
 export function fakeListInstance(tmpData, listInst) {
   return {
+    $$is: 'fakelist',
+    parentInst: listInst,
     length: Object.keys(tmpData).length,
     data: tmpData,
     getData() {
@@ -143,6 +146,15 @@ export function fakeListInstance(tmpData, listInst) {
         // }
       })
       listInst.update(forEachTmp)
+    },
+    hasClass(params){
+      let hasCls = false
+      Object.keys(tmpData).forEach(key => {
+        let data = tmpData[key]
+        let clsData = _hasClass(params, data)
+        if (clsData) hasCls = true
+      })
+      return hasCls
     },
     addClass(params) {
       if (!lib.isString(params)) return
@@ -198,9 +210,11 @@ export function listInstDelegate(treeid, listInst, from){
     let key = `data[${index}]`
     return {
       treeid,
+      parentInst: listInst,
       data: lib.clone(data),
       getData(){
-        return lib.clone(data)
+        // return lib.clone(data)
+        return this.data
       },
       reset(param){
         if (!param) return
@@ -599,7 +613,7 @@ export const commonBehavior = (app, mytype) => {
          * }
         */
         if (this.__ready&&lib.isFunction(this.__ready)) {
-          this.__ready()
+          setTimeout(this.__ready.bind(this), 50);
         }
 
         // let activePage = this.activePage
@@ -625,11 +639,11 @@ export const commonBehavior = (app, mytype) => {
       }
     },
     methods: {
-      __getAppVers(param){
-        if (lib.isString(param)) {
-          return app['_vars'][param]
-        }
-      },
+      // __getAppVers(param){
+      //   if (lib.isString(param)) {
+      //     return app['_vars'][param]
+      //   }
+      // },
 
       parent(param, ctx){
         if (!ctx) ctx = this
@@ -845,7 +859,7 @@ export const commonBehavior = (app, mytype) => {
           let $is = this.$$is
           // let $id = this.data.id || this.properties.id
           let $id = ''
-          let $ds = this.data.$item || this.data.$list || this.data.dataSource
+          let $ds = this.data.$item || this.data.$list || this.data.$dataSource || this.data.dataSource
           let fromTree
           let fromComponent = this.data.fromComponent || ($ds && $ds['fromComponent'])
 
@@ -1033,6 +1047,16 @@ export const commonMethodBehavior = (app, mytype) => {
   })
 }
 
+function getParent(ctx, f) {
+  if (ctx.parentInst) {
+    if (ctx.parentInst[f]) {
+      return ctx.parentInst
+    } else {
+      return getParent(ctx.parentInst, f)
+    }
+  }
+}
+
 export function reactFun(app, e, prefix) {
   if (this.treeInst) {
     this.treeInst[(prefix ? 'catchItemMethod' : 'itemMethod')].call(this.treeInst, e, prefix)
@@ -1085,10 +1109,11 @@ export function reactFun(app, e, prefix) {
   }
   
   if (fun) {
-    let parentInstance = this._preGetAppVars(null, rEvt)
-    if (lib.isEmpty(parentInstance)) {
-      parentInstance = undefined
+    let rootInstance = this._preGetAppVars(null, rEvt)
+    if (lib.isEmpty(rootInstance)) {
+      rootInstance = undefined
     }
+    let parentInstance = getParent(this, fun)
     
     e.currentTarget.dataset._query = param
     const evtFun = activePage[fun] || app.activePage[fun]
@@ -1098,17 +1123,18 @@ export function reactFun(app, e, prefix) {
     if (vals) {
 
     } else {
-      let rootInstance = parentInstance
-      function getParent(ctx, f){
-        if (ctx.parentInst) {
-          if (ctx.parentInst[f]) {
-            return ctx.parentInst
-          } else {
-            return getParent(ctx.parentInst, f)
-          }
-        }
-      }
-      parentInstance = getParent(this, fun)
+      // let rootInstance = rootInstance
+      // function getParent(ctx, f){
+      //   if (ctx.parentInst) {
+      //     if (ctx.parentInst[f]) {
+      //       return ctx.parentInst
+      //     } else {
+      //       return getParent(ctx.parentInst, f)
+      //     }
+      //   }
+      // }
+      // parentInstance = getParent(this, fun)
+
       if (lib.isFunction(thisFun)) {
         thisFun.call(this, e, param, context)
       } else if (parentInstance) {
