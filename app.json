@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/tabpro/index",
     "pages/markdown/index",
     "pages/tab/index",
     "pages/steper/index",

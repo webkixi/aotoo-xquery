@@ -1,0 +1,3 @@
+<view class="container">
+  <ui-list list="{{tabConfig}}" class="tab-boxer" />
+</view>
