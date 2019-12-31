@@ -102,17 +102,22 @@ export function _hasClass(params, data) {
 }
 
 // tmpData 数据格式 {"data[1]": {}, "data[2]": {}}
-export function fakeListInstance(tmpData, listInst) {
+export function fakeListInstance(temp_data, listInst) {
+  let theOldTempData = temp_data
   return {
     $$is: 'fakelist',
     parentInst: listInst,
-    length: Object.keys(tmpData).length,
-    data: tmpData,
+    length: Object.keys(temp_data).length,
+    data: lib.clone(temp_data),
     getData() {
-      return tmpData
+      return this.data
+    },
+    reset(){
+      this.data = lib.clone(theOldTempData)
     },
     forEach(cb) {
       let forEachTmp = {}
+      let tmpData = this.data
       let datas = Object.keys(tmpData)
       datas.forEach((key, ii) => {
         // let _data = {[key]: tmpData[key]}
@@ -149,6 +154,7 @@ export function fakeListInstance(tmpData, listInst) {
     },
     hasClass(params){
       let hasCls = false
+      let tmpData = this.data
       Object.keys(tmpData).forEach(key => {
         let data = tmpData[key]
         let clsData = _hasClass(params, data)
@@ -157,6 +163,7 @@ export function fakeListInstance(tmpData, listInst) {
       return hasCls
     },
     addClass(params) {
+      let tmpData = this.data
       if (!lib.isString(params)) return
       Object.keys(tmpData).forEach(key => {
         let data = tmpData[key]
@@ -175,6 +182,7 @@ export function fakeListInstance(tmpData, listInst) {
       listInst.update(tmpData)
     },
     removeClass(params) {
+      let tmpData = this.data
       if (!lib.isString(params)) return
       Object.keys(tmpData).forEach(key => {
         let data = tmpData[key]
@@ -193,6 +201,7 @@ export function fakeListInstance(tmpData, listInst) {
       listInst.update(tmpData)
     },
     update(params) {
+      let tmpData = this.data
       Object.keys(tmpData).forEach(key => {
         let data = tmpData[key]
         data = Object.assign({}, data, params)

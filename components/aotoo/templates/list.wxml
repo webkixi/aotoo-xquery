@@ -113,7 +113,9 @@
   >
     <block wx:if="{{util.isArray(list.data)}}">
       <block wx:for="{{list.data}}" wx:key="__key">
-        <swiper-item>
+        <swiper-item
+          item-id="{{item.id || (item.attr && item.attr['id']) || ''}}"
+        >
           <template is="itemContent" data="{{item}}" />
         </swiper-item>
       </block>
