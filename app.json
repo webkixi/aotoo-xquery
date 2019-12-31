@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/tabside/index",
     "pages/tabpro/index",
     "pages/markdown/index",
     "pages/tab/index",
