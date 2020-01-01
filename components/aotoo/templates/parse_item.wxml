@@ -10,7 +10,7 @@
     id="{{item.id||''}}" 
     data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid']||item.attr['treeid']||'')}}"
     data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
-    selectable="{{item.selectable||''}}"
+    selectable="{{item.selectable||true}}"
     space="{{item.space||''}}"
     decode="{{item.decode||''}}"
   >{{item.text}}</text>

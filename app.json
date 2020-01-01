@@ -1,8 +1,8 @@
 {
   "pages": [
+    "pages/markdown/index",
     "pages/tabside/index",
     "pages/tabpro/index",
-    "pages/markdown/index",
     "pages/tab/index",
     "pages/steper/index",
     "pages/itempop/index",
