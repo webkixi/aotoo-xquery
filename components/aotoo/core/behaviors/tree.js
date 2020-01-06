@@ -8,10 +8,10 @@ import {
 export const treeBehavior = function(app, mytype) {
   mytype = mytype || 'tree'
   return Behavior({
-    behaviors: [listComponentBehavior(app, mytype)],
+    behaviors: [listBehavior(app, mytype)],
     lifetimes: {
       created: function created() {
-        this.$$is = 'tree'
+        // this.$$is = 'tree'
         this.childs = {}
       },
       ready: function() {

@@ -32,6 +32,8 @@ export function isArray(obj) {
 }
 
 export function isNumber(obj) {
+  if (obj === 0) return true
+  if (isNaN(obj)) return false
   return obj && objTypeof(obj) == 'number'
 }
 

@@ -41,15 +41,41 @@ function updateSelf(params) {
     // }
 
     if (list.header || list.footer) {
-      list.header = list.header && resetItem(list.header, this)
-      list.footer = list.footer && resetItem(list.footer, this)
-      list.header ? list.header.__header = true : ''
-      list.footer ? list.footer.__footer = true : ''
+      // list.header = list.header && resetItem(list.header, this)
+      // list.footer = list.footer && resetItem(list.footer, this)
+      // list.header ? list.header.__header = true : ''
+      // list.footer ? list.footer.__footer = true : ''
+      
+      if (list.header && lib.isObject(list.header)) {
+        let methods = list.header.methods
+        list.header.methods = null
+        list.header = resetItem(list.header, this)
+        list.header.methods = methods
+        list.header.__header = true
+      }
+
+      if (list.footer && lib.isObject(list.footer)) {
+        let methods = list.footer.methods
+        list.footer.methods = null
+        list.footer = resetItem(list.footer, this)
+        list.footer.methods = methods
+        list.footer.__footer = true
+      }
     }
     
     let mylist = list
-    const fromTree = this.data.fromTree
-    mylist = fromTree ? lib.listToTree.call(this, mylist, fromTree) : reSetList.call(this, list)
+    let fromTree = this.data.fromTree || mylist.fromTree
+    if (fromTree) {
+      this.__fromTree = fromTree
+    }
+
+    if (this.$$type === 'tree') {
+      mylist = reSetList.call(this, list)
+      mylist = lib.listToTree.call(this, mylist, fromTree)
+    } else {
+      mylist = reSetList.call(this, list)
+    }
+    // mylist = fromTree ? lib.listToTree.call(this, mylist, fromTree) : reSetList.call(this, list)
     this.setData({
       $list: mylist,
       props: listProps,
@@ -242,6 +268,9 @@ export const listBehavior = function(app, mytype) {
             if (param.data) {
               let tmp = reSetArray.call(this, param.data, that.data.props)
               param.data = tmp.data
+              if (this.$$type === 'tree') {
+                param = lib.listToTree.call(this, param)
+              }
             }
 
             if (param.methods && lib.isObject(param.methods)) {
@@ -268,7 +297,7 @@ export const listBehavior = function(app, mytype) {
                 if (param[key] || param[key] === 0 || typeof param[key] === 'boolean') {
                   let nkey = key.indexOf('$list.') == -1 ? '$list.' + key : key
                   let nval = param[key]
-                  if (isArray(nval)) {
+                  if (isArray(nval) && key!=='data') {
                     let $list = this.data.$list
                     if (lib.isObject(itemMethod)) {
                       $list.itemMethod = itemMethod
@@ -322,19 +351,114 @@ export const listBehavior = function(app, mytype) {
         }
       },
       
-      __newItem: function(params) {
-        if (lib.isArray(params)) {
-          return params.map(param => {
-            return reSetItemAttr.call(this, param, this.data.props)
-          })
+      __newItem: function(params, act) {
+        let self = this
+        if (this.$$type === 'tree') {
+          let treeProps = this.data.props
+          if (!lib.isArray(params)) {
+            params = [params]
+          }
+
+          if (lib.isArray(params)) {
+            function embedList(item, data) {
+              if (data.length) {
+                item['@list'] = {
+                  data,
+                  type: item.type,
+                  listClass: item.liClass || 'ul',
+                  itemClass: treeProps.itemClass || '',
+                  itemStyle: treeProps.itemStyle || '',
+                  show: item.hasOwnProperty('show') ? item.show : true,
+                  fromTree: self.__fromTree || self.uniqId,
+                  fromComponent: self.componentInst ? self.componentInst.uniqId : self.uniqId,
+                  __fromParent: self.uniqId,
+                  methods: {
+                    __ready() {
+                      if (self) {
+                        // self.childs[treeid] = this
+                        self.childs[item.idf] = this
+                      }
+                    }
+                  }
+                }
+              }
+              return item
+            }
+
+            function getChild(idf, ary) {
+              let tmp = []
+              ary.forEach(item=>{
+                if (item.$parent === idf) {
+                  if (item.idf) {
+                    let data = getChild(item.idf, ary)
+                    item = embedList(item, data)
+                  }
+                  tmp.push(item)
+                }
+              })
+              return tmp
+            }
+
+            let idfp = {};  // 有idf和parent
+            let olyp = {};  // 只有parent
+            let noip = [];  // 没有idf，没有parent
+            let idfs = {}   // 只有idf
+
+            params.forEach(item=>{
+              if (item.parent) {
+                item.$parent = item.parent
+                delete item.parent
+              }
+
+              if (item.$parent) {
+                if (item.idf) {
+                  idfp[item.$parent] = (idfp[item.$parent] || [item]).concat(getChild(item.idf, params))
+                } else {
+                  olyp[item.$parent] = (olyp[item.$parent]||[]).push(item)
+                }
+              } else {
+                if (item.idf) {
+                  // idfs[item.idf] = (idfs[item.idf]||[item]).concat(getChild(item.idf, params))
+                  let data = getChild(item.idf, params)
+                  item = embedList(item, data)
+                } 
+                noip.push(item)
+              }
+            })
+
+            if (!lib.isEmpty(olyp)) {
+              Object.keys(olyp).forEach(idf => {
+                this.childs[idf] && this.childs[idf][act](olyp[idf])
+              })
+            }
+
+            if (!lib.isEmpty(idfp)) {
+              Object.keys(idfp).forEach(idf => {
+                let val = idfp[idf]
+                let item = val.splice(0, 1)
+                item = embedList(item, val)
+                this.childs[idf] && this.childs[idf][act](item)
+              })
+            }
+
+            return noip.map(param => {
+              return reSetItemAttr.call(this, param, treeProps)
+            })
+          }
         } else {
-          return reSetItemAttr.call(this, params, this.data.props)
+          if (lib.isArray(params)) {
+            return params.map(param => {
+              return reSetItemAttr.call(this, param, this.data.props)
+            })
+          } else {
+            return reSetItemAttr.call(this, params, this.data.props)
+          }
         }
       },
 
       findIndex: function (params, bywhat='attr') {
         let $selectIndex
-        if (params) {
+        if (params || params === 0) {
           if (lib.isNumber(params)) {
             return params
           }
@@ -477,7 +601,7 @@ export const listBehavior = function(app, mytype) {
           let $list = this.data.$list
           let $data = $list.data
           let appendFun = (opts) => {
-            $list.data = $data.concat(that.__newItem(opts))
+            $list.data = $data.concat(that.__newItem(opts, 'append'))
             that.setData({$list})
           }
 
@@ -502,7 +626,7 @@ export const listBehavior = function(app, mytype) {
           let $list = this.data.$list
           let $data = $list.data
           let prependFun = (opts) => {
-            $list.data = [].concat(this.__newItem(opts)).concat($data)
+            $list.data = [].concat(this.__newItem(opts, 'prepend')).concat($data)
             that.setData({$list})
           }
 
@@ -540,7 +664,7 @@ export const listBehavior = function(app, mytype) {
           let $selectIndex = this.findIndex(params)
           let insertFun = (payload) => {
             if (payload) {
-              payload = that.__newItem(payload)
+              payload = that.__newItem(payload, 'insert')
               if ($selectIndex || $selectIndex == 0) {
                 $data.splice($selectIndex, 0, payload)
                 that.setData({ $list })

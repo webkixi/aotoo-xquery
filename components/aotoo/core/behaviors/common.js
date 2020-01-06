@@ -102,7 +102,7 @@ export function _hasClass(params, data) {
 }
 
 // tmpData 数据格式 {"data[1]": {}, "data[2]": {}}
-export function fakeListInstance(temp_data, listInst) {
+export function fakeListInstance(temp_data, listInst, listInstDelegate) {
   let theOldTempData = temp_data
   return {
     $$is: 'fakelist',
@@ -112,10 +112,17 @@ export function fakeListInstance(temp_data, listInst) {
     getData() {
       return this.data
     },
+    parent(param){
+      if (listInstDelegate) {
+        return listInstDelegate.parent(param)
+      }
+      return listInst.parent(param)
+    },
     reset(){
       this.data = lib.clone(theOldTempData)
     },
     forEach(cb) {
+      let that = this
       let forEachTmp = {}
       let tmpData = this.data
       let datas = Object.keys(tmpData)
@@ -125,6 +132,16 @@ export function fakeListInstance(temp_data, listInst) {
         if (lib.isFunction(cb)) {
           let context = {
             data: _data,
+            parent(param){
+              return that.parent(param)
+            },
+            getChilds(){
+              if (_data && _data.idf) {
+                let attr = _data.attr || {}
+                let treeid = attr.treeid || attr['data-treeid']
+                return listInst.childs[treeid]
+              }
+            },
             addClass(cls) {
               let clsData = _addClass(key, cls, _data)
               forEachTmp = Object.assign(forEachTmp, clsData)
@@ -250,6 +267,11 @@ export function listInstDelegate(treeid, listInst, from){
             return listInst.parent(param)
           }
           return listInst
+        }
+      },
+      getChilds(){
+        if (data && data.idf) {
+          return listInst.childs[treeid]
         }
       },
       css(params) {
@@ -378,7 +400,7 @@ export function listInstDelegate(treeid, listInst, from){
           }
         })
         let tmpData = lib.clone(_tmpData)
-        return fakeListInstance(tmpData, listInst)
+        return fakeListInstance(tmpData, listInst, this)
         // return {
         //   length: Object.keys(tmpData).length,
         //   data: tmpData,
@@ -545,9 +567,9 @@ export const commonBehavior = (app, mytype) => {
                 }
               })
             }
+            delete ds.methods
+            delete this.originalDataSource.methods
           }
-          delete ds.methods
-          delete this.originalDataSource.methods
         }
 
         let preSet = {
@@ -880,7 +902,7 @@ export const commonBehavior = (app, mytype) => {
             fromTree = this.data.fromTree || this.data.$list.fromTree
             if (lib.isString(fromTree)) {
               const treeInst = app['_vars'][fromTree]
-              $id ? treeInst['childs'][$id] = this : ''
+              // $id ? treeInst['childs'][$id] = this : ''
               this.treeInst = treeInst
             }
           }
@@ -1012,7 +1034,7 @@ export const commonMethodBehavior = (app, mytype) => {
 
         let oType = e.__type || e.type
         let nType = (prefix ? prefix + oType : oType).replace('catchcatch', 'catch')
-        let dsetEvtStr = dataset['evt'].replace(/_(tap|aim|catchtap|longpress|catchlongpress)/g, '$1').replace(/aim/g, 'catchtap')
+        let dsetEvtStr = dataset['evt'].replace(/_(tap|aim|catchtap|longpress|catchlongpress)/, '$1').replace(/aim=/g, 'catchtap=')
         // let dsetEvtStr = dataset['evt'].replace(/_/g, '').replace(/aim/g, 'catchtap')
         let dsetEvt = nType + '@@' + dsetEvtStr
         
@@ -1114,7 +1136,11 @@ export function reactFun(app, e, prefix) {
   let context = this
   if (dataset && (dataset['treeid'] || dataset['data-treeid']) && is === 'list') {
     let treeid = (dataset['treeid'] || dataset['data-treeid'])
-    context = listInstDelegate(treeid, this)
+    if (this.$$type === 'tree') {
+      context = this.find(treeid)
+    } else {
+      context = listInstDelegate(treeid, this)
+    }
   }
   
   if (fun) {

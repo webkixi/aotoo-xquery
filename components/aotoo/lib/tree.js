@@ -14,6 +14,8 @@ import {
   resetItem
 } from "./foritem";
 
+let self = null
+
 const filter = function(data, callback) { 
   if (isArray(data)) {
     return data.filter(callback)
@@ -41,12 +43,12 @@ function subTree(item, dataAry, deep, index){
     fromTree = this.fromTree
   }
 	let nsons = []
-	let sons = filter(dataAry, o => o.parent == item.idf)
+	let sons = filter(dataAry, o => o.$parent == item.idf)
 	sons.forEach( (son, ii) => {
 		let _clsName = son.itemClass || son.class
-    _clsName = valideClassName(_clsName, deep)
     son.itemClass = _clsName
 		if (son.idf && idrecode.indexOf(son.idf) == -1) {
+      son.itemClass = valideClassName(_clsName, deep)
 			idrecode.push(son.idf)
 			nsons = nsons.concat([subTree.call({fromTree}, son, dataAry, ++deep, ii)])
 			--deep
@@ -60,20 +62,31 @@ function subTree(item, dataAry, deep, index){
     const treeid = (item.attr && item.attr['data-treeid']) || index
     // const $id = item.$$id || item.id || `level${deep}-${treeid}`
     const $id = item.$$id || item.id || `${treeid}`
+    item.id = item.id || 'sort-' + treeid
 		item['@list'] = {
-      $$id: $id,
+      // $$id: $id,
       data: nsons,
       type: item.type,
       listClass: item.liClass || 'ul',
       itemClass: treeProps.itemClass||'',
       itemStyle: treeProps.itemStyle||'',
       show: item.hasOwnProperty('show') ? item.show : true,
-      fromComponent : fromTree
+      fromTree: self.__fromTree || self.uniqId,
+      fromComponent: self.componentInst ? self.componentInst.uniqId :  self && self.uniqId,
+      __fromParent: self && self.uniqId,
+      methods:{
+        __ready(){
+          if (self) {
+            self.childs[treeid] = this
+            self.childs[item.idf] = this
+          }
+        }
+      }
       // fromTree : fromTree
     }
-    // item['__sort'] = (item['__sort'] || []).concat('@list')
+    item['__sort'] = (item['__sort'] || []).concat('@list')
   }
-  item = resetItem(item)  //在list初始化中已经做过了
+  // item = resetItem(item)  //在list初始化中已经做过了
 	return item
 }
 
@@ -97,6 +110,23 @@ export function tree(dataAry, props, fromTree){
     itemClass: props.itemClass || props.class,
     itemStyle: props.itemStyle || props.style,
   }
+  dataAry = dataAry.map(item=>{
+    if (item && isObject(item)) {
+      if (item.parent) {
+        item.$parent = item.$parent || item.parent
+        delete item.parent
+      }
+      // if (item.idf && item.title) {
+      //   if (isObject(item.title)) {
+      //     item.title.itemClass = item.title.itemClass ? item.title.itemClass+' caption' : 'caption'
+      //   }
+      //   if (isString(item.title)) {
+      //     item.title = {title: item.title, itemClass: 'caption'}
+      //   }
+      // }
+    }
+    return item
+  })
   dataAry.forEach( (item, ii) => {
     treeDeep = 1
     if (typeof item === 'number' || typeof item === 'string') {
@@ -104,8 +134,8 @@ export function tree(dataAry, props, fromTree){
     }
     if (item && typeof item == 'object' && !Array.isArray(item)) {
       // item.fromTree = fromTree
-      item.fromComponent = fromTree
-      if (item.idf && !item.parent && idrecode.indexOf(item.idf) == -1) {
+      // item.fromComponent = fromTree
+      if (item.idf && !item.$parent && idrecode.indexOf(item.idf) == -1) {
         var clsName = item.itemClass || item.class
         clsName = clsName ? clsName.indexOf('level0') == -1 ? clsName + ' level0' : clsName : 'level0'
         item.itemClass = clsName
@@ -113,7 +143,7 @@ export function tree(dataAry, props, fromTree){
         nItem.__deep = treeDeep
         menus.push(nItem)
       }
-      if (!item.idf && !item.parent) {
+      if (!item.idf && !item.$parent) {
         menus.push(item)
       }
     }
@@ -129,6 +159,8 @@ export function tree(dataAry, props, fromTree){
 
 export function listToTree(_list, fromTree) {
   let list = clone(_list)
+  this.$flat = _list
+  self = this
   if (isObject(list) && list.data) {
     list.data = tree.call(this, list.data, list, fromTree)
   }

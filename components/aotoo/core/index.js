@@ -158,8 +158,11 @@ function core(params) {
       wx.$$find = function(param, context) {
         let id, cls
         let vars = app['_vars']
-        if (param) {
+        if (param||param === 0) {
           if (lib.isString(param)) {
+            let justit = that.getElementsById(param)
+            if (justit) return justit
+            if (vars[param]) return vars[param]  // 直接返回实例
             if (param.charAt(0) === '#') {
               id = param.replace('#', '')
             } else {
@@ -272,7 +275,7 @@ function core(params) {
                 return this.data
               },
               find(param){
-                return wx.find(param, this.data)
+                return wx.$$find(param, this.data)
               },
               forEach(cb) {
                 if (lib.isFunction(cb)) {

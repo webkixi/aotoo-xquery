@@ -86,11 +86,11 @@ export function resetItem(data, context, loop, attrkey) {
     if (context) {
       data.fromComponent = context.data.fromComponent || data.fromComponent || context.data.uniqId
       data.__fromParent = context.data.__fromParent
-      if (data.methods || data.itemMethod) {
+      if (data.methods) {
         if (attrkey&&attrkey.indexOf('@')>-1) {
           /** 不处理 @组件的methods */
         } else {
-          const methods = data.methods || data.itemMethod
+          const methods = data.methods
           Object.keys(methods).forEach(key=>{
             let fun = methods[key]
             if (isFunction(fun)) {

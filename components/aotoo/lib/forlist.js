@@ -26,9 +26,10 @@ export function reSetItemAttr(item, list){
   if (list.itemMethod ){
     var itm = list.itemMethod
     if (typeof itm == 'object') {
-      Object.keys(itm).forEach(evt=>{
-        item[evt] = itm[evt]
-      })
+      item = Object.assign({}, item, itm)
+      // Object.keys(itm).forEach(evt=>{
+      //   item[evt] = itm[evt]
+      // })
     }
   }
 
