@@ -11,7 +11,8 @@ import {
   treeBehavior,
   treeComponentBehavior,
   reactFun,
-  fakeListInstance
+  fakeListInstance,
+  listInstDelegate
 } from "./behaviors/index";
 
 import { 
@@ -24,6 +25,182 @@ import {
   upload,
   usualKit,
 } from "./utils";
+
+function mkFind(context, app){
+  let that = context
+  wx.$$find = function (param, context) {
+    let id, cls
+    let vars = app['_vars']
+    if (param||param === 0) {
+      if (lib.isString(param)) {
+        let justit = that.getElementsById(param)
+        if (justit) return justit
+        if (vars[param]) return vars[param]  // 直接返回实例
+        if (param.charAt(0) === '#') {
+          id = param.replace('#', '')
+        } else {
+          cls = param
+        }
+      }
+
+      function findChilds(ctx) {
+        if (!ctx) return null
+        let xxx = []
+        if (lib.isArray(ctx)) {
+          ctx.forEach(item=>{
+            if (item) {
+              if (item.$$is === 'fakelist') {
+                if (item.length) xxx = xxx.concat(findChilds(item.parentInst))
+              } else {
+                xxx = xxx.concat(findChilds(item))
+              }
+            }
+          })
+        } else {
+          xxx = [ctx]
+          if (ctx.children && ctx.children.length) {
+            ctx.children.forEach(cld => {
+              if (cld.children&&cld.children.length) {
+                xxx = xxx.concat(findChilds(cld))
+              } else {
+                xxx = xxx.concat(cld)
+              }
+            })
+          }
+        }
+        return xxx
+      }
+
+      let findScope = findChilds(context) || Object.entries(vars).map(item => item[1])
+      let findIt = []
+      findScope.forEach(inst => {
+        // let inst = item[1] 
+        let $data = inst.getData()
+        if ($data) {
+          if ((inst.$$is === 'list' || inst.$$is === 'fakelist') && !$data.isItem) {
+            let listInst = inst
+            let index = null
+            let bywhat = 'attr'
+            if (param && lib.isString(param)) {
+              if (id) {
+                bywhat = 'id'
+              }
+              if (param.charAt(0) === '.') {
+                bywhat = 'class'
+              }
+            }
+            if (inst.$$is === 'fakelist') {
+              listInst = inst.parentInst
+            }
+            index = listInst.findIndex(param, bywhat)
+            if (index || index === 0) {
+              if (!lib.isArray(index)) index = [index]
+              if (lib.isArray(index)) {
+                let datas = {}
+                index.forEach(idx => {
+                  let item = listInst.data.$list.data[idx]
+                  let treeid = item.attr['treeid'] || item.attr['data-treeid']
+                  item.__realIndex = idx
+                  if (item.$$id) {
+                    /** item作为实例来处理 */
+                  } else if (item.isItem) {
+                    /** item作为实例来处理 */
+                  } else {
+                    /** 此处的数据为非实例处理数据，需要封装 */
+                    datas[`data[${idx}]`] = item
+                    findIt = findIt.concat(listInstDelegate(item, listInst))
+                  }
+                })
+
+                // index.forEach(idx => {
+                //   let item = listInst.data.$list.data[idx]
+                //   let treeid = item.attr['treeid'] || item.attr['data-treeid']
+                //   item.__realIndex = idx
+                //   if (item.$$id) {
+                //     /** item作为实例来处理 */
+                //   } else if (item.isItem) {
+                //     /** item作为实例来处理 */
+                //   } else {
+                //     /** 此处的数据为非实例处理数据，需要封装 */
+                //     datas[`data[${idx}]`] = item
+                //   }
+                // })
+                // let tmpData = lib.clone(datas)
+                // findIt = findIt.concat(fakeListInstance(tmpData, listInst))
+              }
+            }
+          }
+
+          if (id) {
+            if (id === $data.$$id || id === $data.id || id === inst.data.id) {
+              findIt = findIt.concat(inst)
+            }
+          }
+
+          if (cls) {
+            if (inst.hasClass && inst.hasClass(cls)) {
+              findIt = findIt.concat(inst)
+            } else {
+              /** form及其他实例方法暂未有对应解决方案 */
+            }
+          }
+
+          if (param && lib.isObject(param)) {
+            let tmp = Object.entries(param)
+            let target = tmp[0]
+            if ($data[target[0]] && $data[target[0]] === target[1]) {
+              findIt = findIt.concat(inst)
+            }
+          }
+        }
+      })
+
+      // 没有考虑form及非item/list的情况
+      if (findIt.length) {
+        // if (findIt.length === 1) {
+        //   return findIt[0]
+        // }
+        return {
+          data: findIt,
+          length: findIt.length,
+          getData(){
+            return this.data
+          },
+          find(param){
+            return wx.$$find(param, this.data)
+          },
+          forEach(cb) {
+            if (lib.isFunction(cb)) {
+              findIt.forEach(function (cld) {
+                cb.call(that, cld)
+              })
+            }
+          },
+          addClass(cls) {
+            this.forEach(function (cld) {
+              cld.addClass && cld.addClass(cls)
+            })
+          },
+          removeClass(cls) {
+            this.forEach(function (cld) {
+              cld.removeClass && cld.removeClass(cls)
+            })
+          },
+          reset(param) {
+            this.forEach(function (cld) {
+              cld.reset && cld.reset(param)
+            })
+          },
+          update(param) {
+            this.forEach(function (cld) {
+              cld.update && cld.update(param)
+            })
+          }
+        }
+      }
+    } 
+  }.bind(context)
+}
 
 function pageDataElement(data) {
   let nData
@@ -139,8 +316,6 @@ function core(params) {
 
     const oldReady = params.onReady
     params.onReady = function() {
-      const that = this
-
       const elements = this.eles
       const actions = this.acts
       const actionIds = Object.keys(actions)
@@ -155,178 +330,34 @@ function core(params) {
         }
       })
 
-      wx.$$find = function(param, context) {
-        let id, cls
-        let vars = app['_vars']
-        if (param||param === 0) {
-          if (lib.isString(param)) {
-            let justit = that.getElementsById(param)
-            if (justit) return justit
-            if (vars[param]) return vars[param]  // 直接返回实例
-            if (param.charAt(0) === '#') {
-              id = param.replace('#', '')
-            } else {
-              cls = param
-            }
-          }
+      mkFind(this, app)
 
-          function findChilds(ctx) {
-            if (!ctx) return null
-            let xxx = []
-            if (lib.isArray(ctx)) {
-              ctx.forEach(item=>{
-                if (item) {
-                  if (item.$$is === 'fakelist') {
-                    if (item.length) xxx = xxx.concat(findChilds(item.parentInst))
-                  } else {
-                    xxx = xxx.concat(findChilds(item))
-                  }
-                }
-              })
-            } else {
-              xxx = [ctx]
-              if (ctx.children && ctx.children.length) {
-                ctx.children.forEach(cld => {
-                  if (cld.children&&cld.children.length) {
-                    xxx = xxx.concat(findChilds(cld))
-                  } else {
-                    xxx = xxx.concat(cld)
-                  }
-                })
-              }
-            }
-            return xxx
-          }
-
-          let findScope = findChilds(context) || Object.entries(vars).map(item => item[1])
-          let findIt = []
-          findScope.forEach(inst => {
-            // let inst = item[1] 
-            let $data = inst.getData()
-            if ($data) {
-              if ((inst.$$is === 'list' || inst.$$is === 'fakelist') && !$data.isItem) {
-                let listInst = inst
-                let index = null
-                let bywhat = 'attr'
-                if (param && lib.isString(param)) {
-                  if (id) {
-                    bywhat = 'id'
-                  }
-                  if (param.charAt(0) === '.') {
-                    bywhat = 'class'
-                  }
-                }
-                if (inst.$$is === 'fakelist') {
-                  listInst = inst.parentInst
-                }
-                index = listInst.findIndex(param, bywhat)
-                if (index || index === 0) {
-                  if (!lib.isArray(index)) index = [index]
-                  if (lib.isArray(index)) {
-                    let datas = {}
-                    index.forEach(idx => {
-                      let item = listInst.data.$list.data[idx]
-                      item.__realIndex = idx
-                      if (item.$$id) {
-                        /** item作为实例来处理 */
-                      } else if (item.isItem) {
-                        /** item作为实例来处理 */
-                      } else {
-                        /** 此处的数据为非实例处理数据，需要封装 */
-                        datas[`data[${idx}]`] = item
-                      }
-                    })
-                    let tmpData = lib.clone(datas)
-                    findIt = findIt.concat(fakeListInstance(tmpData, listInst))
-                  }
-                }
-              }
-
-              if (id) {
-                if (id === $data.$$id || id === $data.id || id === inst.data.id) {
-                  findIt = findIt.concat(inst)
-                }
-              }
-
-              if (cls) {
-                if (inst.hasClass && inst.hasClass(cls)) {
-                  findIt = findIt.concat(inst)
-                } else {
-                  /** form及其他实例方法暂未有对应解决方案 */
-                }
-              }
-
-              if (param && lib.isObject(param)) {
-                let tmp = Object.entries(param)
-                let target = tmp[0]
-                if ($data[target[0]] && $data[target[0]] === target[1]) {
-                  findIt = findIt.concat(inst)
-                }
-              }
-            }
-          })
-
-          // 没有考虑form及非item/list的情况
-          if (findIt.length) {
-            return {
-              data: findIt,
-              length: findIt.length,
-              getData(){
-                return this.data
-              },
-              find(param){
-                return wx.$$find(param, this.data)
-              },
-              forEach(cb) {
-                if (lib.isFunction(cb)) {
-                  findIt.forEach(function (cld) {
-                    cb.call(that, cld)
-                  })
-                }
-              },
-              addClass(cls) {
-                this.forEach(function (cld) {
-                  cld.addClass && cld.addClass(cls)
-                })
-              },
-              removeClass(cls) {
-                this.forEach(function (cld) {
-                  cld.removeClass && cld.removeClass(cls)
-                })
-              },
-              reset(param) {
-                this.forEach(function (cld) {
-                  cld.reset && cld.reset(param)
-                })
-              },
-              update(param) {
-                this.forEach(function (cld) {
-                  cld.update && cld.update(param)
-                })
-              }
-            }
-          }
-        } 
-      }
-
+      this.find = wx.$$find
       
       if (typeof oldReady == 'function') {
         oldReady.apply(this, arguments)
-        this.hooks.emit('onReady')
+        // this.hooks.emit('onReady')
         // setTimeout(() => {
         //   oldReady.apply(this, arguments)
         //   this.hooks.emit('onReady')
         // }, 150);
-      } else {
-        this.hooks.emit('onReady')
       }
+      setTimeout(() => {
+        this.hooks.emit('onReady')
+        this.rendered = true
+      }, 100);
     }
 
     const oldSshow = params.onShow
     params.onShow = function(){
+      // let pageStack = getCurrentPages()
+      // let curPage = pageStack[(pageStack.length-1)] || this
       if (this.__hide) {
+        mkFind(this, app)
         app.activePage = this
         activePage = this
+        // app.activePage = curPage
+        // activePage = curPage
       }
       this.__hide = false
       if (typeof oldSshow == 'function') {

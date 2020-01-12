@@ -64,10 +64,10 @@
       >{{props.text}}</text>
     </block>
     <block wx:elif="{{props.fromComponent}}">
-      <ui-item class="ui-item" item="{{props}}" fromComponent="{{props.fromComponent}}"/>
+      <ui-item item="{{props}}" fromComponent="{{props.fromComponent}}"/>
     </block>
     <block wx:else>
-      <ui-item class="ui-item" item="{{props}}"/>
+      <ui-item item="{{props}}"/>
     </block>
   </block>
 </template>

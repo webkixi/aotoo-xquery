@@ -144,6 +144,7 @@
     aria-label="{{ list.type['aria-label']||'' }}" 
     data-evt="{{util.dataEvt(list.type, ['bindscroll', 'bindscrolltolower', 'bindscrolltoupper'])}}"
   >
+    <slot name="scroll-top"></slot>
     <block wx:if="{{util.isArray(list.data)}}">
       <block wx:if="{{list.type.container}}">
         <view class="hlist {{list.listClass||list.class||''}}">
@@ -158,6 +159,7 @@
         </block>
       </block>
     </block>
+    <slot name="bottom"></slot>
   </scroll-view>
   <!-- <block wx:if="{{list.type['scroll-top'] && list.type['scroll-left']}}">
     <scroll-view 
@@ -266,6 +268,8 @@
 </template>
 
 <template name="mylist">
+  <slot name="header"></slot>
+  <slot></slot>
   <block wx:if="{{list.header}}">
     <ui-item item="{{list.header}}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
   </block>
@@ -280,6 +284,7 @@
   <block wx:if="{{list.footer}}">
     <ui-item item="{{list.footer}}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
   </block>
+  <slot name="footer"></slot>
 </template>
 
 

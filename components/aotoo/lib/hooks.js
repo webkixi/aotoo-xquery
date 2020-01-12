@@ -252,6 +252,10 @@ class _hooks {
       }
     }
   }
+  hasOn(key){
+    let myActions = this.actions
+    return myActions[key] ? myActions[key].length ? true : false : false
+  }
   off(key, fun) {
     if (isString(key)) {
       if (key === '*') {

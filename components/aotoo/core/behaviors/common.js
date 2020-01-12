@@ -230,7 +230,13 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
 }
 
 export function listInstDelegate(treeid, listInst, from){
-  let index = listInst.findIndex(treeid)
+  let index = null
+  if (treeid && (treeid.__realIndex || treeid.__realIndex===0)) {
+    index = treeid.__realIndex
+    treeid = treeid.attr['treeid'] || treeid.attr['data-treeid']
+  } else {
+    index = listInst.findIndex(treeid)
+  }
   if (index || index === 0) {
     let data = (listInst.getData()).data[index]
     let key = `data[${index}]`
@@ -644,7 +650,16 @@ export const commonBehavior = (app, mytype) => {
          * }
         */
         if (this.__ready&&lib.isFunction(this.__ready)) {
-          setTimeout(this.__ready.bind(this), 50);
+          let activePage = this.activePage
+          if (activePage.rendered) {
+            that.__ready()
+          } else {
+            this.activePage.hooks.on('onReady', function() {
+              // setTimeout(that.__ready.bind(that), 50);
+              // that.__ready.call(that)
+              that.__ready()
+            })
+          }
         }
 
         // let activePage = this.activePage

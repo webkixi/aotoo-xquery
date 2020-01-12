@@ -107,7 +107,9 @@
   </block>
 </template>
 
+<slot name="header"></slot>
 <slot name="top"></slot>
+<slot></slot>
 
 <block wx:if="{{util.isObject(item)}}">
   <template is="parse-part" data="{{item}}" />
@@ -119,5 +121,5 @@
   </block>
 </block>
 
-<slot ></slot>
 <slot name="bottom"></slot>
+<slot name="footer"></slot>

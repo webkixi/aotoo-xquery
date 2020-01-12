@@ -26,7 +26,9 @@ export function reSetItemAttr(item, list){
   if (list.itemMethod ){
     var itm = list.itemMethod
     if (typeof itm == 'object') {
-      item = Object.assign({}, item, itm)
+      if (!item.idf && item.title) {
+        item = Object.assign({}, itm, item)
+      }
       // Object.keys(itm).forEach(evt=>{
       //   item[evt] = itm[evt]
       // })
