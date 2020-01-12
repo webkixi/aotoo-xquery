@@ -334,6 +334,12 @@ function normInput(params, profile) {
           }
         }
       }
+    } else {
+      let thisProps = that.props
+      params.value = Object.assign({}, params.value, {
+        fromComponent: thisProps.fromComponent,
+        __fromParent: that.uniqId
+      })
     }
     return normAsset(params, inputAttributsAccessKeys)
   }
@@ -525,7 +531,10 @@ Component({
     }
   },
   methods: {
-    find: function (uid) {
+    find(param){
+      return wx.$$find(param, this)
+    },
+    findBYuid: function (uid) {
       let rightIt
       let rightIndex
       const $validInputs = this.data.$validInputs
@@ -560,7 +569,7 @@ Component({
       const $validInputs = this.data.$validInputs
       if (address && $validInputs.length) {
         const [profile_uid, input_uid] = address.split('.')
-        const res = this.find(profile_uid)
+        const res = this.findBYuid(profile_uid)
         if (res) {
           itemData = [res.info]
           itemIndex = res.index
@@ -630,26 +639,135 @@ Component({
       this.value(willEmpty)
     },
     
+    /**
+     * 
+     * @param {String} id 表单id
+     * @param {Object} val 表单配置
+     */
     profile: function (id, val) {
       const allocation = this.allocation
-      if (id) {
-        if (lib.isString(id)) {
-          const ipData = allocation[id]
-          const address = ipData['uAddress']
-          const profileId = address.split('.')[0]
-          let res = this.find(profileId)
-          if (res && val) {
-            if (lib.isObject(val)) {
-              res.info.profile = Object.assign(res.info.profile, val)
-              this.setData({
-                [`$validInputs[${res.index}]`]: res.info
-              })
-            }
+      const ipData = allocation[id]  // id必须为string类型
+      const address = ipData['uAddress']
+      const profileId = address.split('.')[0]
+      let res = this.findBYuid(profileId)
+      if (res && val) {
+        if (val) {
+          if (lib.isObject(val)) {
+            res.info.profile = Object.assign(res.info.profile, val)
+            this.setData({
+              [`$validInputs[${res.index}]`]: res.info
+            })
           }
+        } else {
+          return res
         }
       }
     },
 
+    /**
+     * 为某个表单添加类名
+     * @param {String|Object} id 表单id，表单配置
+     * @param {String} clsName 添加的类名，允许添加多个类名，如：'clsA clsB'
+     */
+    addClass(id, clsName){
+      let addInputClass = (inputId, clsnm) => {
+        clsnm = clsnm.replace(/\./g, '')
+        let ipData = this.getInputData(inputId)
+        let inputType = ipData.type
+        if (inputType === 'span') {
+          // ipData = ipData.value
+          let value = ipData.value
+          let itCls = value.itemClass && value.itemClass.split(' ') || ''
+          let itemClass = itCls[(itCls.length-1)]
+          let feature = value.$$id || value.id || itemClass
+          if(feature) {
+            let target = this.find(feature)
+            target&&target.addClass(clsnm)
+          }
+          return
+        }
+        let inputCls = ipData.inputClass || ipData.itemClass || ''
+        let ary = clsnm.split(' ')
+        let clsAry = ary.filter(cls => inputCls.indexOf(cls) === -1)
+        inputCls = inputCls + ' ' + clsAry.join(' ')
+        return inputType === 'span' ? {itemClass: inputCls} : {inputClass: inputCls}
+      }
+
+      if (lib.isObject(id)) {
+        let ary = Object.entries(id)
+        let upData = {}
+        ary.forEach(group=>{
+          let [$id, val] = group
+          let inputCls = addInputClass($id, val)
+          if (inputCls) {
+            upData[$id] = inputCls
+          }
+        })
+        this.value(upData)
+      } else {
+        let inputCls = addInputClass(id, clsName)
+        if (inputCls) {
+          this.value({
+            [id]: { inputClass: inputCls }
+          })
+        }
+      }
+    },
+
+    /**
+     * 为某个表单移除类名
+     * @param {String} id 表单id
+     * @param {String} clsName 移除的类名，允许移除多个类名，如：'clsA clsB'
+     */
+    removeClass(id, clsName){
+      let rmvInputClass = (id, clsnm) => {
+        clsnm = clsnm.replace(/\./g, '')
+        let ipData = this.getInputData(id)
+        let inputType = ipData.type
+        if (inputType === 'span') {
+          let value = ipData.value
+          let itCls = value.itemClass && value.itemClass.split(' ') || ''
+          let itemClass = itCls[(itCls.length - 1)]
+          let feature = value.$$id || value.id || itemClass
+          if (feature) {
+            let target = this.find(feature)
+            target&&target.removeClass(clsnm)
+          }
+          return
+        }
+        let inputCls = ipData.inputClass || ''
+        let ary = inputCls.split(' ')
+        let clsAry = ary.filter(cls => clsnm.indexOf(cls) === -1)
+        inputCls = clsAry.join(' ')
+        return inputType === 'span' ? {itemClass: inputCls} : {inputClass: inputCls}
+      }
+
+      if (lib.isObject(id)) {
+        let ary = Object.entries(id)
+        let upData = {}
+        ary.forEach(group => {
+          let [$id, val] = group
+          let inputCls = rmvInputClass($id, val)
+          if (inputCls) {
+            upData[$id] = inputCls
+          }
+        })
+        this.value(upData)
+      } else {
+        let inputCls = rmvInputClass(id, clsName)
+        if (inputCls) {
+          this.value({
+            [id]: { inputClass: inputCls }
+          })
+        }
+      }
+    },
+
+    /**
+     * 获取某个表单的value值
+     * @param {String|null} id 
+     * @param {Boolean} forData true获得完整数据，false只获取表单的value值
+     */
     getValue(id, forData){
       let val = this.value(id)
       if (val) {
@@ -660,6 +778,11 @@ Component({
       }
     },
 
+    /**
+     * 
+     * @param {String|Object} id 表单id，或者完整配置
+     * @param {String|Object} val 
+     */
     setValue(id, val){
       this.value(id, val)
     },
@@ -667,6 +790,19 @@ Component({
     setInputProfile(param={}){
       if (lib.isObject(param)) {
         this.value(param)
+      }
+    },
+
+    setInputData(param) {
+      this.setInputProfile(param)
+    },
+
+    getInputData(id) {
+      const allocation = this.allocation
+      if (id) {
+        if (lib.isString(id)) {
+          return allocation[id]
+        }
       }
     },
     
@@ -688,6 +824,7 @@ Component({
                   res.inputData = resault = normInput.call(this, resault, res.profile)
                   willUpdate = {[res.address]: resault}
                 } else {
+                  // 下拉菜单允许数组
                   if (lib.isArray(val) && inputType === 'dropdown') {
                     val = {titles: {data: val}}
                   }
@@ -718,7 +855,7 @@ Component({
                   } else {
                     if (lib.isObject(myval)) {
                       let resault = Object.assign({}, res.inputData, myval)
-                      res.inputData = result
+                      res.inputData = resault
                       willUpdate[res.address] = resault
                     }
                   }

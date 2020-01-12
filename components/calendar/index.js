@@ -158,10 +158,12 @@ function tintRange(fromInit) {
     this.hooks.emit('empty-month-checked')
   } else {
     if (startDate.month === endDate.month) {
-      startInst.tint(value[0], value[1], 'selected', 'end')
+      startInst && startInst.tint(value[0], value[1], 'selected', 'end')
     } else {
-      startInst.tint(value[0], null, 'selected', 'start')
-      endInst.tint(null, value[1], 'selected', 'end')
+      if (startInst) {
+        startInst && startInst.tint(value[0], null, 'selected', 'start')
+        endInst && endInst.tint(null, value[1], 'selected', 'end')
+      }
     }
   }
 }
@@ -295,6 +297,7 @@ function adapter(source={}) {
 
     // if (!total) throw new Error('必须指定范围天数, total')
     if (total) {
+      this.total = total
       dateList = []
 
       let modeConfig = {
@@ -374,6 +377,7 @@ function adapter(source={}) {
           let myDate = `${ymd.year}-${ymd.month}-1`
           let attrDate = `${ymd.year}-${ymd.month}`
           return {
+            id: `menus-${ymd.year}-${ymd.month}`,
             title: `${ymd.year}-${ymd.month}`,
             aim: `gotoMonth?ym=${myDate}`,
             attr: {date: attrDate}
@@ -392,14 +396,52 @@ function adapter(source={}) {
               that.header = this
               this.selectedElement = ''
             },
+            moveTo(){
+              // let sysInfo = that.sysInfo
+              // console.log(sysInfo);
+              // let query = wx.createSelectorQuery().in(this)
+              // query.selectAll('.calendar-nav >>> .calendar-nav-item').boundingClientRect(ret => {
+              //   if (ret.length) {
+              //     // console.log(ret);
+              //   }
+              // }).exec()
+            },
             selected(date){
               if (this.selectedElement===date) return
               this.selectedElement = date
-              let findIt = this.find({date})
-              if (findIt) {
-                this.forEach(item=>item.removeClass('selected'))
-                findIt.addClass('selected')
+              // this.moveTo()
+              // console.log(this.data.$list.data);
+              let datas = this.data.$list.data
+              let len = datas.length
+              let index = -1
+              this.forEach((item, ii) => {
+                let $date = item.data.title
+                if ($date === date) {
+                  index = ii
+                  item.addClass('.selected')
+                } else {
+                  if (item.hasClass('.selected')) item.removeClass('.selected')
+                }
+              })
+              if (~index) {
+                let target = -1
+                if (index === 0) {
+                  target = 0 
+                  this.update({ "type.scroll-left": 0 })
+                } else {
+                  target = index - 3
+                  if (target > -1) {
+                    let targetItem = datas[target]
+                    let targetId = targetItem.id
+                    this.update({ "type.scroll-into-view": targetId })
+                  }
+                }
               }
+              // let findIt = this.find({date})
+              // if (findIt) {
+              //   this.forEach(item=>item.removeClass('selected'))
+              //   findIt.addClass('selected')
+              // }
             },
             gotoMonth(e, param, inst){
               // inst.siblings().removeClass('selected')
@@ -422,10 +464,10 @@ function adapter(source={}) {
       $dateList: dateList
     }, function () {
       // console.log(that);
-      if (total) {
-        that.rendered = true
-        that.hooks.emit('render-calendar')
-      }
+      // if (total) {
+      //   that.rendered = true
+      //   that.hooks.emit('render-calendar')
+      // }
     })
   } catch (error) {
     console.error(error);
@@ -499,6 +541,7 @@ Component({
           }
         }).exec()
         let sysInfo = wx.getSystemInfoSync()
+        that.sysInfo = sysInfo
         that.query.selectAll('.calendar >>> .calendar-list-item').boundingClientRect(ret => {
           if (ret && ret.length) {
             that.elements.items = ret.map(item=>{
@@ -528,24 +571,21 @@ Component({
         })
 
         // 延时为了不去污染orienDataSource，保证原始数据不被污染
+        let $dl = that.data.$dateList
+        if (mode===1) {
+          if ($dl.type['scrollIntoView']) {
+            that.hooks.emit('scroll-into-view', {id: $dl.type['scrollIntoView']})
+          }
+        }
+
+        if (mode===2) {
+          if ($dl.type['scrollIntoView']) {
+            that.hooks.emit('swiper-current', {id: $dl.type['scrollIntoView']})
+          }
+        }
         setTimeout(() => {
           
-          let $dl = that.data.$dateList
-          if (mode===1) {
-            if ($dl.type['scrollIntoView']) {
-              that.hooks.emit('scroll-into-view', {id: $dl.type['scrollIntoView']})
-            }
-          }
 
-          if (mode===2) {
-            if ($dl.type['scrollIntoView']) {
-              that.hooks.emit('swiper-current', {id: $dl.type['scrollIntoView']})
-            }
-          }
-
-          setTimeout(() => {
-            that.hooks.emit('onReady')
-          }, 500);
         }, 100);
       })
     },
@@ -560,19 +600,18 @@ Component({
       if (that.$$id) {
         that.mount(that.$$id)
       }
+      if (this.total) {
+        that.rendered = true
+        this.activePage.hooks.on('onReady', function() {
+          setTimeout(() => {
+            that.hooks.emit('render-calendar')
+            that.hooks.emit('onReady')
+          }, 400);
+        })
+      }
     }
   },
   methods: {
-    // update(param){
-    //   let options = this.options
-    //   let start = options.start
-    //   let total = options.total
-    //   if (lib.isArray(param)) {
-    //     this.fillData = param
-    //     let ary = calendarDays.call(this, start, total)
-    //   }
-    // },
-
     getFestival(){
       return getFestival()
     },
@@ -604,12 +643,20 @@ Component({
           if (lib.isObject(params)) {
             params = Object.assign({}, this.options, params)
             adapter.call(this, params)
+            setTimeout(() => {
+              that.hooks.emit('render-calendar')
+              that.hooks.emit('onReady')
+            }, 400);
           }
         })
       } else {
         if (lib.isObject(params)) {
           params = Object.assign({}, this.options, params)
           adapter.call(this, params)
+          setTimeout(() => {
+            that.hooks.emit('render-calendar')
+            that.hooks.emit('onReady')
+          }, 400);
         }
       }
     },

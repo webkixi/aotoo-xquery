@@ -389,7 +389,10 @@
 </template>
 
 <template name="@span">
-  <ui-item wx:if="{{input.value}}" item="{{input.value}}" fromComponent="{{uniqId}}"/>
+  <block wx:if="{{input.value}}">
+    <!-- {{ input.value.itemClass = (input.value.inputClass||input.value.itemClass||'') }} -->
+    <ui-item item="{{input.value}}" fromComponent="{{uniqId}}"/>
+  </block>
 </template>
 
 <template name="whatTypeElement">
@@ -429,12 +432,12 @@
             ></text>
           </block>
           <block wx:elif="{{util.isString(input.eye)}}">
-            <text 
+            <view 
               catch:tap="openCloseEey" 
               data-address="{{input.uAddress}}" 
               class="{{input.eye}}" 
               data-evt="{{util.dataEvt(input, ['catchtap'])}}"
-            ></text>
+            ></view>
           </block>
           <block wx:else>
             <text 
