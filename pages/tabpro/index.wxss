@@ -1,3 +1,5 @@
+@import "../common/source.wxss";
+
 .container {
   display: flex;
   margin-top: 0;

@@ -1,3 +1,5 @@
+@import "../common/source.wxss";
+
 .container{
   margin-top: 80px;
   align-items: center;

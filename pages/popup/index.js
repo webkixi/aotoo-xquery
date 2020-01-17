@@ -2,13 +2,15 @@
 //获取应用实例
 const app = getApp()
 const Pager = require('../../components/aotoo/core/index')
+let source = require('../common/source')
 
 Pager({
   data: {
     popConfig: {
       $$id: 'modal',
       title: '窗口标题'
-    }
+    },
+    ...source
   },
 
   onReady(){

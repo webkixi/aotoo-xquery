@@ -2,6 +2,7 @@
 //获取应用实例
 const Pager = require('../../components/aotoo/core/index')
 let lib = Pager.lib
+let source = require('../common/source')
 
 function mkSteper(id=lib.suid('step_'), min, max, step=1) {
   return {
@@ -138,6 +139,7 @@ function mkSteper(id=lib.suid('step_'), min, max, step=1) {
 Pager({
   data: {
     steperConfig: mkSteper('steper'),
+    ...source
   },
   onReady(){
     let $steper = this.getElementsById('steper')

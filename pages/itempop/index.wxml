@@ -6,3 +6,5 @@
     <view class="btn" bind:tap="closePop">隐藏</view>
   </view>
 </view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />

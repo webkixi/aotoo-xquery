@@ -3,3 +3,5 @@
     <ui-list list="{{tabConfig}}" />
   </view>
 </view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />

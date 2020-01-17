@@ -611,7 +611,7 @@ Component({
     renderCalender(){
       let that = this
 
-      this.activePage.doReady(true)
+      // this.activePage.doReady(true)
       setTimeout(() => {
         that.hooks.emit('render-calendar')
         that.hooks.emit('onReady')

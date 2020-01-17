@@ -1,4 +1,9 @@
 @import '../../css/markdown.wxss';
+@import "../common/source.wxss";
+
+.container{
+  padding: 10px;
+}
 
 .markdown-body .img{
   padding-left: 0;

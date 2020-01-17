@@ -1,0 +1,7 @@
+<view class="container">
+  <ui-tree list="{{indexList}}" class="tab-boxer" >
+    <ui-item slot="top" item="{{searchConfig}}" />
+  </ui-tree>
+</view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />

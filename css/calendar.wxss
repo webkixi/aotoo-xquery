@@ -41,7 +41,8 @@
   background: #fff;
 }
 .calendar-list .calendar-list-item {
-  height: calc(114rpx * 5 + 92rpx);
+  /* height: calc(114rpx * 5 + 92rpx); */
+  min-height: 300px;
 }
 .calendar-list .calendar-list-item .invalid {
   color: #ccc;

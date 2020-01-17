@@ -2,6 +2,7 @@
 //获取应用实例
 const app = getApp()
 const Pager = require('../../components/aotoo/core/index')
+let source = require('../common/source')
 
 Pager({
   data: {
@@ -20,6 +21,7 @@ xquery是一个小程序的开发工具库
 ![xquery](/css/xquery.png#mode=aspectFit)
 `
     },
+    ...source
   },
 
   onReady(){}

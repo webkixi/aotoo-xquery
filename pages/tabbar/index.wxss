@@ -1,0 +1,23 @@
+@import "../../components/modules/tabbar.wxss";
+@import "../common/source.wxss";
+
+
+.container{
+  display: flex;
+  margin-top: 80px;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-boxer.demo1 {
+  bottom: 20%;
+}
+
+.tab-boxer.demo2 {
+  bottom: 40%;
+}
+
+.sticky-bar.bottom {
+  top: auto;
+  bottom: 60%;
+}

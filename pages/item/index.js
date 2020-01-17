@@ -2,6 +2,7 @@
 //获取应用实例
 const app = getApp()
 const Pager = require('../../components/aotoo/core/index')
+let source = require('../common/source')
 
 Pager({
   data: {
@@ -9,7 +10,8 @@ Pager({
       $$id: 'isItem',
       title: 'xquery的基础item组件',
       itemClass: 'anyClassName'
-    }
+    },
+    ...source
   },
 
   onReady(){

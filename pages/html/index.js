@@ -2,6 +2,7 @@
 //获取应用实例
 const app = getApp()
 const Pager = require('../../components/aotoo/core/index')
+let source = require('../common/source')
 
 Pager({
   data: {
@@ -24,6 +25,7 @@ Pager({
 </div>
 `
     },
+    ...source
   },
 
   onReady(){}

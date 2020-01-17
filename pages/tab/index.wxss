@@ -1,6 +1,8 @@
+@import "../common/source.wxss";
+
 .container{
   display: flex;
-  margin-top: 80px;
+  margin-top: 0;
   align-items: center;
   justify-content: center;
 }

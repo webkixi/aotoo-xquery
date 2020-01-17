@@ -1,4 +1,6 @@
 <!--index.wxml-->
 <view class="container">
-  <ui-calendar dataSource="{{calendarConfig}}" />
+  <ui-calendar wx:if="{{calendarConfig}}" dataSource="{{calendarConfig}}" />
 </view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />

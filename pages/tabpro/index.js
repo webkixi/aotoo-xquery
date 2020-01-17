@@ -6,6 +6,7 @@
  */
 const Pager = require('../../components/aotoo/core/index')
 let lib = Pager.lib
+let source = require('../common/source')
 
 function mkTab(id=lib.suid('step_'), options) {
   return {
@@ -101,6 +102,7 @@ function mkTab(id=lib.suid('step_'), options) {
 Pager({
   data: {
     tabConfig: mkTab('tabselect'),
+    ...source
   },
   onLoad(){
     this.hooks.once('set-content', function(param){

@@ -2,6 +2,7 @@
 //获取应用实例
 const app = getApp()
 const Pager = require('../../components/aotoo/core/index')
+let source = require('../common/source')
 
 const popConfig = {
   $$id: 'modal',
@@ -44,7 +45,8 @@ const popConfig = {
 Pager({
   data: {
     mask: false,
-    popConfig
+    popConfig,
+    ...source
   },
 
   closePop(e){

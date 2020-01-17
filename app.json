@@ -1,16 +1,18 @@
 {
   "pages": [
     "pages/markdown/index",
-    "pages/tabside/index",
+    "pages/html/index",
+    "pages/item/index",
     "pages/tabpro/index",
-    "pages/tab/index",
-    "pages/steper/index",
+    "pages/tabside/index",
     "pages/itempop/index",
     "pages/list/index",
     "pages/popup/index",
-    "pages/item/index",
+    "pages/indexlist/index",
     "pages/calendar/index",
-    "pages/html/index"
+    "pages/steper/index",
+    "pages/tab/index",
+    "pages/tabbar/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
