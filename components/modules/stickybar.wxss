@@ -1,0 +1,21 @@
+.sticky-bar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 30px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: royalblue;
+  color: #fff;
+}
+
+.sticky-bar.bottom {
+  top: auto;
+  bottom: 0;
+}
+
+.sticky-bar.code-button {
+  height: 60px;
+}

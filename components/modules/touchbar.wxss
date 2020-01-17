@@ -1,0 +1,67 @@
+.touchbar-cat {
+  position: fixed;
+  right: 2px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  width: 20px;
+  height: 86vh;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  z-index: 500;
+}
+
+.touchbar-cat .hlist{
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  font-size: 10px;
+}
+
+/* .touchbar-cat .hlist{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  box-sizing: border-box;
+  font-size: 10px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+} */
+
+.touchbar-cat .touchbar-cat-tips {
+  position: fixed;
+  width: 100px;
+  height: 100px;
+  background-color: red;
+  display: none;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.touchbar-cat .touchbar-cat-tips.active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.touchbar-cat .item{
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.touchbar-cat .item.active {
+  color: #fff;
+  background-color: rgb(86,191,106);
+  border-radius: 50%;
+}
