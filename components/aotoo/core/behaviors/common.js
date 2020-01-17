@@ -520,6 +520,29 @@ export const commonBehavior = (app, mytype) => {
         value: ''
       }
     },
+    definitionFilter(defFields, definitionFilterArr) {
+      // 监管组件的setData
+      defFields.methods = defFields.methods || {}
+      defFields.methods._setData_ = function (data, callback) {
+        let that = this
+        const originalSetData = this._originalSetData // 原始 setData
+        originalSetData.call(this, data, function() {
+          if (that.activePage) {
+            that.activePage.doReady()
+            if (lib.isFunction(callback)) {
+              callback()
+            }
+          } else {
+            that.hooks.on('__ready', function() {
+              that.activePage.doReady()
+              if (lib.isFunction(callback)) {
+                callback()
+              }
+            })
+          }
+        }) // 做 data 的 setData
+      }
+    },
     externalClasses: ['class-name'],
     relations: {},
     pageLifetimes: {
@@ -541,6 +564,8 @@ export const commonBehavior = (app, mytype) => {
         this.mounted = false
         this.children = []
         app['_vars'][this.uniqId] = this
+        this._originalSetData = this.setData // 原始 setData
+        this.setData = this._setData_ // 封装后的 setData
       },
       //节点树完成，可以用setData渲染节点，但无法操作节点
       attached: function () { //节点树完成，可以用setData渲染节点，但无法操作节点
@@ -651,16 +676,17 @@ export const commonBehavior = (app, mytype) => {
         this.init = false
         this.mounted = true
         this.activePage = app.activePage
-        this.hooks.emit('ready')
         // // let oriData = this.data.item || this.data.list || this.data.dataSource || {}
         // // this.originalDataSource = lib.clone(oriData)
-
-
-
-
+        
+        
+        
+        
         // this.mount()
-
+        
         this._mount()
+        this.hooks.emit('ready')
+        this.hooks.fire('__ready')
 
         // if (this.__ready) {
         //   console.log('======= 3333');

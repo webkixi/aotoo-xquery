@@ -316,9 +316,9 @@ function core(params) {
       this.setData = function (param, cb) {
         oldSetData.call(that, param, function () {
           if (lib.isFunction(cb)) {
+            that.doReady()
             cb()
           }
-          that.doReady()
         })
       }
       app.activePage = activePage = this
