@@ -7,5 +7,6 @@
   <ui-item wx:if="{{$header}}" item="{{$header}}" fromComponent="{{uniqId}}"/>
   <ui-list wx:if="{{$weekTils}}" list="{{$weekTils}}" />
   <ui-list wx:if="{{$dateList}}" list="{{$dateList}}" fromComponent="{{uniqId}}"/>
-  <ui-item wx:if="{{$footer}}" wx:if="{{$footer}}" item="{{$footer}}" fromComponent="{{uniqId}}" />
+  <ui-item wx:if="{{$footer}}" item="{{$footer}}" fromComponent="{{uniqId}}" />
+  <ui-pop wx:if="{{$popwin}}" item="{{$popwin}}" />
 </view>

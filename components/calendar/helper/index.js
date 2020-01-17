@@ -123,7 +123,7 @@ export function completeMonth(timestart) {
   let globalDisable = this.disable
   let fillupData = this.fillData
   let defaultDate = this.date // 默认日期显示，item类型
-  let validFestival = this.options.festival
+  let validFestival = this.coptions.festival
   let dataIndexs = indexData(fillupData)
   // 生成日历数据，上个月的 x 天 + 当月的 [28,29,30,31]天 + 下个月的 y 天 = 42
   let res = [];
@@ -272,11 +272,11 @@ export function completeMonth(timestart) {
 
 export function oneMonthListConfig(timestart) {
   let that = this
-  let options = this.options
+  let coptions = this.coptions
   let allowBox = this.allowBox
-  let checkType = options.type   // single/range/mutiple
-  let rangeCount = options.rangeCount
-  let rangeMode = options.rangeMode
+  let checkType = coptions.type   // single/range/mutiple
+  let rangeCount = coptions.rangeCount
+  let rangeMode = coptions.rangeMode
   let allMonths = this.allMonths
   let {year, month, day} = getYmd(timestart)
   let endPoint = getYmd(this.validEndDay)
@@ -430,6 +430,8 @@ export function oneMonthListConfig(timestart) {
         __ready(){
           let theMon = this
 
+          this.checkedIndex = null // 当前月份选中的日期在数组中的index下标
+
           /**
            * 显示状态
            * false时， 整个结构去除， 包括占位容器
@@ -534,7 +536,7 @@ export function oneMonthListConfig(timestart) {
           // 该月处于lazy隐藏状态时，
           if (!this.lazyDisplay) {
             this.hooks.one('lazy', function(){
-              theMon.tint(spd, epd, cls)
+              theMon.tint(spd, epd, cls, stat)
             })
             return
           }
@@ -635,7 +637,8 @@ export function oneMonthListConfig(timestart) {
                   periodValidDays(param, rangeCount)
                 }
               }
-              inst.addClass('selected')
+              // inst.addClass('selected')
+              theMon.setChecked(inst)
             }
             that.selectDate(e, param, inst) // tap=selected?date=2019-11-21 that.itemMethod.call(inst, e)
           })
@@ -648,16 +651,27 @@ export function oneMonthListConfig(timestart) {
         },
 
         setChecked(targetDate){
-          this.forEach(item=>{
-            let data = item.data
-            let date = data.date
-            let ts = data.timestamp
-            if (date === targetDate || ts === targetDate) {
-              item.addClass('selected')
+          let target = null
+          if (targetDate) {
+            if (targetDate.treeid) {
+              let index = this.findIndex(targetDate.treeid)
+              this.checkedIndex = index
+              target = targetDate
+              targetDate.addClass('selected')
+            } else {
+              this.forEach((item, ii)=>{
+                let data = item.data
+                let date = data.date
+                let ts = data.timestamp
+                if (date === targetDate || ts === targetDate) {
+                  item.addClass('selected')
+                  target = item
+                  this.checkedIndex = ii
+                }
+              })
             }
-          })
-          // setTimeout(() => {
-          // }, 100);
+          }
+          return target
         },
 
         emptyChecked(){
@@ -666,16 +680,37 @@ export function oneMonthListConfig(timestart) {
 
         unChecked(targetDate){
           // this.hooks.emit('emptyChecked')
-          this.forEach(item=>{
-            let data = item.data
-            let date = data.date
-            let ts = data.timestamp
-            if (date === targetDate || ts === targetDate) {
+          let findIt = false
+          if (lib.isArray(targetDate)){
+            let uids = []
+            let uinst = []
+            targetDate.forEach((item, ii)=>{
               item.removeClass('selected range')
+              if (uids.indexOf(item.parentInst.uniqId)===-1) {
+                uids.push(item.parentInst.uniqId)
+                uinst.push(item)
+              }
+            })
+            uinst.forEach(it=>it.exec())
+            return 
+          }
+          if (this.checkedIndex || this.checkedIndex === 0) {
+            let target = this.find(this.checkedIndex)
+            if (target) {
+              findIt = true
+              target.removeClass('selected range')
             }
-          })
-          // setTimeout(() => {
-          // }, 100);
+          } 
+          if (!findIt) {
+            this.forEach(item=>{
+              let data = item.data
+              let date = data.date
+              let ts = data.timestamp
+              if (date === targetDate || ts === targetDate) {
+                item.removeClass('selected range')
+              }
+            })
+          }
         },
 
         onSelectedMonth(e, param, inst) {

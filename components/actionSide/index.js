@@ -243,13 +243,14 @@ Component({
     __opration: function(p, c, op) {
       const that = this
       let {param, cb} = paramCb(p, c)
+      let curClass = this.data.item.itemClass || ''
       try {
         if (lib.isString(param)) param = {itemClass: param}
         let myclass = cls(param)
         let myStyle = sty(param)
         let myContent = content.call(this, param, myclass, op) || {}
         let target = {
-          itemClass: `${op} ${myclass} moveit`,
+          itemClass: `${op} ${myclass} moveit ${curClass}`,
           // itemStyle: myStyle || this.__cssStyle,
           itemStyle: myStyle,
           mask: param.enableMask ? 'actionMask show' : (op.indexOf('toast') > -1 || op.indexOf('actionSide-message') > -1) ? 'actionMask' : myContent.__yesCloseBtn ? 'actionMask' : 'actionMask show'

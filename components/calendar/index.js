@@ -3,7 +3,8 @@
  * github: webkixi
  * 小程序的模板真是又长又臭
  */
-const app = null //getApp()
+// const app = null //getApp()
+const app = getApp()
 const Core = require('../aotoo/core/index')
 const lib = Core.lib
 export const {
@@ -101,7 +102,8 @@ function tintSelected(value=[]) {
       if (inst) {
         inst.setChecked(date)
         that.hooks.one('emptyMonthChecked', function () {
-          inst && inst.emptyChecked()
+          inst && inst.unChecked(date)
+          // inst && inst.emptyChecked()
         })
       }
     }
@@ -123,10 +125,12 @@ function tintRange(fromInit) {
   let endInstId = `${this.calenderId}-${endDate.year}-${endDate.month}`
   let endInst = activePage.getElementsById(endInstId)
 
-  if (!value[1] && fromInit) {
+  if (value[0] && !value[1] && fromInit) {
     setTimeout(() => {
-      startInst.setChecked(value[0])
-    }, 300);
+      let target = startInst.setChecked(value[0])
+      startInst.checkedIndex = null
+      // this.rangeValue = [target]
+    }, 100);
     return
   }
 
@@ -142,11 +146,18 @@ function tintRange(fromInit) {
       let emDate = endInst.getDate()
 
       // 同年、同月的场景下，只执行一次，避免性能损耗
+      // if (smDate.year === emDate.year && smDate.month === emDate.month) {
+      //   startInst.hooks.emit('emptyChecked')
+      // } else {
+      //   startInst.hooks.emit('emptyChecked')
+      //   endInst.hooks.emit('emptyChecked')
+      // }
       if (smDate.year === emDate.year && smDate.month === emDate.month) {
-        startInst.hooks.emit('emptyChecked')
+        startInst.unChecked(that.rangeValue)
       } else {
-        startInst.hooks.emit('emptyChecked')
-        endInst.hooks.emit('emptyChecked')
+        startInst.unChecked(that.rangeValue)
+        // startInst.hooks.emit('emptyChecked')
+        // endInst.hooks.emit('emptyChecked')
       }
     }
   })
@@ -222,11 +233,11 @@ let defaultConfig = {
 
 function adapter(source={}) {
   let that = this
-  let options = Object.assign({}, defaultConfig, source)
-  options.total = parseInt(options.total)
-  options.mode = parseInt(options.mode)
-  options.rangeCount = parseInt(options.rangeCount)
-  options.rangeMode = parseInt(options.rangeMode)
+  let coptions = Object.assign({}, defaultConfig, source)
+  coptions.total = parseInt(coptions.total)
+  coptions.mode = parseInt(coptions.mode)
+  coptions.rangeCount = parseInt(coptions.rangeCount)
+  coptions.rangeMode = parseInt(coptions.rangeMode)
   let {
     $$id,
     header,
@@ -242,8 +253,8 @@ function adapter(source={}) {
     disable,
     festival,
     toolbox
-  } = options
-  this.options = options
+  } = coptions
+  this.coptions = coptions
   this.value = value || []  // 点选后的值
   // this.data = data || []  // 指定日期填充数据
   this.fillData = data || []  // 指定日期填充数据
@@ -265,10 +276,10 @@ function adapter(source={}) {
     let dateList = null
     let currentYmd = getYmd()
     let selected = value[0] || new Date().getTime()
-    let $weekTils = weeksTils(options)
+    let $weekTils = weeksTils(coptions)
 
-    header = (this.allowBox.header && this.options.header) || null
-    footer = (this.allowBox.footer && this.options.footer) || null
+    header = (this.allowBox.header && this.coptions.header) || null
+    footer = (this.allowBox.footer && this.coptions.footer) || null
 
     if (this.fillData.length) {
       let fillData = this.fillData
@@ -463,11 +474,7 @@ function adapter(source={}) {
       $footer: footer,
       $dateList: dateList
     }, function () {
-      // console.log(that);
-      // if (total) {
-      //   that.rendered = true
-      //   that.hooks.emit('render-calendar')
-      // }
+      that.renderCalender()
     })
   } catch (error) {
     console.error(error);
@@ -489,7 +496,7 @@ Component({
         if (!this.init) {
           if (lib.isObject(params)) {
             this.rendered = false
-            params = Object.assign({}, this.options, params)
+            params = Object.assign({}, this.coptions, params)
             adapter.call(this, params)
           }
         }
@@ -500,7 +507,8 @@ Component({
     $weekTils: null,
     $header: null,
     $footer: null,
-    $dateList: null
+    $dateList: null,
+    $popwin: null
   },
   behaviors: [Core.baseBehavior(app, 'calendar')],
   lifetimes: {
@@ -517,8 +525,8 @@ Component({
       
       // this.activePage.hooks.on('onReady', function() {
       this.hooks.once('render-calendar', function () {
-        let options = that.options
-        let mode = options.mode
+        let coptions = that.coptions
+        let mode = coptions.mode
         that.query.selectAll('.calendar').boundingClientRect((ret) => {
           if (ret && ret.length) {
             let ret0 = ret[0]
@@ -583,10 +591,6 @@ Component({
             that.hooks.emit('swiper-current', {id: $dl.type['scrollIntoView']})
           }
         }
-        setTimeout(() => {
-          
-
-        }, 100);
       })
     },
     attached: function() { //节点树完成，可以用setData渲染节点，但无法操作节点
@@ -600,18 +604,33 @@ Component({
       if (that.$$id) {
         that.mount(that.$$id)
       }
-      if (this.total) {
-        that.rendered = true
-        this.activePage.hooks.on('onReady', function() {
-          setTimeout(() => {
-            that.hooks.emit('render-calendar')
-            that.hooks.emit('onReady')
-          }, 400);
-        })
-      }
+      that.rendered = true
     }
   },
   methods: {
+    renderCalender(){
+      let that = this
+
+      this.activePage.doReady(true)
+      setTimeout(() => {
+        that.hooks.emit('render-calendar')
+        that.hooks.emit('onReady')
+      }, 100);
+
+      // if (this.activePage.__rendered) {
+      //   setTimeout(() => {
+      //     that.hooks.emit('render-calendar')
+      //     that.hooks.emit('onReady')
+      //   }, 1000);
+      // } else {
+      //   this.activePage.hooks.on('onReady', function () {
+      //     setTimeout(() => {
+      //       that.hooks.emit('render-calendar')
+      //       that.hooks.emit('onReady')
+      //     }, 1000);
+      //   })
+      // }
+    },
     getFestival(){
       return getFestival()
     },
@@ -641,22 +660,16 @@ Component({
           $dateList: null
         }, function(){
           if (lib.isObject(params)) {
-            params = Object.assign({}, this.options, params)
+            params = Object.assign({}, this.coptions, params)
             adapter.call(this, params)
-            setTimeout(() => {
-              that.hooks.emit('render-calendar')
-              that.hooks.emit('onReady')
-            }, 400);
+            that.renderCalender()
           }
         })
       } else {
         if (lib.isObject(params)) {
-          params = Object.assign({}, this.options, params)
+          params = Object.assign({}, this.coptions, params)
           adapter.call(this, params)
-          setTimeout(() => {
-            that.hooks.emit('render-calendar')
-            that.hooks.emit('onReady')
-          }, 400);
+          that.renderCalender()
         }
       }
     },
@@ -717,8 +730,8 @@ Component({
 
     // 跳转到指定月份
     goto(date){
-      let options = this.options
-      let mode = options.mode
+      let coptions = this.coptions
+      let mode = coptions.mode
       let allMonths = this.allMonths
       let ymd = getYmd(date)
       let ym = `${ymd.year}-${ymd.month}`
@@ -742,8 +755,8 @@ Component({
     },
 
     setValue(date, cb){
-      let options = this.options
-      let type = options.type
+      let coptions = this.coptions
+      let type = coptions.type
       let activePage = this.activePage
       if (date) {
         let value = this.value
@@ -757,7 +770,8 @@ Component({
         if (type === 'single') {
           this.hooks.emit('emptyMonthChecked')  // 先清空所有已选项
           this.hooks.one('emptyMonthChecked', function () {
-            monInst && monInst.emptyChecked()
+            monInst && monInst.unChecked(date)
+            // monInst && monInst.emptyChecked()
           })
           value = [date]
         }
@@ -853,10 +867,10 @@ Component({
     // 响应业务tap事件的回调方法
     selectDate(e, param, inst){
       let that = this
-      let options = this.options
-      let type = options.type
-      let tapFun = options.tap
-      let rangeCount = options.rangeCount
+      let coptions = this.coptions
+      let type = coptions.type
+      let tapFun = coptions.tap
+      let rangeCount = coptions.rangeCount
 
       let activePage = this.activePage
       e.currentTarget.dataset.date = param.date
@@ -947,6 +961,9 @@ Component({
             }
           }
         }
+        // if (param.range === 'end') {
+        //   this.rangeValue = []
+        // }
       }
     },
 
@@ -1067,7 +1084,7 @@ Component({
       // top: 0
       // width: 414
 
-      let mode = this.options.mode   //mode=1 scroll-view  mode=2 swiper
+      let mode = this.coptions.mode   //mode=1 scroll-view  mode=2 swiper
       if (mode === 2) return this.__computZoneItemsSwiper()
 
       let that = this
@@ -1084,22 +1101,26 @@ Component({
         let {top, left, right, bottom, width, height, showed} = item
         top = top - scrollTop
         bottom = bottom - scrollTop
-        if (!showed && (top < cbottom && top >= ctop || bottom < cbottom && bottom > ctop)) {
+        if (!showed && (top < 2 * cbottom && top >= ctop)) {
           item.showed = true
           zoneItems.push(item)
-        } else {
-          if (showed) {
-            if (bottom < 0 && Math.abs(bottom)>cheight) {
-              item.showed = false
-              outItems.push(item)
-            }
-
-            if (top>cheight && top>(cbottom+cheight)) {
-              item.showed = false
-              outItems.push(item)
-            }
-          }
         }
+        // if (!showed && (top < cbottom && top >= ctop || bottom < cbottom && bottom > ctop)) {
+        //   item.showed = true
+        //   zoneItems.push(item)
+        // } else {
+        //   if (showed) {
+        //     if (bottom < 0 && Math.abs(bottom)>cheight) {
+        //       item.showed = false
+        //       outItems.push(item)
+        //     }
+
+        //     if (top>cheight && top>(cbottom+cheight)) {
+        //       item.showed = false
+        //       outItems.push(item)
+        //     }
+        //   }
+        // }
       })
       this.zoneItems = zoneItems
       return {zoneItems, outItems}
