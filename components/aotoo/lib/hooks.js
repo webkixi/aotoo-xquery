@@ -252,6 +252,20 @@ class _hooks {
       }
     }
   }
+  reverseOn(key, cb) {
+    let myActions = this.actions
+    const hooksActionUniqId = suid('hooks_action_')
+    if (cb) {
+      cb['hooksActionUniqId'] = hooksActionUniqId
+    }
+    if (isString(key)) {
+      if (myActions[key]) {
+        myActions[key] = [].concat([cb], myActions[key])
+      } else {
+        myActions[key] = [cb]
+      }
+    }
+  }
   hasOn(key){
     let myActions = this.actions
     return myActions[key] ? myActions[key].length ? true : false : false

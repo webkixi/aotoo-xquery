@@ -265,14 +265,6 @@ export const listBehavior = function(app, mytype) {
               param = {data: param}
             }
 
-            if (param.data) {
-              let tmp = reSetArray.call(this, param.data, that.data.props)
-              param.data = tmp.data
-              if (this.$$type === 'tree') {
-                param = lib.listToTree.call(this, param)
-              }
-            }
-
             if (param.methods && lib.isObject(param.methods)) {
               const methods = param.methods
               Object.keys(methods).forEach(key => {
@@ -291,6 +283,19 @@ export const listBehavior = function(app, mytype) {
               delete param.itemMethod
             }
 
+            let $list = this.data.$list
+            if (lib.isObject(itemMethod)) {
+              $list.itemMethod = itemMethod
+            }
+
+            if (param.data) {
+              let tmp = reSetArray.call(this, param.data, $list)
+              param.data = tmp.data
+              if (this.$$type === 'tree') {
+                param = lib.listToTree.call(this, param)
+              }
+            }
+
             if (lib.isObject(param)) {
               let target = {}
               Object.keys(param).forEach(key => {
@@ -298,20 +303,16 @@ export const listBehavior = function(app, mytype) {
                   let nkey = key.indexOf('$list.') == -1 ? '$list.' + key : key
                   let nval = param[key]
                   if (isArray(nval) && key!=='data') {
-                    let $list = this.data.$list
-                    if (lib.isObject(itemMethod)) {
-                      $list.itemMethod = itemMethod
-                    }
-                    nval = reSetArray.call(this, param[key], this.data.$list).data
+                    nval = reSetArray.call(this, param[key], $list).data
                   } else {
                     if (key.indexOf('title') > -1 || key.indexOf('img')>-1 || isObject(nval)) {
                       if (key === 'type') {
                         /** 不出来list.type数据 */
                       } else if (isObject(nval)) {
-                        nval = reSetItemAttr.call(this, param[key], this.data.$list)
+                        nval = reSetItemAttr.call(this, param[key], $list)
                       }
                       if (key.indexOf('@') === -1) {
-                        nval = reSetItemAttr.call(this, param[key], this.data.$list)
+                        nval = reSetItemAttr.call(this, param[key], $list)
                       }
                     }
                   }

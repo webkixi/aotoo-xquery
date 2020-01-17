@@ -248,6 +248,14 @@ export function listInstDelegate(treeid, listInst, from){
         // return lib.clone(data)
         return this.data
       },
+      exec(){
+        // 列表实例批量更新方法
+        // exec方法允许执行以下若干更新方法后，触发批量更新数据并渲染
+        // 本对象原来的使用环境是list.forEach场景中使用，由forEach方法批来量更新数据，脱离forEach后没有触发机制
+        // 在有些场景当中本对象会作为个体变量传递给外部，如 return [inst1, inst2, inst3]
+        // 此时即便应用了更新方法仍然不能更新数据、渲染，因为没有触发事件执行更新
+        listInst.update(listInst.__foreachUpdata)
+      },
       reset(param){
         if (!param) return
         let upData = {}
@@ -557,6 +565,10 @@ export const commonBehavior = (app, mytype) => {
         // this.mountId = id || props.$$id // 如果$$id，则交给
         // this.setData({uniqId: this.uniqId})
 
+        let that = this
+        let pages = getCurrentPages()
+        let activePage = this.activePage || pages[pages.length - 1]
+
         this.properties = lib.clone(this.properties)
         let properties = this.properties
         let ds = (properties.item || properties.list || properties.dataSource || {})
@@ -569,7 +581,7 @@ export const commonBehavior = (app, mytype) => {
                 let fun = ds.methods[key]
                 if (lib.isFunction(fun)) {
                   // this[key] = fun.bind(this)
-                  this[key] = fun
+                  this[key] = fun.bind(this)
                 }
               })
             }
@@ -620,6 +632,16 @@ export const commonBehavior = (app, mytype) => {
         if (!preSet.fromComponent) delete preSet.fromComponent
         if (!preSet.id) delete preSet.id
         this.setData(preSet)
+
+        if (this.__ready) {
+          if (activePage.hooks) {
+            activePage.hooks.reverseOn('__READY', function () {
+              that.__ready()
+            })
+          } else {
+            activePage.__READY = [that.__ready].concat(activePage.__READY||[])
+          }
+        }
       },
 
 
@@ -630,37 +652,59 @@ export const commonBehavior = (app, mytype) => {
         this.mounted = true
         this.activePage = app.activePage
         this.hooks.emit('ready')
-        // let oriData = this.data.item || this.data.list || this.data.dataSource || {}
-        // this.originalDataSource = lib.clone(oriData)
-        this.mount()
-
-        let ods = this.originalDataSource
-        if (ods && lib.isObject(ods) && ods.__fromParent) {
-          this.parentInst = app['_vars'][ods.__fromParent]
-          this.parentInst && this.parentInst.children.push(this)
-        }
+        // // let oriData = this.data.item || this.data.list || this.data.dataSource || {}
+        // // this.originalDataSource = lib.clone(oriData)
 
 
-        /** 执行在数据中预置__ready方法
-         * {
-         *    title: '',
-         *    methods: {
-         *      __ready(){}
-         *    }
-         * }
-        */
-        if (this.__ready&&lib.isFunction(this.__ready)) {
-          let activePage = this.activePage
-          if (activePage.rendered) {
-            that.__ready()
-          } else {
-            this.activePage.hooks.on('onReady', function() {
-              // setTimeout(that.__ready.bind(that), 50);
-              // that.__ready.call(that)
-              that.__ready()
-            })
-          }
-        }
+
+
+        // this.mount()
+
+        this._mount()
+
+        // if (this.__ready) {
+        //   console.log('======= 3333');
+        //   this.activePage.hooks.reverseOn('__READY', function() {
+        //     that.__ready()
+        //   })
+        //   // if (this.activePage.__rendered) {
+        //   //   clearTimeout(this.activePage.timmer)
+        //   //   this.activePage.timmer = setTimeout(() => {
+        //   //     that.activePage.hooks.fire('__READY')
+        //   //   }, 60);
+        //   // }
+        // }
+
+        // let ods = this.originalDataSource
+        // if (ods && lib.isObject(ods) && ods.__fromParent) {
+        //   this.parentInst = app['_vars'][ods.__fromParent]
+        //   this.parentInst && this.parentInst.children.push(this)
+        // }
+
+        // /** 执行在数据中预置__ready方法
+        //  * {
+        //  *    title: '',
+        //  *    methods: {
+        //  *      __ready(){}
+        //  *    }
+        //  * }
+        // */
+        // if (this.__ready&&lib.isFunction(this.__ready)) {
+        //   let activePage = this.activePage
+        //   that.__ready()
+        //   // if (activePage.__rendered) {
+        //   //   that.__ready()
+        //   // } else {
+        //   //   this.activePage.hooks.on('onReady', function() {
+        //   //     // setTimeout(that.__ready.bind(that), 50);
+        //   //     // that.__ready.call(that)
+        //   //     that.__ready()
+        //   //   })
+        //   // }
+        // }
+
+
+
 
         // let activePage = this.activePage
         // let proto = activePage.__prototype
@@ -679,9 +723,11 @@ export const commonBehavior = (app, mytype) => {
 
       //组件实例从节点树中移除
       detached: function () {
-        setTimeout(() => {
-          app['_vars'][this.uniqId] = null
-        }, 50);
+        this.hooks.emit('componentDetached')
+        // this.hooks = null
+        // setTimeout(() => {
+        //   app['_vars'][this.uniqId] = null
+        // }, 50);
       }
     },
     methods: {
@@ -893,76 +939,134 @@ export const commonBehavior = (app, mytype) => {
         }
         return this
       },
-      mount: function(id) {
+      
+      _mount(id){
         let that = this
-        let activePage = this.activePage
-        let uniqId = this.uniqId
-        if (!this.init) {
-          if (id) {
-            activePage['elements'][id] = this
-          }
-
-          let $is = this.$$is
-          // let $id = this.data.id || this.properties.id
-          let $id = ''
-          let $ds = this.data.$item || this.data.$list || this.data.$dataSource || this.data.dataSource
-          let fromTree
-          let fromComponent = this.data.fromComponent || ($ds && $ds['fromComponent'])
-
-          if (fromComponent) {
-            this.componentInst = app['_vars'][fromComponent]
-          }
-
-          if ($is == 'list') {
-            fromTree = this.data.fromTree || this.data.$list.fromTree
-            if (lib.isString(fromTree)) {
-              const treeInst = app['_vars'][fromTree]
-              // $id ? treeInst['childs'][$id] = this : ''
-              this.treeInst = treeInst
-            }
-          }
-
-          if ($is == 'item') {
-            // $id = $id || this.data.item['$$id'] || this.data.item['id']
-            $id = $id || this.data.item && this.data.item['$$id']
-          }
-          
-          if ($is == 'list' || $is == 'tree') {
-            $id = $id || this.data.$list && this.data.$list['$$id']
-          }
-
-          let $$$id = this.data.id
-
-          $id = $id||id
-          if ($id) {
-            const itemKey = activePage['eles'][$id]
-            if (itemKey) {
-              activePage['elements'][$id] = activePage['elements'][itemKey] = this
-            } else {
-              activePage['elements'][$id] = this
-            }
-          }
-
-          if ($$$id) {
-            activePage['elements'][$$$id] = this
-          }
-
-          // 该页面实例销毁时，销毁所有组件实例
-          activePage.hooks.on('destory', function () {
-            app['_vars'][uniqId] = null
-            if (id || $id) {
-              const myid = id || $id
-              const itemKey = activePage['eles'][$id]
-              // activePage['elements'][$id] = null
-              // activePage['elements'][itemKey] = null
-            }
-            activePage['elements'] = null
+        let pages = getCurrentPages()
+        let activePage = this.activePage || pages[pages.length - 1]
+        if (!activePage) {
+          app.hooks.on('__MOUNT', function() {
+            that._mount(id)
           })
+          return 
         } else {
-          this.hooks.on('ready', function() {
-            that.mount(id)
-          })
+          app.hooks.fire('__MOUNT')
         }
+        let elements = activePage['elements'] || {}
+        let eles = activePage['eles'] || {}
+        let uniqId = this.uniqId
+        let $is = this.$$is
+        let $ds = lib.isObject(this.originalDataSource) ? this.originalDataSource : {}
+        let fromComponent = this.data.fromComponent || ($ds && $ds['fromComponent'])
+        let fromTree = this.data.fromTree || ($ds && $ds['fromTree'])
+        let __fromParent = $ds['__fromParent']
+        let $$id = $ds['$$id'] || $ds['id']
+        let _id = this.data.id
+        let pageDataKey = eles[$$id]
+        app['_vars'][uniqId] = this
+        if (id) {
+          elements[id] = this
+        }
+        if (this.data.id) {
+          elements[_id] = this
+        }
+        if ($$id) {
+          elements[$$id] = this
+        }
+        if (pageDataKey) {
+          elements[pageDataKey] = this
+        }
+        if (fromComponent) {
+          this.componentInst = app['_vars'][fromComponent]
+        }
+        if (__fromParent) {
+          this.parentInst = app['_vars'][__fromParent]
+          this.parentInst && this.parentInst.children.push(this)
+        }
+        if (lib.isString(fromTree)) {
+          let treeInst = app['_vars'][fromTree]
+          this.treeInst = treeInst
+        }
+        activePage['elements'] = elements
+
+        this.hooks.one('componentDetached', function () {
+          app['_vars'][uniqId] = null
+          if (_id) elements[_id] = null
+          if ($$id) elements[$$id] = null
+          if (pageDataKey) elements[pageDataKey] = null
+        })
+      },
+      mount: function(id) {
+        this._mount(id)
+        // let that = this
+        // let activePage = this.activePage
+        // let uniqId = this.uniqId
+        // if (!this.init) {
+        //   if (id) {
+        //     activePage['elements'][id] = this
+        //   }
+
+        //   let $is = this.$$is
+        //   // let $id = this.data.id || this.properties.id
+        //   let $id = ''
+        //   let $ds = this.data.$item || this.data.$list || this.data.$dataSource || this.data.dataSource
+        //   let fromTree
+        //   let fromComponent = this.data.fromComponent || ($ds && $ds['fromComponent'])
+
+        //   if (fromComponent) {
+        //     this.componentInst = app['_vars'][fromComponent]
+        //   }
+
+        //   if ($is == 'list') {
+        //     fromTree = this.data.fromTree || this.data.$list.fromTree
+        //     if (lib.isString(fromTree)) {
+        //       const treeInst = app['_vars'][fromTree]
+        //       // $id ? treeInst['childs'][$id] = this : ''
+        //       this.treeInst = treeInst
+        //     }
+        //   }
+
+        //   if ($is == 'item') {
+        //     // $id = $id || this.data.item['$$id'] || this.data.item['id']
+        //     $id = $id || this.data.item && this.data.item['$$id']
+        //   }
+          
+        //   if ($is == 'list' || $is == 'tree') {
+        //     $id = $id || this.data.$list && this.data.$list['$$id']
+        //   }
+
+        //   let $$$id = this.data.id
+
+        //   $id = $id||id
+        //   if ($id) {
+        //     const itemKey = activePage['eles'][$id]
+        //     if (itemKey) {
+        //       activePage['elements'][$id] = activePage['elements'][itemKey] = this
+        //     } else {
+        //       activePage['elements'][$id] = this
+        //     }
+        //   }
+
+        //   if ($$$id) {
+        //     activePage['elements'][$$$id] = this
+        //   }
+
+        //   // 该页面实例销毁时，销毁所有组件实例
+        //   activePage.hooks.on('destory', function () {
+        //     app['_vars'][uniqId] = null
+        //     if (id || $id) {
+        //       const myid = id || $id
+        //       const itemKey = activePage['eles'][$id]
+        //       // activePage['elements'][$id] = null
+        //       // activePage['elements'][itemKey] = null
+        //     }
+        //     activePage['elements'] = null
+        //   })
+        // } else {
+        //   this.hooks.on('ready', function() {
+        //     that.mount(id)
+        //   })
+        // }
       },
       show: function(params) {
         lib.isFunction(this.update) && this.update({ show: true })
