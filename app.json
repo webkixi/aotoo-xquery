@@ -1,10 +1,10 @@
 {
   "pages": [
     "pages/markdown/index",
+    "pages/tabside/index",
+    "pages/tabpro/index",
     "pages/html/index",
     "pages/item/index",
-    "pages/tabpro/index",
-    "pages/tabside/index",
     "pages/itempop/index",
     "pages/list/index",
     "pages/popup/index",

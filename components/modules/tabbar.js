@@ -64,6 +64,9 @@ module.exports = function mkTabbar(id = lib.suid('tabbar_'), params) {
   }
 
   opts.data = opts.data.map(item => {
+    if (item.href) {
+      item.aim = `onTap?url=${item.href}`
+    }
     item.itemClass = item.itemClass || ''
     if (item.img) {
       let src = item.img.src || item.img
