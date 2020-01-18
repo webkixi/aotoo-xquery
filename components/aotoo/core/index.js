@@ -347,12 +347,12 @@ function core(params) {
 
       mkFind(this, app)
       this.find = wx.$$find
+      this.doReady(true)
       
       if (typeof oldReady == 'function') {
         oldReady.apply(this, arguments)
       }
 
-      this.doReady(true)
       setTimeout(() => {
         this.hooks.emit('onReady')
         this.__rendered = true
