@@ -57,16 +57,18 @@ function mkFind(context, app){
             }
           })
         } else {
-          xxx = [ctx]
+          // xxx = [ctx]
           if (ctx.children && ctx.children.length) {
             ctx.children.forEach(cld => {
               if (cld.children&&cld.children.length) {
-                xxx = xxx.concat(findChilds(cld))
+                // xxx = xxx.concat(findChilds(cld))
+                xxx = findChilds(cld).concat(xxx)
               } else {
                 xxx = xxx.concat(cld)
               }
             })
           }
+          xxx = xxx.concat(ctx)
         }
         return xxx
       }

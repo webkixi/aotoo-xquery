@@ -110,7 +110,8 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
     length: Object.keys(temp_data).length,
     data: lib.clone(temp_data),
     getData() {
-      return this.data
+      // return this.data
+      return listInstDelegate.__refreshData()
     },
     parent(param){
       if (listInstDelegate) {
@@ -246,7 +247,7 @@ export function listInstDelegate(treeid, listInst, from){
       data: lib.clone(data),
       getData(){
         // return lib.clone(data)
-        return this.data
+        return (listInst.getData()).data[index]
       },
       exec(){
         // 列表实例批量更新方法
@@ -254,6 +255,7 @@ export function listInstDelegate(treeid, listInst, from){
         // 本对象原来的使用环境是list.forEach场景中使用，由forEach方法批来量更新数据，脱离forEach后没有触发机制
         // 在有些场景当中本对象会作为个体变量传递给外部，如 return [inst1, inst2, inst3]
         // 此时即便应用了更新方法仍然不能更新数据、渲染，因为没有触发事件执行更新
+        if (!listInst.__foreachUpdata) return 
         listInst.update(listInst.__foreachUpdata)
       },
       reset(param){
@@ -291,6 +293,9 @@ export function listInstDelegate(treeid, listInst, from){
       css(params) {
         // if (!lib.isString(params)) return
         if (typeof params !== 'string') return
+        if (data) {
+          data = this.getData()
+        }
         let styData = _css(key, params, data)
         if (styData) {
           if (from === 'foreach') {
@@ -315,6 +320,9 @@ export function listInstDelegate(treeid, listInst, from){
       },
       addClass(params) {
         if (!lib.isString(params)) return
+        if (data) {
+          data = this.getData()
+        }
         let clsData = _addClass(key, params, data)
         if (clsData) {
           if (from === 'foreach') {
@@ -340,6 +348,9 @@ export function listInstDelegate(treeid, listInst, from){
       },
       removeClass(params) {
         if (!lib.isString(params)) return
+        if (data) {
+          data = this.getData()
+        }
         let clsData = _removeClass(key, params, data)
         if (from === 'foreach') {
           listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, clsData)
@@ -353,6 +364,7 @@ export function listInstDelegate(treeid, listInst, from){
       update(params) {
         let upData = {}
         if (data) {
+          data = this.getData()
           if (lib.isFunction(params)) {
             data = params(data) || data
           } else {
@@ -369,6 +381,7 @@ export function listInstDelegate(treeid, listInst, from){
       show() {
         let upData = {}
         if (data) {
+          data = this.getData()
           data.show = true
           upData[key] = data
           // listInst.update(upData)
@@ -382,6 +395,7 @@ export function listInstDelegate(treeid, listInst, from){
       hide() {
         let upData = {}
         if (data) {
+          data = this.getData()
           data.show = false
           upData[key] = data
           // listInst.update(upData)
@@ -399,21 +413,25 @@ export function listInstDelegate(treeid, listInst, from){
         listInst.delete(treeid)
       },
       siblings(param) { // 只针对class进行筛选
-        let _tmpData = {};
-        ((listInst.getData()).data || []).forEach((item, ii) => {
-          if (ii !== index) {
-            let key = `data[${ii}]`
-            if (lib.isString(param)) {
-              let cls = param.split(' ')
-              let itCls = (item.itemClass || ' ').split(' ')
-              let _cls = cls.filter(c => itCls.indexOf(c) > -1)
-              if (cls.length === _cls.length) _tmpData[key] = item
-            } else {
-              _tmpData[key] = item
+        function __refreshData() {
+          let _tmpData = {};
+          ((listInst.getData()).data || []).forEach((item, ii) => {
+            if (ii !== index) {
+              let key = `data[${ii}]`
+              if (lib.isString(param)) {
+                let cls = param.split(' ')
+                let itCls = (item.itemClass || ' ').split(' ')
+                let _cls = cls.filter(c => itCls.indexOf(c) > -1)
+                if (cls.length === _cls.length) _tmpData[key] = item
+              } else {
+                _tmpData[key] = item
+              }
             }
-          }
-        })
-        let tmpData = lib.clone(_tmpData)
+          })
+          return _tmpData
+        }
+        let tmpData = lib.clone(__refreshData())
+        this.__refreshData = __refreshData
         return fakeListInstance(tmpData, listInst, this)
         // return {
         //   length: Object.keys(tmpData).length,
@@ -762,6 +780,10 @@ export const commonBehavior = (app, mytype) => {
       //     return app['_vars'][param]
       //   }
       // },
+
+      findPath(param){
+        /** 查找路径 */
+      },
 
       parent(param, ctx){
         if (!ctx) ctx = this
