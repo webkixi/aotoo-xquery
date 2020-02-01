@@ -85,6 +85,21 @@ module.exports = function mkTab($$id, opts, type) {
     }
   }
 
+  if (type === 'vv') {
+    menusType = {
+      "is": 'scroll',
+      "scroll-x": true,
+    }
+
+    contentType = {
+      is: 'swiper',
+      bindchange: 'onSwiperChange',
+      circular: false,
+      duration: 300,
+      vertical: true,
+    }
+  }
+
   return {
     $$id: $$id || lib.suid('tabside_'),
     listClass: opts.listClass,

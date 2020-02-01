@@ -1,0 +1,265 @@
+@keyframes white-to-yellow {
+  0% {
+    background: #fff;
+  }
+  100% {
+    background: #d7a945;
+  }
+}
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  75% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+view {
+  margin: 0;
+  height: 0;
+}
+
+.turntable-canvas {
+  width: 300px;
+  height: 300px;
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: 0 auto;
+}
+
+/* 容器 */
+.turntable-wrap{
+  position: relative;
+  overflow: hidden;
+  margin: 50px;
+  width: 340px;
+  height: 340px;
+  border: 7px solid #b2a98d;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #b2a98d;
+}
+
+/* 周围跑马灯容器 */
+.turntable-wrap .light{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #e0ddd1;
+  animation: rotate 5s linear infinite;
+}
+
+/* 定义一个跑马灯 */
+.turntable-wrap .light .item{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 10px;
+  height: 100%;
+  /* border-radius: 50%; */
+  transform-origin: center center;
+}
+
+.turntable-wrap .light .item::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.turntable-wrap .light .item:nth-of-type(odd)::before {
+  background: #d7a945;
+  animation: white-to-yellow 1s linear reverse infinite;
+}
+
+.turntable-wrap .light .item:nth-of-type(even)::before {
+  background: #fff;
+  animation: white-to-yellow 1s linear infinite;
+}
+
+/* 跑马灯背景 */
+.turntable-wrap .turntable {
+  position: absolute;
+  margin: 20px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.turntable-wrap .turntable .bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border: 1px solid #dfd8be;
+  border-radius: 50%;
+  transform: rotate(90deg);
+}
+
+.turntable-wrap .turntable .bgg{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 300px;
+}
+
+.turntable-wrap .turntable .bgg image{
+  width: 100%;
+  height: 100%;
+}
+
+.turntable-wrap .turntable .bg .item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 1px;
+  height: 100%;
+  background: #dfd8be;
+  transform-origin: center center;
+}
+
+/* 礼物 */
+.turntable-wrap .turntable .gift {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: rotate(45deg);
+}
+
+.turntable-wrap .turntable .gift .item {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  width: 45%;
+  height: 45%;
+  transform-origin: right bottom;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* .turntable-wrap .turntable .gift .item .htitle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: block;
+  width: 50px;
+  height: 70px;
+  margin: auto;
+  background: yellow;
+  transform: rotate(-45deg);
+  text-align: center;
+  line-height: 80px;
+  border-radius: 5px;
+  background: #f23c3c;
+  color: #fff;
+  font-size: 24px;
+}
+
+.turntable-wrap .turntable .gift .item .htitle:before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 0;
+  width: 50px;
+  height: 1px;
+  background: #fff;
+} 
+
+.turntable-wrap .turntable .gift .item.no-gift .htitle {
+  background: #fff;
+  color: #bfa74f;
+  font-size: 16px;
+  width: 20px;
+  line-height: 20px;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+*/
+
+.turntable-wrap .turntable .gift .item .htitle {
+  display: block;
+  width: 20px;
+  line-height: 20px;
+  transform: rotate(-45deg);
+  color: #fff;
+  font-size: 18px;
+}
+.turntable-wrap .turntable .gift .item image {
+  display: block;
+  transform: rotate(-45deg);
+}
+
+.turntable-wrap .turntable .gift .item.no-gift .htitle {
+  color: #bfa74f;
+  font-size: 16px;
+  width: 20px;
+  word-wrap: break-word; /*英文的时候需要加上这句，自动换行*/
+  word-break:break-all;
+}
+
+/* 指针 */
+.turntable-wrap .pointer {
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  margin: -23px auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #fff;
+  border: 5px solid #fff;
+  box-shadow: 0 0 0 5px #b9a046;
+  text-align: center;
+  line-height: 16px;
+  color: #b9a046;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.turntable-wrap .pointer:before {
+  content: '';
+  position: absolute;
+  top: -58px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 0;
+  border-style: solid;
+  border-color: transparent transparent #b9a046 transparent;
+  border-width: 25px 10px 25px 10px;
+}
