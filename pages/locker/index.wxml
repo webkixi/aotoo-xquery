@@ -1,0 +1,8 @@
+<view class="container">
+  <view class="lockerBoxer">
+    <canvas type="2d" id="canvasLocker" class="canvasLocker" disable-scroll="true"></canvas>
+    <ui-list list="{{lockConfig}}" />
+  </view>
+</view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />

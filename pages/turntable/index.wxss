@@ -1,0 +1,7 @@
+@import "../../components/modules/turntable.wxss";
+@import "../common/source.wxss";
+
+.anyClassName {
+  font-size: 40rpx;
+  font-weight: bold;
+}

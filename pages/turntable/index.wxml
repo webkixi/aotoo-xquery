@@ -1,0 +1,6 @@
+<view class="container">
+  <canvas style="position:fixed;left: -10000rpx;" disable-scroll="true" canvas-id='turntable-canvas' id="turntable-canvas-bg" class='turntable-canvas '></canvas>
+  <ui-list wx:if="{{turntableConfig}}" list="{{turntableConfig}}" class="tab-boxer" />
+</view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />
