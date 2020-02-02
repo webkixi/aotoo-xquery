@@ -24,7 +24,12 @@ xquery包含以下这些特性
 * html支持
 * 方便扩展内置/外部插件 
 
-> xquery源码中有`.styl`类型的样式文件，使用stylus命令行编译
+> xquery源码中有`.styl`类型的样式文件，使用stylus命令行编译  
+
+## DEMO列表  
+demo图片均有效，github图片需要翻墙才能查看  
+![/images/demo.jpg](/css/demo.jpg)
+
 
 ## 如何使用  
 clone或下载本项目  

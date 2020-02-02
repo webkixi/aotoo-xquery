@@ -1,11 +1,11 @@
 {
   "pages": [
-    "pages/locker/index",
     "pages/markdown/index",
-    "pages/turntable/index",
-    "pages/tabdetail/index",
-    "pages/tabpro/index",
     "pages/tabside/index",
+    "pages/tabdetail/index",
+    "pages/turntable/index",
+    "pages/locker/index",
+    "pages/tabpro/index",
     "pages/html/index",
     "pages/item/index",
     "pages/itempop/index",
