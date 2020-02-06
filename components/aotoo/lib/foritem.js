@@ -9,6 +9,13 @@ import {
   resetSuidCount,
 } from './util'
 
+const eventName = ['tap', 'catchtap', 'aim', '_tap', '_aim', 
+'longpress', '_longpress', 'longtap', '_longtap',
+'touchstart', 'touchmove','touchend', 'touchcancel',
+'_touchstart', '_touchmove', '_touchend', '_touchcancel',
+'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'
+]
+
 function formatImg(props) {
   let img = props.img
   if (isString(img)) {
@@ -124,6 +131,17 @@ export function resetItem(data, context, loop, attrkey) {
             delete data.aim
           } else {
             extAttrs[key] = data[key]
+          }
+
+          if (eventName.includes(key) && context) {
+            if (key === 'aim') key = 'catchtap'
+            let val = data[key]
+            if (isFunction(val)) {
+              let fun = val.bind(context)
+              let funKey = '__on' + key
+              data[key] = funKey
+              context[funKey] = fun
+            }
           }
         }
       } else {
