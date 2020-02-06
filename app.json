@@ -1,5 +1,7 @@
 {
   "pages": [
+    "pages/fruit/index",
+    "pages/guagua/index",
     "pages/markdown/index",
     "pages/tabside/index",
     "pages/tabdetail/index",

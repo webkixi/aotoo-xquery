@@ -1,0 +1,8 @@
+<view class="container">
+  <view class="guagua-container">
+    <ui-item wx:if="{{guaguaConfig}}" item="{{guaguaConfig}}" />
+    <canvas type='2d' disable-scroll="true" id="guagua-canvas" class='guagua-canvas'></canvas>
+  </view>
+</view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />
