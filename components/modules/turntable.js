@@ -117,6 +117,7 @@ function mkGifts(max=6, data) {
 
 module.exports = function(params) {
   let dft = {
+    id: '',
     data: [],
     colors: [], 
     times: 5,  // 默认转几圈
@@ -182,6 +183,9 @@ module.exports = function(params) {
     ],
     methods: {
       __ready(){
+        if (config.id) {
+          this.activePage[config.id] = this
+        }
         let that = this
         this.timmer = null
         this.running = false

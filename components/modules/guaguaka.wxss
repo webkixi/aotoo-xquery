@@ -1,0 +1,41 @@
+.guagua-container{
+  position: relative;
+  width: 200px;
+  height: 100px;
+}
+
+.guagua-canvas{
+  width: 100%;
+  height: 100%;
+}
+
+.guaguayes {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid red;
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 30px;
+  font-weight: 700;
+  color: red;
+}
+
+.guaguayes .guagua-touchpad{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
+
+.guaguayes .guagua-touchpad .htitle{
+  display: block;
+  width: 100%;
+  height: 100%;
+}

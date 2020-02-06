@@ -1,0 +1,42 @@
+.fruit-container{
+  position: relative;
+  width: 380px;
+  height: 380px;
+}
+
+.fruit-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.fruit-machine{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  position: absolute;
+  box-sizing: border-box;
+  left: 0;
+  top: 0;
+}
+
+.fruit-machine .item{
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fruit-machine .item.valide{
+  border: 3px solid #efefef;
+  border-radius: 10px;
+}
+
+.fruit-machine .item.valide image{
+  width: 100%;
+}
+
+.fruit-machine .item.inValide{
+  /* border: 10px solid #000; */
+  /* background-color: #ccc; */
+}
