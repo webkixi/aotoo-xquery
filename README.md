@@ -28,7 +28,7 @@ xquery包含以下这些特性
 
 ## DEMO列表  
 demo图片均有效，github图片需要翻墙才能查看  
-![/images/demo.jpg](/css/demo.jpg)
+![demo](http://www.agzgz.com/myimgs/demo.jpg)
 
 
 ## 如何使用  
@@ -102,4 +102,4 @@ markdown/html组件
 
 ## DEMO小程序 
 
-![DEMO小程序](./css/xquery.png)
+![DEMO小程序](http://www.agzgz.com/myimgs/xquery.png)
