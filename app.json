@@ -1,10 +1,10 @@
 {
   "pages": [
+    "pages/markdown/index",
+    "pages/tabdetail/index",
     "pages/fruit/index",
     "pages/guagua/index",
-    "pages/markdown/index",
     "pages/tabside/index",
-    "pages/tabdetail/index",
     "pages/turntable/index",
     "pages/locker/index",
     "pages/tabpro/index",
