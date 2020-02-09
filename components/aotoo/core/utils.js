@@ -37,6 +37,15 @@ export function post(url, data={}, param={}, method='POST') {
     }
     postParam = Object.assign(postParam, param)
     postParam.fail = postParam.error
+
+    // if (method === 'GET') {
+    //   let tmp = lib.formatQuery(url)
+    //   let query = Object.assign({}, data, tmp.query)
+    //   url = lib.formatToUrl(tmp.url, query)
+    //   postParam.url = url
+    //   console.log('========1111', url);
+    // }
+
     if (postParam.url) wx.request(postParam)
   })
 }
@@ -185,7 +194,8 @@ class UsualKit {
           let stat = res.authSetting[`scope.${scopeType}`]
           if (!stat) {
             if (scopeType === 'userInfo') {
-              return resolve(stat)
+              // return resolve(stat)
+              return erro(stat)
             }
           }
           wx.authorize({

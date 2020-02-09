@@ -230,13 +230,15 @@
   </block>
   <block wx:else>
     <block wx:if="{{util.isString(item.src)}}">
-      <image 
+      <!-- <image 
         style="{{item.style||item.itemStyle||''}}" 
         lazy-load="{{true}}" 
         class="himg {{item.class||item.itemClass||''}}" 
         mode="{{item.mode || 'widthFix'||''}}" 
         src="{{item.src}}" 
-        bind:tap="{{item.tap ? 'itemMethod' : ''}}" 
+        webp="{{item.webp||''}}" 
+        show-menu-by-longpress="{{item['show-menu-by-longpress']||''}}"
+        bind:tap="{{item.tap ? 'itemMethod' : item.preview ? 'imgPreview' : ''}}" 
         bind:longtap="{{item.longtap ? 'itemMethod' : ''}}" 
         bind:longpress="{{item.longpress ? 'itemMethod' : ''}}"
         bind:touchstart="{{item.touchstart ? 'itemMethod' : ''}}"
@@ -246,7 +248,33 @@
         catch:tap="{{(item.aim||item.catchtap) ? 'catchItemMethod' : ''}}"
         catch:longpress="{{item.catchlongpress ? 'catchItemMethod' : ''}}"
         catch:longtap="{{item.catchlongtap ? 'catchItemMethod' : ''}}"
-        data-evt="{{util.dataEvt(item, ['tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel'])}}"
+
+        binderror=        "{{item.binderror ? 'itemMethod' : ''}}"
+        bindload=         "{{item.bindload ? 'itemMethod' : ''}}"
+        data-evt="{{util.dataEvt(item, ['preview', 'tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
+      /> -->
+      <image 
+        style="{{item.style||item.itemStyle||''}}" 
+        lazy-load="{{true}}" 
+        class="himg {{item.class||item.itemClass||''}}" 
+        mode="{{item.mode || 'widthFix'||''}}" 
+        src="{{item.src}}" 
+        data-src = "{{item.src}}"
+        webp="{{item.webp||''}}" 
+        show-menu-by-longpress="{{item['show-menu-by-longpress']||''}}"
+
+        catch:touchstart= "{{(item.touchstart || item.catchtouchstart) ? 'itemMethod' : ''}}"
+        catch:touchmove=  "{{(item.touchmove || item.catchtouchmove) ? 'itemMethod' : ''}}"
+        catch:touchend =  "{{(item.touchend  || item.catchtouchend) ? 'itemMethod' : ''}}"
+        catch:cancel=     "{{(item.cancel || item.catchcancel) ? 'itemMethod' : ''}}"
+
+        catch:tap=        "{{(item.tap || item.aim||item.catchtap) ? 'catchItemMethod' : item.preview ? 'imgPreview' : ''}}"
+        catch:longpress=  "{{item.longpress || item.catchlongpress ? 'catchItemMethod' : ''}}"
+        catch:longtap=    "{{item.longtap || item.catchlongtap ? 'catchItemMethod' : ''}}"
+
+        binderror=        "{{item.binderror ? 'itemMethod' : ''}}"
+        bindload=         "{{item.bindload ? 'itemMethod' : ''}}"
+        data-evt="{{util.dataEvt(item, ['bindload', 'binderror', 'preview', 'tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
       />
 
       <!-- <block wx:if="{{util.hasEvent(item)}}">

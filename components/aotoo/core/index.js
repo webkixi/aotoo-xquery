@@ -468,4 +468,5 @@ core.listComponentBehavior = listComponentBehavior
 core.treeBehavior = treeBehavior
 core.treeComponentBehavior = treeComponentBehavior
 core.hooks = lib.hooks
+lib.innerKit = core.toolkit
 module.exports = core

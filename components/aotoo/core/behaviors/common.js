@@ -1241,6 +1241,36 @@ export const commonMethodBehavior = (app, mytype) => {
       catchItemMethod: function (e) {
         reactFun.call(this, app, e, 'catch')
       },
+
+      imgPreview: function(e) {
+        let currentTarget = e.currentTarget
+        let dataset = currentTarget.dataset
+        let src = dataset.src
+
+        let $item = this.data.$item
+        let $img = $item.img
+        let findIt = null
+        if (lib.isArray($img)) {
+          findIt = $img.find({src})
+        } else {
+          findIt = $img
+        }
+
+        if (findIt) {
+          let preview = findIt.preview
+          let previewConfig = {
+            current: src,
+            urls: [src]
+          }
+          if (lib.isArray(preview)) {
+            previewConfig = {
+              current: src,
+              urls: preview
+            }
+          }
+          wx.previewImage(previewConfig)
+        }
+      }
     }
   })
 }

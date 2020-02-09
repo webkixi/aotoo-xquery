@@ -7,6 +7,17 @@
   <!-- item.tap -->
   <block wx:if="{{item.tap}}">
     <view 
+      data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']) || ''}}" 
+      data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+      id="{{item.id || id || ''}}" 
+      style="{{item.style||item.itemStyle||''}}" 
+      class="{{item.class||item.itemClass||''}}"  
+      bind:tap="itemMethod" 
+      data-evt="{{util.dataEvt(item, ['tap'])}}"
+    >
+      <include src="../slot.wxml" />
+    </view>
+    <!-- <view 
       data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
       data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
       id="{{item.id || id}}" 
@@ -28,7 +39,7 @@
       >
         <include src="../slot.wxml" />
       </view>
-    </block>
+    </block> -->
   </block>
 
   <!--  -->
@@ -36,6 +47,18 @@
   <!-- item.catchtap -->
   <block wx:elif="{{item.catchtap}}">
     <view 
+      data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']) || ''}}" 
+      data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+      id="{{item.id || id || ''}}" 
+      style="{{item.style||item.itemStyle||''}}" 
+      class="{{item.class||item.itemClass||''}}"  
+      catch:tap="catchItemMethod" 
+      data-evt="{{util.dataEvt(item, ['catchtap'])}}"
+    >
+        <include src="../slot.wxml" />
+    </view>
+
+    <!-- <view 
       data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
       data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
       id="{{item.id || id}}" 
@@ -57,7 +80,7 @@
       >
         <include src="../slot.wxml" />
       </view>
-    </block>
+    </block> -->
   </block>
 
 
