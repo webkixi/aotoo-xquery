@@ -32,20 +32,12 @@ export function post(url, data={}, param={}, method='POST') {
         resolve(res)
       },
       error: function (e) {
-        reject('网络出错');
+        // reject('网络出错');
+        reject(e)
       }
     }
     postParam = Object.assign(postParam, param)
     postParam.fail = postParam.error
-
-    // if (method === 'GET') {
-    //   let tmp = lib.formatQuery(url)
-    //   let query = Object.assign({}, data, tmp.query)
-    //   url = lib.formatToUrl(tmp.url, query)
-    //   postParam.url = url
-    //   console.log('========1111', url);
-    // }
-
     if (postParam.url) wx.request(postParam)
   })
 }

@@ -55,7 +55,7 @@
       catch:tap="catchItemMethod" 
       data-evt="{{util.dataEvt(item, ['catchtap'])}}"
     >
-        <include src="../slot.wxml" />
+      <include src="../slot.wxml" />
     </view>
 
     <!-- <view 
@@ -96,6 +96,16 @@
   <block wx:if="{{item.tap}}">
     <view 
       data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+      id="{{item.id||id||''}}" 
+      style="{{item.style||item.itemStyle||''}}" 
+      class="{{item.class||item.itemClass}}"  
+      bind:tap="itemMethod" 
+      data-evt="{{util.dataEvt(item, ['tap'])}}"
+    >
+      <include src="../slot.wxml" />
+    </view>
+    <!-- <view 
+      data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
       id="{{item.id || id}}" 
       wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" 
       class="{{item.class||item.itemClass}}"  
@@ -114,7 +124,7 @@
       >
         <include src="../slot.wxml" />
       </view>
-    </block>
+    </block> -->
   </block>
 
   <!--  -->
@@ -122,6 +132,16 @@
   <!-- item.catchtap -->
   <block wx:elif="{{item.catchtap}}">
     <view 
+      data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+      id="{{item.id || id|| ''}}" 
+      style="{{item.style||item.itemStyle||''}}" 
+      class="{{item.class||item.itemClass||''}}"  
+      catch:tap="catchItemMethod" 
+      data-evt="{{util.dataEvt(item, ['catchtap'])}}"
+    >
+      <include src="../slot.wxml" />
+    </view>
+    <!-- <view 
       data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
       id="{{item.id || id}}" 
       wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" 
@@ -141,7 +161,7 @@
       >
         <include src="../slot.wxml" />
       </view>
-    </block>
+    </block> -->
   </block>
 
 </block>

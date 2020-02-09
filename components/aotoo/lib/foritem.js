@@ -138,7 +138,7 @@ export function resetItem(data, context, loop, attrkey) {
             let val = data[key]
             if (isFunction(val)) {
               let fun = val.bind(context)
-              let funKey = '__on' + key
+              let funKey = suid('__on_') + key
               data[key] = funKey
               context[funKey] = fun
             }
