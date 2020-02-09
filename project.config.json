@@ -4,7 +4,7 @@
 		"ignore": []
 	},
 	"setting": {
-		"urlCheck": true,
+		"urlCheck": false,
 		"es6": true,
 		"enhance": true,
 		"postcss": true,
@@ -28,7 +28,7 @@
 	},
 	"compileType": "miniprogram",
 	"libVersion": "2.10.1",
-	"appid": "wxce40ad9bd2b4e27c",
+	"appid": "wxf3ea6bf81c6ef85a",
 	"projectname": "xquery%E6%B5%8B%E8%AF%95",
 	"debugOptions": {
 		"hidedInDevtools": []

@@ -1,0 +1,5 @@
+<view class="container">
+  <ui-list wx:if="{{collapsConfig}}" list="{{collapsConfig}}" />
+</view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />

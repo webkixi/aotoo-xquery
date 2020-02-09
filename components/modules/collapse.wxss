@@ -1,0 +1,95 @@
+.collaps-pad{
+  width: 95vw;
+  height: auto;
+}
+
+.collaps-pad .htitle{
+  display: block;
+}
+
+.collaps-pad .collaps-item{
+  position: relative;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.collaps-pad .collaps-item > image{
+  position: absolute;
+  left: 10px;
+  top: 5px;
+}
+
+.collaps-pad .collaps-item > .htitle{
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  background-color: #eee;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-top-left-radius:5px;
+  border-top-right-radius:5px;
+  /* border-bottom-right-radius:5px;
+  border-bottom-left-radius:5px; */
+}
+
+.collaps-pad .collaps-item > .htitle::after{
+  content: '◎';
+  color: #666;
+  display: block;
+}
+
+.collaps-pad .collaps-item.on>.htitle::after {
+  content: '○';
+  color: #bbb;
+  display: block;
+}
+
+.collaps-pad .collaps-item.disabled>.htitle::after {
+  content: '';
+}
+
+.collaps-pad .collaps-item > .htitle:hover{
+  background-color: #ddd;
+}
+
+.collaps-pad .collaps-item.disabled > .htitle {
+  background-color: #efefef;
+  color: #aaa;
+}
+
+.collaps-pad .collaps-item > .hbody {
+  padding: 0;
+  margin: 0;
+  height: 0;
+  transition: all 0.2s ease-in-out;
+}
+
+.collaps-pad .collaps-item > .hbody .hb-item {
+  display: none;
+}
+
+.collaps-pad .collaps-item.disabled > .hbody .hb-item {
+  display: none;
+}
+
+.collaps-pad .collaps-item.on > .hbody {
+  display: block;
+  height: 200px;
+  overflow: scroll;
+}
+
+.collaps-pad .collaps-item.on > .hbody .hb-item {
+  margin: 10px;
+  display: block;
+}

@@ -30,7 +30,7 @@ module.exports = {
           ],
           enableMask: true,
           closeBtn: true,
-          itemStyle: 'width: 90vw; height: 70vh; top: -100px'
+          itemStyle: 'width: 90vw; height: 70vh; top: -100px; overflow: auto'
         })
       }
     }
