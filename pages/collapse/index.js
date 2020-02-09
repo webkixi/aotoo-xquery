@@ -61,11 +61,5 @@ Pager({
       },
     }),
     ...source
-  },
-  xxx(e){
-    console.log('===== nnnn');
-  },
-  onReady(){
-    
   }
 })

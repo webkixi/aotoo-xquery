@@ -1,0 +1,6 @@
+@import "../../components/modules/collapse.wxss";
+@import "../common/source.wxss";
+
+.container{
+  padding-top: 100rpx;
+}

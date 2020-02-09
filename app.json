@@ -1,8 +1,8 @@
 {
   "pages": [
-    "pages/collapse/index",
-    "pages/poi/index",
     "pages/markdown/index",
+    "pages/poi/index",
+    "pages/collapse/index",
     "pages/tabdetail/index",
     "pages/fruit/index",
     "pages/guagua/index",
