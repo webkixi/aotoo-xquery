@@ -13,7 +13,8 @@ const eventName = ['tap', 'catchtap', 'aim', '_tap', '_aim',
 'longpress', '_longpress', 'longtap', '_longtap',
 'touchstart', 'touchmove','touchend', 'touchcancel',
 '_touchstart', '_touchmove', '_touchend', '_touchcancel',
-'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'
+'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel',
+'touchoption'
 ]
 
 function formatImg(props) {
@@ -30,6 +31,7 @@ function formatImg(props) {
 }
 
 // 处理url
+// hash 传递navigate组件的参数
 function formatUrl(props) {
   let url = props.url
   if (isString(url)) {

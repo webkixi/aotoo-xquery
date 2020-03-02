@@ -26,9 +26,12 @@ export function reSetItemAttr(item, list){
   if (list.itemMethod ){
     var itm = list.itemMethod
     if (typeof itm == 'object') {
-      if (!item.idf && (item.title || item.img)) {
+      if (!item.idf) {
         item = Object.assign({}, itm, item)
       }
+      // if (!item.idf && (item.title || item.img)) {
+      //   item = Object.assign({}, itm, item)
+      // }
       // Object.keys(itm).forEach(evt=>{
       //   item[evt] = itm[evt]
       // })
@@ -100,12 +103,16 @@ export function reSetArray(data, list) {
       let methods = list.itemMethod
       let tmp = {}
       Object.keys(methods).forEach(key => {
-        let funKey = '__on'+key
-        tmp[key] = funKey
-        let fun = methods[key]
-        if (isFunction(fun)) {
-          fun = fun.bind(that)
-          that[funKey] = fun
+        if (key === 'touchoption') {
+          tmp[key] = methods[key]
+        } else {
+          let funKey = '__on'+key
+          tmp[key] = funKey
+          let fun = methods[key]
+          if (isFunction(fun)) {
+            fun = fun.bind(that)
+            that[funKey] = fun
+          }
         }
       })
       list.itemMethod = tmp

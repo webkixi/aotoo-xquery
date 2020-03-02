@@ -139,28 +139,6 @@ function existTemp(item, excludeTmp) {
   } : noopRet
 }
 
-function customCustom(item, key, attrName) {
-  var comp = item[key]
-  var compOption = comp && comp.option || {}
-  var compChildren = comp && comp.children || []
-
-  if (attrName) {
-    return compOption[attrName]
-  }
-  if (isArray(comp)) {
-    return {
-      option: compOption,
-      children: comp
-    }
-  }
-  if (isObject(comp)) {
-    return {
-      option: compOption,
-      children: compChildren
-    }
-  }
-}
-
 var innerCount = -1
 function suid(prefix) {
   innerCount++
@@ -220,9 +198,10 @@ function dataEvt(item, selects) {
   var evtStr = ''
   if (selects && isArray(selects)) {
     selects.forEach(function(evtName, ii) {
-      if (item[evtName]) {
-        var val = item[evtName]
+      if (item[evtName]||(item.type&&item.type[evtName])) {
+        var val = item[evtName]||(item.type&&item.type[evtName])
         if (isArray(val)) val = val.join(';;')
+        if (isObject(val)) val = '<'+JSON.stringify(val)+'>' // <{ ... }>
         if ((ii+1)==selects.length) {
           evtStr += evtName+'='+val
         } else {
@@ -245,7 +224,7 @@ function getClass(item, prefix){
   return myClass
 }
 
-function formatQuery(url) {
+function formatQuery(url, attrAry) {
   var aim = url
   var query={};
   if (url) {
@@ -253,13 +232,37 @@ function formatQuery(url) {
     aim = urls[0]
     if (urls[1]) {
       var params = urls[1].split('&')
-      params.forEach(function (param) {
+      params.forEach(function (param, ii) {
         var attrs = param.split('=')
-        query[attrs[0]] = attrs[1] ? attrs[1] : true
+        if (attrs[1] === '__xxx__' && attrAry) {
+          query[attrs[0]] = attrAry[ii]
+        } else {
+          query[attrs[0]] = attrs[1] ? attrs[1] : true
+        }
       })
     }
   }
   return {url: aim, query: query}
+}
+
+function parseObject(str, type) {
+  var re = getRegExp("\<\{[^\>]*\}\>", "g")
+  var objAry = str.match(re)
+  var targetAry = []
+  var targetObj = {}
+  str = str.replace(re, '__xxx__')
+  objAry && objAry.forEach(function (it, ii) {
+    var myQuery = {}
+    it = it.replace('<{', '').replace('}>', '').replace(getRegExp('"', 'g'), '')
+    var ary = it.split(',')
+    ary.forEach(function (ele) {
+      var aa = ele.split(':')
+      myQuery[aa[0]] = aa[1]
+      targetObj[aa[0]] = aa[1]
+    })
+    targetAry.push(myQuery)
+  })
+  return type ? targetAry : targetObj
 }
 
 var storeEvts = {}
@@ -270,6 +273,23 @@ function rightEvent(dsetEvt) {
     // if (storeEvts[_id]) {
     //   return storeEvts[_id]
     // }
+
+    // 取出字串中的object对象字串，并重新解析为object
+    var targetAry = parseObject(dsetEvt, 'return ary')
+    // var re = getRegExp("\<\{[^\>]*\}\>", "g")
+    // var objAry = dsetEvt.match(re)
+    // var targetAry = []
+    // dsetEvt = dsetEvt.replace(re, '__xxx__')
+    // objAry && objAry.forEach(function (it, ii) {
+    //   var myQuery = {}
+    //   it = it.replace('<{', '').replace('}>', '').replace(getRegExp('"', 'g'), '')
+    //   var ary = it.split(',')
+    //   ary.forEach(function (ele) {
+    //     var aa = ele.split(':')
+    //     myQuery[aa[0]] = aa[1]
+    //   })
+    //   targetAry.push(myQuery)
+    // })
 
     var rightEvt
     if (dsetEvt.indexOf('?') > -1) {
@@ -283,7 +303,7 @@ function rightEvent(dsetEvt) {
           var its = item.split('=')
           var itName = its.splice(0, 1)
           var itQuery = its.join('=')
-          var evtObj = formatQuery(itQuery)
+          var evtObj = formatQuery(itQuery, targetAry)
           myQuery[itName] = {
             fun: evtObj.url,
             param: evtObj.query,
@@ -294,7 +314,7 @@ function rightEvent(dsetEvt) {
       rightEvt.allParam = myQuery
     } else {
       dsetEvt = dsetEvt.replace('@@', '?').replace(getRegExp(",", "g"), '&')
-      var evtObj = formatQuery(dsetEvt)
+      var evtObj = formatQuery(dsetEvt, targetAry)
       var evtType = evtObj.url
       var evtQuery = evtObj.query
       var evtSelect = evtQuery[evtType]
@@ -325,18 +345,27 @@ function rightEvent(dsetEvt) {
 
 var tpos = {
   instance: undefined,
-  start: { x: 0, y: 0 },
-  current: {x: 0, y: 0, pos: 0},
+  start: { x: 0, y: 0, timeStamp: 0 },
+  // btns：有多少个附加按钮用于计算宽度
+  // inst 当前子项的实例
+  current: {x: 0, y: 0, pos: 0, timeStamp: 0, index: -1, btns: 0, inst: null}, 
   distance: 0,
   events: {},
-  moving: false,
+  moving: false,    // touchmove触发状态
+  endTouch: false,  // touchend触发状态
   timeStamp: {
     gap: 500,
     start: 0,
     end: 0
   },
-  _siblingIds: []
+  _siblingIds: [],
+  tops: null,  // top值合集
+  _tops: null,  // 上一次top值合集
+  lefts: null,  // left值合集
+  _lefts: null  // 上一次left值合集
 }
+
+var globleVar = {}
 
 var touchMethods = ['touchstart', 'touchmove', 'touchend']
 var catchTouchMethods = ['catchtouchstart', 'catchtouchmove', 'catchtouchend']
@@ -363,6 +392,69 @@ function isFakeEvent(allParam) {
   return isFake
 }
 
+function optionObserver(newValue, oldValue, ownerInstance, instance) {
+  globleVar.touchoption = newValue
+  globleVar.oldTouchoption = oldValue
+}
+
+function initTouchEnv(e, ins, dsetEvt) {
+  var currentTarget = e.currentTarget
+  var dataset = currentTarget.dataset
+  
+  var tmp = rightEvent(dsetEvt)
+  var allParam = tmp.allParam
+  if (allParam) {
+    tpos.events.tap = allParam._tap ? allParam._tap : allParam.tap ? allParam.tap : undefined
+    tpos.events.catchtap = allParam._aim ? allParam._aim : allParam._catchtap ? allParam._catchtap : allParam.catchtap ? allParam.catchtap : undefined
+    tpos.events.longpress = allParam._longpress ? allParam._longpress : allParam.longpress ? allParam.longpress : undefined
+    tpos.events.catchlongpress = allParam._catchlongpress ? allParam._catchlongpress : allParam.catchlongpress ? allParam.catchlongpress : undefined
+    tpos.events.longtap = allParam._longtap ? allParam._longtap : allParam.longtap ? allParam.longtap : undefined
+    tpos.events.catchlongtap = allParam._catchlongtap ? allParam._catchlongtap : allParam.catchlongtap ? allParam.catchlongtap : undefined
+
+    tpos.events.touchstart = allParam.touchstart || allParam.catchtouchstart
+    tpos.events.touchmove = allParam.touchmove || allParam.catchtouchmove
+    tpos.events.touchend = allParam.touchend || allParam.catchtouchend
+    tpos.events.touchcancel = allParam.touchcancel || allParam.catchtouchcancel
+
+    if (allParam.__drop && (e.type === 'touchstart' || e.type ==='touchend')) {
+      allParam.__drop.gap = allParam.__drop.gap ? parseInt(allParam.__drop.gap) : 0
+      var option = allParam.__drop
+      var wid = parseInt(option.width.replace('px', ''))
+      var hgt = parseInt(option.height.replace('px', ''))
+      var gap = option.gap
+
+      var allInst = ins.selectAllComponents('.'+allParam.__drop.itemClass)
+      var ary = []
+      var aryLeft = []
+      var insts = []
+      allInst.forEach(function(item, ii) {
+        var ds = item.getDataset()
+        var id = ds.id, treeid = ds.treeid, top = ds.top, left = ds.left, right = ds.right, bottom = ds.bottom, widht = ds.width, height = ds.height
+        ary.push({id: id, val: top, index: ii})
+        aryLeft.push({id: id, val: left, index: ii})
+        item.id = ds.id
+        insts.push(item)
+      })
+
+      tpos.tops = ary
+      tpos.lefts = aryLeft
+      tpos.allInst = insts  // 子元素集合
+
+      if (tpos.tops) {
+        if (!tpos._tops) { // 第一次_tops为null
+          tpos._tops = tpos._tops || tpos.tops
+        }
+      }
+      if (tpos.lefts) {
+        if (!tpos._lefts) { // 第一次_lefts为null
+          tpos._lefts = tpos._lefts || tpos.lefts
+        }
+      }
+    }
+  }
+  return tmp
+}
+
 function chooseTouchFun(e, ins, stopPropagation) {
   var evtType = e.type
   var currentTarget = e.currentTarget
@@ -378,20 +470,10 @@ function chooseTouchFun(e, ins, stopPropagation) {
 
   tpos.events = {}
 
-  var tmp = rightEvent(dsetEvt)
+  var tmp = initTouchEnv(e, ins, dsetEvt)
   var allParam = tmp.allParam
   
   if (allParam) {
-    tpos.events.tap = allParam._tap ? allParam._tap : allParam.tap ? allParam.tap : undefined
-    tpos.events.catchtap = allParam._aim ? allParam._aim : allParam._catchtap ? allParam._catchtap : allParam.catchtap ? allParam.catchtap : undefined
-    tpos.events.longpress = allParam._longpress ? allParam._longpress : allParam.longpress ? allParam.longpress : undefined
-    tpos.events.catchlongpress = allParam._catchlongpress ? allParam._catchlongpress : allParam.catchlongpress ? allParam.catchlongpress : undefined
-
-    tpos.events.touchstart = allParam.touchstart || allParam.catchtouchstart
-    tpos.events.touchmove = allParam.touchmove || allParam.catchtouchmove
-    tpos.events.touchend = allParam.touchend || allParam.catchtouchend
-    tpos.events.touchcancel = allParam.touchcancel || allParam.catchtouchcancel
-
     if (allParam.__slip) {
       var slip = allParam.__slip.fun ? allParam.__slip.fun.split(';;') : allParam.__slip.split(';;')
       var slip2 = slip[2] && slip[2].split(':')
@@ -469,7 +551,8 @@ function chooseTouchFun(e, ins, stopPropagation) {
     }
     
      e.__query = tmp.param
-     tpos.__allParam = allParam
+     tpos.__allParam = tpos.__allParam || allParam
+     tpos._allParam = tpos._allParam || sClone(tpos.__allParam)
      switch (evtType) {
        case 'touchstart':
          tStart(e, slipObj, ins, stopPropagation)
@@ -487,11 +570,11 @@ function chooseTouchFun(e, ins, stopPropagation) {
 }
 
 function iMethod(e, ins) {
-  var res = chooseTouchFun(e, ins)
+  chooseTouchFun(e, ins)
 }
 
 function ciMethod(e, ins) {
-  var res = chooseTouchFun(e, ins, 'catch')
+  chooseTouchFun(e, ins, 'catch')
 }
 
 function setStyle(inst, distance, distanceY) {
@@ -509,6 +592,8 @@ function tStart(e, slip, ins, stopPropagation) {
   var pageX = target.pageX
   var pageY = target.pageY
   tpos.timeStamp.start = e.timeStamp
+  tpos.endTouch = false
+  tpos.moving = false
 
   var cb = param.cb
   var h = parseInt(slip.height)
@@ -519,6 +604,10 @@ function tStart(e, slip, ins, stopPropagation) {
   var find = slip.find
   var inst = e.instance
   var tmpTarget = tpos.instance
+
+  tpos.start.x = pageX
+  tpos.start.y = pageY
+  tpos.start.timeStamp = e.timeStamp
 
   if (allParam.__slip) {
     if (tmpTarget) {
@@ -565,22 +654,40 @@ function tStart(e, slip, ins, stopPropagation) {
   } else {
     /** */
   }
+
+  if (allParam.__drop){
+    dropStart(e, ins)
+  }
+
+
+  // 响应js的touchstart方法
   var tevent = tpos.events.touchstart
   if (tevent && (tevent !== 'true' || tevent.fun !== 'true')) {
     stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
   }
+
+  // 模拟longpress
+  if (!tpos.moving) {
+    if (tpos.events.longpress || tpos.events.catchlongpress) {
+      var targetTimeStamp = e.timeStamp + tpos.timeStamp.gap
+      var ts = e.timeStamp
+      var newE = JSON.parse(JSON.stringify(e))
+      newE.type = 'longpress'
+      newE.__stopPropagation = tpos.events.catchlongpress ? true : false
+      
+      function endPoint(params) {
+        if (ts<targetTimeStamp) {
+          if (!tpos.endTouch) ins.requestAnimationFrame(endPoint)
+          ts+=17
+        } else {
+          callMethod(newE, ins)
+        }
+      }
+      ins.requestAnimationFrame(endPoint)
+    }
+  }
 }
 
-/**
- * 'a'  左  <-
- * 's'  下
- * 'd'  右  ->
- * 'w'  上
- * 'ad'  左右
- * 'ws'  上下
- * 'wsad' 上下左右
- * '@'  全方位
- */
 function tMove(e, slip, ins, stopPropagation) {
   var currentTarget = e.currentTarget
   var dataset = currentTarget.dataset
@@ -611,15 +718,21 @@ function tMove(e, slip, ins, stopPropagation) {
   var toX = pageX - curX
   var toY = pageY - curY
 
-  tpos.moving = false
-  tpos.instance && (tpos.instance.moving = false)
-  if (absDiffx > 10 || absDiffy > 10) {
-    tpos.moving = true
-    if (allParam.__slip) tpos.instance && (tpos.instance.moving = true)
-  }
+  tpos.moving = true
+
+  // tpos.moving = false
+  // tpos.instance && (tpos.instance.moving = false)
+  // if (absDiffx > 10 || absDiffy > 10) {
+  //   tpos.moving = true
+  //   // if (allParam.__slip) tpos.instance && (tpos.instance.moving = true)
+  // }
   
   var h = parseInt(slip.height)
   if (allParam.__slip) {
+    if (absDiffx > 10 || absDiffy > 10) {
+      tpos.instance && (tpos.instance.moving = true)
+    }
+
     var oriIndex = slip.siblingIds.indexOf(treeid)
     var curIndex = tpos._siblingIds.indexOf(treeid)
     var curPos  = curIndex*h
@@ -734,12 +847,33 @@ function tMove(e, slip, ins, stopPropagation) {
   } else {
     /** */
   }
+
+  // 允许拖动
+  if (allParam.__drop) {
+    dropMove(e, ins)
+  }
+
   tpos.current.x = pageX
   tpos.current.y = pageY
+  tpos.current.timeStamp = e.timeStamp
   var tevent = tpos.events.touchmove
   if (tevent && (tevent !== 'true' || tevent.fun !== 'true')) {
     stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
   }
+}
+
+function dropStart(e, ins) {
+  
+}
+
+
+
+function dropMove(e, ins) {
+  
+}
+
+function dropEnd(e, ins) {
+  
 }
 
 function tEnd(e, slip, ins, stopPropagation) {
@@ -760,6 +894,7 @@ function tEnd(e, slip, ins, stopPropagation) {
   tpos.timeStamp.end = e.timeStamp
   var gapTime = tpos.timeStamp.end - tpos.timeStamp.start
 
+  tpos.endTouch = true
   var myInst = tpos.instance
   var inst = e.instance
   var target = e.touches[0] || e.changedTouches[0]
@@ -841,15 +976,20 @@ function tEnd(e, slip, ins, stopPropagation) {
   var isFake = isFakeEvent(allParam)
   var newE = JSON.parse(JSON.stringify(e))
   var tevent = tpos.events.touchend
-
   if (tevent && (tevent !== 'true' || tevent.fun !== 'true')) {
     stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
   }
 
+  // 允许拖动
+  if (allParam.__drop) {
+    dropEnd(e, ins)
+  }
+
+  // 模拟的longtap tap
   if (!tpos.moving) {
     if (gapTime > tpos.timeStamp.gap) {
-      if (tpos.events.longpress || tpos.events.catchlongpress) {
-        newE.type = 'longpress'
+      if (tpos.events.longtap || tpos.events.catchlongtap) {
+        newE.type = 'longtap'
         newE.__stopPropagation = tpos.events.catchlongpress ? true : false
       }
     } else {
@@ -863,13 +1003,13 @@ function tEnd(e, slip, ins, stopPropagation) {
       if (isFake) {
         callMethod(newE, ins)
       } else {
-        // if (parseInt(absDiffx) == 0 && parseInt(absDiffy) == 0 && tpos.distance == 0) {
         if (parseInt(absDiffx) == 0 && parseInt(absDiffy) == 0 ) {
           callMethod(newE, ins)
         }
       }
     }
   }
+  
   tpos.moving = false
 }
 
@@ -901,6 +1041,7 @@ module.exports = {
   getItemClass: getItemClass,
   getItemStyle: getItemStyle,
 
+  optionObserver: optionObserver,
   iMethod: iMethod,
   ciMethod: ciMethod,
   tStart: tStart,

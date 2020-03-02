@@ -21,15 +21,15 @@
 <template name="itemContent">
   <block wx:if="{{item.show}}">
     <slot name="top"></slot>
-    <block wx:if="{{type && util.isObject(type) && type.is === 'slip'}}">
+    <block wx:if="{{type && util.isObject(type) && type.is === 'drop'}}">
       <block wx:if="{{item.$$id}}">
-        <ui-item item="{{ {__slip: type.option, ...item} }}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+        <ui-item item="{{ {__drop: type.option, ...item} }}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
       </block>
       <block wx:else>
         <!-- <block wx:if="{{item.attr}}">
-          <ui-item item="{{ {__slip: type.option, ...item} }}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}" />
+          <ui-item item="{{ {__drop: type.option, ...item} }}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}" />
         </block> -->
-        <template is="item" data="{{ item: {__slip: type.option, ...item} }}" />
+        <template is="item" data="{{ item: {__drop: type.option, ...item} }}" />
       </block>
     </block>
     <block wx:elif="{{type && util.isObject(type) && type.isItem}}">
@@ -138,11 +138,21 @@
     scroll-into-view="{{ list.type['scroll-into-view']||''}}" 
     scroll-with-animation	="{{ list.type['scroll-with-animation']||'' }}" 
     enable-back-to-top="{{ list.type['enable-back-to-top']||'' }}" 
+    enable-flex="{{ list.type['enable-flex']||'' }}" 
+    scroll-anchoring="{{ list.type['scroll-anchoring']||'' }}" 
+    refresher-enabled="{{ list.type['refresher-enabled']||'' }}" 
+    refresher-threshold="{{ list.type['refresher-threshold']||'' }}" 
+    refresher-default-style="{{ list.type['refresher-default-style']||'' }}" 
+    refresher-background="{{ list.type['refresher-background']||'' }}" 
+    refresher-triggered="{{ list.type['refresher-triggered']||'' }}" 
     bindscrolltoupper="{{list.type&&list.type.bindscrolltoupper ? '_scrollMethod' : ''}}"
     bindscrolltolower="{{list.type&&list.type.bindscrolltolower ? '_scrollMethod' : ''}}"  
     bindscroll="{{list.type&&list.type.bindscroll ? '_scrollMethod' : ''}}"
-    aria-label="{{ list.type['aria-label']||'' }}" 
-    data-evt="{{util.dataEvt(list.type, ['bindscroll', 'bindscrolltolower', 'bindscrolltoupper'])}}"
+    bindrefresherpulling="{{list.type&&list.type.bindrefresherpulling ? '_scrollMethod' : ''}}"
+    bindrefresherrefresh="{{list.type&&list.type.bindrefresherrefresh ? '_scrollMethod' : ''}}"
+    bindrefresherrestore="{{list.type&&list.type.bindrefresherrestore ? '_scrollMethod' : ''}}"
+    bindrefresherabort="{{list.type&&list.type.bindrefresherabort ? '_scrollMethod' : ''}}"
+    data-evt="{{util.dataEvt(list.type, ['bindrefresherabort', 'bindrefresherrestore', 'bindrefresherrefresh', 'bindrefresherpulling', 'bindscroll', 'bindscrolltolower', 'bindscrolltoupper'])}}"
   >
     <slot name="scroll-top"></slot>
     <block wx:if="{{util.isArray(list.data)}}">

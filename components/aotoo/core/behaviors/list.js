@@ -162,7 +162,7 @@ export const listBehavior = function(app, mytype) {
         return this
       },
 
-      forEach(cb){
+      forEach(cb, callback){
         this.__foreachUpdata = {}
         let that = this
         let upData = {}
@@ -196,10 +196,10 @@ export const listBehavior = function(app, mytype) {
           // }
         })
         // this.update(upData)
-        this.update(this.__foreachUpdata)
+        this.update(this.__foreachUpdata, callback)
       },
 
-      addClass: function(listCls) {
+      addClass: function(listCls, cb) {
         if (listCls) {
           listCls = listCls.replace(/\./g, '')
           listCls = lib.isString(listCls) ? listCls.split(' ') : []
@@ -209,7 +209,7 @@ export const listBehavior = function(app, mytype) {
           $listClass = $listClass.concat(listCls)
           this.update({
             listClass: $listClass.join(' ')
-          })
+          }, cb)
         }
       },
 
@@ -226,7 +226,7 @@ export const listBehavior = function(app, mytype) {
         }
       },
 
-      removeClass: function (listCls) {
+      removeClass: function (listCls, cb) {
         if (listCls) {
           listCls = listCls.replace(/\./g, '')
           listCls = lib.isString(listCls) ? listCls.split(' ') : []
@@ -237,7 +237,7 @@ export const listBehavior = function(app, mytype) {
           $listClass = _cls
           this.update({
             listClass: ($listClass.join(' ') || ' ')
-          })
+          }, cb)
 
           // let indexs = []
           // $listClass.forEach((cls, ii)=>{
@@ -306,7 +306,7 @@ export const listBehavior = function(app, mytype) {
                     nval = reSetArray.call(this, param[key], $list).data
                   } else {
                     if (key.indexOf('title') > -1 || key.indexOf('img')>-1 || isObject(nval)) {
-                      if (key === 'type') {
+                      if (key === 'type' || nkey.indexOf('$list.type.') > -1) {
                         /** 不出来list.type数据 */
                       } else if (isObject(nval)) {
                         nval = reSetItemAttr.call(this, param[key], $list)
@@ -596,14 +596,14 @@ export const listBehavior = function(app, mytype) {
         }
       },
 
-      append: function(params) {
+      append: function(params, cb) {
         const that = this
         if (params) {
           let $list = this.data.$list
           let $data = $list.data
           let appendFun = (opts) => {
             $list.data = $data.concat(that.__newItem(opts, 'append'))
-            that.setData({$list})
+            that.setData({$list}, cb)
           }
 
           let result = this.hooks.emit('append', params)
@@ -621,14 +621,14 @@ export const listBehavior = function(app, mytype) {
         return this
       },
 
-      prepend: function(params) {
+      prepend: function(params, cb) {
         const that = this
         if (params) {
           let $list = this.data.$list
           let $data = $list.data
           let prependFun = (opts) => {
             $list.data = [].concat(this.__newItem(opts, 'prepend')).concat($data)
-            that.setData({$list})
+            that.setData({$list}, cb)
           }
 
           let result = this.hooks.emit('prepend', params)
@@ -646,18 +646,18 @@ export const listBehavior = function(app, mytype) {
         return this
       },
 
-      delete: function (params) {
+      delete: function (params, cb) {
         let $list = this.data.$list
         let $data = $list.data
         let $selectIndex = this.findIndex(params)
         if ($selectIndex || $selectIndex == 0) {
           $data.splice($selectIndex, 1)
-          this.setData({ $list })
+          this.setData({ $list }, cb)
         }
         return this
       },
 
-      insert: function (params, pay) {
+      insert: function (params, pay, cb) {
         const that = this
         let $list = this.data.$list
         let $data = $list.data
@@ -668,7 +668,7 @@ export const listBehavior = function(app, mytype) {
               payload = that.__newItem(payload, 'insert')
               if ($selectIndex || $selectIndex == 0) {
                 $data.splice($selectIndex, 0, payload)
-                that.setData({ $list })
+                that.setData({ $list }, cb)
               }
             }
           }
@@ -731,6 +731,7 @@ export const listBehavior = function(app, mytype) {
 }
 
 function listReactFun(app, e, type="list") {
+  app = app || getApp()
   const that = this
   if (this.treeInst) {
     return type == 'swiper' ? this.treeInst._swiperMethod.call(this.treeInst, e, type) : this.treeInst._scrollMethod.call(this.treeInst, e, type)

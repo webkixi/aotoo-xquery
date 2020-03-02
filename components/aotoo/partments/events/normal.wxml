@@ -1,11 +1,17 @@
 <wxs src="../../util.wxs" module="util" />
 
-<include wx:if="{{item.animation}}" src="./normal_animate.wxml" />
-<block wx:elif="{{util.dataset(item, 'data-treeid')}}">
-
-    <!--  -->
-    <!--  -->
-    <!-- item.tap -->
+<!-- <include wx:if="{{item.animation}}" src="./normal_animate.wxml" /> -->
+<view 
+  data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
+  data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+  id="{{item.id || id||''}}" 
+  animation="{{item.animation||''}}"
+  style="{{item.style||item.itemStyle || ''}}"
+  class="{{item.class||item.itemClass}}"  
+>
+  <include src="../slot.wxml" />
+</view>
+<!-- <block wx:elif="{{util.dataset(item, 'data-treeid')}}">
     <view 
       data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
       data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
@@ -28,11 +34,6 @@
 
 
 </block> <block wx:else>
-
-
-    <!--  -->
-    <!--  -->
-    <!-- item.tap -->
     <view 
       data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
       id="{{item.id || id}}" wx:if="{{item.style||item.itemStyle}}" 
@@ -52,4 +53,4 @@
     </block>
 
 
-</block>
+</block> -->

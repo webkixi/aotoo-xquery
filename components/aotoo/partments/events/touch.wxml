@@ -1,58 +1,75 @@
 <wxs src="../../util.wxs" module="util" />
-
-<include wx:if="{{item.animation}}" src="./touch_animate.wxml" />
-<!--  -->
-<!--  -->
-<!-- item.longtap item.longpress -->
-<block wx:if="{{item._tap || item._longpress || item.touchstart ||item.touchmove||item.touchend}}">
+<template name="bindtouch">
   <view 
     data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
     data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
-    id="{{item.id || id}}"
-    wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}"
+    id="{{item.id || id||''}}"
+    animation="{{item.animation||''}}"
+    style="{{item.style||item.itemStyle||''}}"
     class="{{item.class||item.itemClass}}"  
-    data-evt="{{util.dataEvt(item, ['__slip', '_tap', '_longpress', 'tap', 'catchtap', 'longpress', 'catchlongpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel'])}}"
-    bind:touchstart="{{util.iMethod}}" bind:touchmove="{{util.iMethod}}" bind:touchend="{{util.iMethod}}" bind:touchcancel="{{util.iMethod}}"
+    data-top = "{{(item.position && item.position.top) || ''}}"
+    data-left = "{{(item.position && item.position.left) || ''}}"
+    data-right = "{{(item.position && item.position.right) || ''}}"
+    data-bottom = "{{(item.position && item.position.bottom) || ''}}"
+    data-width = "{{(item.position && item.position.width) || ''}}"
+    data-height = "{{(item.position && item.position.height) || ''}}"
+    change:data-option= "{{item.touchoption ? util.optionObserver : ''}}"
+    data-option= "{{item.touchoption||''}}"
+    data-evt="{{util.dataEvt(item, ['__drop', '__slip', '_tap', '_longpress', 'tap', 'catchtap', 'longpress', 'catchlongpress', 'longtap', 'catchlongtap', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'touchcancel', 'catchtouchcancel'])}}"
+    bind:touchstart= "{{util.iMethod}}" 
+    bind:touchmove= "{{util.iMethod}}" 
+    bind:touchend= "{{util.iMethod}}" 
+    bind:touchcancel= "{{util.iMethod}}"
   >
     <include src="../slot.wxml" />
   </view>
+</template>
+
+<template name="catchtouch">
+  <view 
+    data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
+    data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+    id="{{item.id || id||''}}"
+    animation="{{item.animation||''}}"
+    style="{{item.style||item.itemStyle||''}}"
+    class="{{item.class||item.itemClass}}"
+    data-top = "{{(item.position && item.position.top) || ''}}"
+    data-left = "{{(item.position && item.position.left) || ''}}"
+    data-right = "{{(item.position && item.position.right) || ''}}"
+    data-bottom = "{{(item.position && item.position.bottom) || ''}}"
+    data-width = "{{(item.position && item.position.width) || ''}}"
+    data-height = "{{(item.position && item.position.height) || ''}}"
+    change:data-option= "{{item.touchoption ? util.optionObserver : ''}}"
+    data-option= "{{item.touchoption||''}}"
+    data-evt="{{util.dataEvt(item, ['__drop', '__slip', '_aim', '_catchlongpress', 'tap', 'catchtap', 'longpress', 'catchlongpress', 'longtap', 'catchlongtap', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'touchcancel', 'catchtouchcancel'])}}"
+    catch:touchstart= "{{util.ciMethod}}" 
+    catch:touchmove= "{{util.ciMethod}}" 
+    catch:touchend= "{{util.ciMethod}}" 
+    catch:touchcancel= "{{util.ciMethod}}"
+  >
+    <include src="../slot.wxml" />
+  </view>
+</template>
+
+<include wx:if="{{item.type && item.type.is==='scroll'}}"  src="./touch_scroll.wxml"></include>
+<!-- <block wx:elif="{{item._tap || item._longpress || item._longtap || item.touchstart ||item.touchmove||item.touchend}}"> -->
+<!--   'tap', 'longpress', 'longtap', 'touchstart', 'touchmove', 'touchend', 'touchcancel', '_tap', '_longpress', '_longtap' -->
+<block wx:elif="{{item.tap||item.longtap||item.longpress||item.touchstart||item.touchmove||item.touchend||item.touchcancel||item._tap||item._longptap||item._longpress}}">
+  <block wx:if="{{item.touchoption && item.touchoption.stopPropagation}}">
+    <template is="catchtouch" data="{{item}}"></template>
+  </block>
   <block wx:else>
-    <view 
-      data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
-      data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
-      id="{{item.id || id}}" 
-      class="{{item.class||item.itemClass}}"  
-      data-evt="{{util.dataEvt(item, ['__slip', '_tap', '_longpress', 'tap', 'catchtap', 'longpress', 'catchlongpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel'])}}"
-      bind:touchstart="{{util.iMethod}}" bind:touchmove="{{util.iMethod}}" bind:touchend="{{util.iMethod}}" bind:touchcancel="{{util.iMethod}}"
-    >
-      <include src="../slot.wxml" />
-    </view>
+    <template is="bindtouch" data="{{item}}"></template>
   </block>
 </block>
-
-<block wx:elif="{{item._aim || item._catchlongpress || item.catchtouchstart || item.catchtouchmove || item.catchtouchend}}">
-  <view 
-    data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
-    data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
-    id="{{item.id || id}}"
-    wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}"
-    class="{{item.class||item.itemClass}}"  
-    data-evt="{{util.dataEvt(item, ['__slip', '_aim', '_catchlongpress', 'tap', 'catchtap', 'longpress', 'catchlongpress', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'touchcancel', 'catchtouchcancel'])}}"
-    catch:touchstart="{{util.ciMethod}}" catch:touchmove="{{util.ciMethod}}" catch:touchend="{{util.ciMethod}}" catch:touchcancel="{{util.ciMethod}}"  bind:touchcancel="{{util.iMethod}}"
-  >
-    <include src="../slot.wxml" />
-  </view>
+<!-- <block wx:elif="{{item._aim || item._catchlongpress || item.catchtouchstart || item.catchtouchmove || item.catchtouchend}}"> -->
+<!-- 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel', '_tap', '_longpress', '_longtap' -->
+<block wx:elif="{{item.aim||item.catchtap||item.catchlongtap||item.catchlongpress||item.catchtouchstart||item.catchtouchmove||item.catchtouchend||item.catchtouchcancel||item._tap||item._longtap||item._longpress}}">
+  <block wx:if="{{item.touchoption && item.touchoption.stopPropagation===false}}">
+    <template is="bindtouch" data="{{item}}"></template>
+  </block>
   <block wx:else>
-    <view 
-      data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
-      data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
-      id="{{item.id || id}}" 
-      class="{{item.class||item.itemClass}}"  
-      data-evt="{{util.dataEvt(item, ['__slip', 'tap', '_aim', '_catchlongpress', 'catchtap', 'longpress', 'catchlongpress', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'touchcancel', 'catchtouchcancel'])}}"
-      catch:touchstart="{{util.ciMethod}}" catch:touchmove="{{util.ciMethod}}" catch:touchend="{{util.ciMethod}}" catch:touchcancel="{{util.ciMethod}}"  bind:touchcancel="{{util.iMethod}}"
-    >
-      <include src="../slot.wxml" />
-    </view>
+    <template is="catchtouch" data="{{item}}"></template>
   </block>
 </block>
 

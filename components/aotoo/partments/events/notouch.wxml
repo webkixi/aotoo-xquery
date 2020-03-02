@@ -47,15 +47,17 @@
   </view>
 </template>
 
-
-<block wx:if="{{item.tap||item.longtap||item.longpress}}">
-  <template is="bindEvent" data="{{item}}"></template>
-</block>
-<block wx:elif="{{item.catchtap||item.aim||item.catchlongtap || item.catchlongpress}}">
-  <template is="catchEvent" data="{{item}}"></template>
-</block>
+<include wx:if="{{item.type && item.type.is==='scroll'}}" src="./notouch_scroll.wxml"></include>
 <block wx:else>
-  <template is="noEvent" data="{{item}}"></template>
+  <block wx:if="{{item.tap||item.longtap||item.longpress}}">
+    <template is="bindEvent" data="{{item}}"></template>
+  </block>
+  <block wx:elif="{{item.catchtap||item.aim||item.catchlongtap || item.catchlongpress}}">
+    <template is="catchEvent" data="{{item}}"></template>
+  </block>
+  <block wx:else>
+    <template is="noEvent" data="{{item}}"></template>
+  </block>
 </block>
 
 <!-- <block wx:if="{{item.longtap||item.longpress}}">

@@ -1,0 +1,122 @@
+<wxs src="../../util.wxs" module="util" />
+
+<template name="bindtouch">
+  <scroll-view
+    data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
+    data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+    id="{{item.id || id||''}}"
+    animation="{{item.animation||''}}"
+    style="{{item.style||item.itemStyle||''}}"
+    class="{{item.class||item.itemClass}}"  
+    data-top = "{{(item.position && item.position.top) || ''}}"
+    data-left = "{{(item.position && item.position.left) || ''}}"
+    data-right = "{{(item.position && item.position.right) || ''}}"
+    data-bottom = "{{(item.position && item.position.bottom) || ''}}"
+    data-width = "{{(item.position && item.position.width) || ''}}"
+    data-height = "{{(item.position && item.position.height) || ''}}"
+    change:data-option= "{{item.touchoption ? util.optionObserver : ''}}"
+    data-option= "{{item.touchoption||''}}"
+    mut-bind:touchstart= "{{util.iMethod}}" 
+    mut-bind:touchmove= "{{util.iMethod}}" 
+    mut-bind:touchend= "{{util.iMethod}}" 
+    mut-bind:touchcancel= "{{util.iMethod}}"
+    
+
+    scroll-x="{{ item.type['scroll-x']||''}}" 
+    scroll-y="{{ item.type['scroll-y']||'' }}"
+    upper-threshold="{{ item.type['upper-threshold']||'' }}" 
+    lower-threshold="{{ item.type['lower-threshold']||'' }}" 
+    scroll-top="{{ item.type['scroll-top']||'' }}" 
+    scroll-left="{{ item.type['scroll-left']||'' }}" 
+    scroll-into-view="{{ item.type['scroll-into-view']||''}}" 
+    scroll-with-animation	="{{ item.type['scroll-with-animation']||'' }}" 
+    enable-back-to-top="{{ item.type['enable-back-to-top']||'' }}" 
+    enable-flex="{{ item.type['enable-flex']||'' }}" 
+    scroll-anchoring="{{ item.type['scroll-anchoring']||'' }}" 
+    refresher-enabled="{{ item.type['refresher-enabled']||'' }}" 
+    refresher-threshold="{{ item.type['refresher-threshold']||'' }}" 
+    refresher-default-style="{{ item.type['refresher-default-style']||'' }}" 
+    refresher-background="{{ item.type['refresher-background']||'' }}" 
+    refresher-triggered="{{ item.type['refresher-triggered']||'' }}" 
+    bindscrolltoupper= "{{item.type&&item.type.bindscrolltoupper ? '_scrollMethod' : ''}}"
+    bindscrolltolower= "{{item.type&&item.type.bindscrolltolower ? '_scrollMethod' : ''}}"  
+    bindscroll= "{{item.type&&item.type.bindscroll ? '_scrollMethod' : ''}}"
+    bindrefresherpulling= "{{item.type&&item.type.bindrefresherpulling ? '_scrollMethod' : ''}}"
+    bindrefresherrefresh= "{{item.type&&item.type.bindrefresherrefresh ? '_scrollMethod' : ''}}"
+    bindrefresherrestore= "{{item.type&&item.type.bindrefresherrestore ? '_scrollMethod' : ''}}"
+    bindrefresherabort= "{{item.type&&item.type.bindrefresherabort ? '_scrollMethod' : ''}}"
+    data-evt="{{util.dataEvt(item, ['__drop', '__slip', '_tap', '_longpress', 'tap', 'catchtap', 'longpress', 'catchlongpress', 'longtap', 'catchlongtap', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'touchcancel', 'catchtouchcancel', 'bindrefresherabort', 'bindrefresherrestore', 'bindrefresherrefresh', 'bindrefresherpulling', 'bindscroll', 'bindscrolltolower', 'bindscrolltoupper' ])}}"
+  >
+    <include src="../slot.wxml" />
+  </scroll-view>
+</template>
+
+<template name="catchtouch">
+  <scroll-view
+    data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid'])}}" 
+    data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
+    id="{{item.id || id||''}}"
+    animation="{{item.animation||''}}"
+    style="{{item.style||item.itemStyle||''}}"
+    class="{{item.class||item.itemClass}}"  
+    data-top = "{{(item.position && item.position.top) || ''}}"
+    data-left = "{{(item.position && item.position.left) || ''}}"
+    data-right = "{{(item.position && item.position.right) || ''}}"
+    data-bottom = "{{(item.position && item.position.bottom) || ''}}"
+    data-width = "{{(item.position && item.position.width) || ''}}"
+    data-height = "{{(item.position && item.position.height) || ''}}"
+    change:data-option= "{{item.touchoption ? util.optionObserver : ''}}"
+    data-option= "{{item.touchoption||''}}"
+    catch:touchstart= "{{util.ciMethod}}" 
+    catch:touchmove= "{{util.ciMethod}}" 
+    catch:touchend= "{{util.ciMethod}}" 
+    catch:touchcancel= "{{util.ciMethod}}"
+    
+
+    scroll-x="{{ item.type['scroll-x']||''}}" 
+    scroll-y="{{ item.type['scroll-y']||'' }}"
+    upper-threshold="{{ item.type['upper-threshold']||'' }}" 
+    lower-threshold="{{ item.type['lower-threshold']||'' }}" 
+    scroll-top="{{ item.type['scroll-top']||'' }}" 
+    scroll-left="{{ item.type['scroll-left']||'' }}" 
+    scroll-into-view="{{ item.type['scroll-into-view']||''}}" 
+    scroll-with-animation	="{{ item.type['scroll-with-animation']||'' }}" 
+    enable-back-to-top="{{ item.type['enable-back-to-top']||'' }}" 
+    enable-flex="{{ item.type['enable-flex']||'' }}" 
+    scroll-anchoring="{{ item.type['scroll-anchoring']||'' }}" 
+    refresher-enabled="{{ item.type['refresher-enabled']||'' }}" 
+    refresher-threshold="{{ item.type['refresher-threshold']||'' }}" 
+    refresher-default-style="{{ item.type['refresher-default-style']||'' }}" 
+    refresher-background="{{ item.type['refresher-background']||'' }}" 
+    refresher-triggered="{{ item.type['refresher-triggered']||'' }}" 
+    bindscrolltoupper= "{{item.type&&item.type.bindscrolltoupper ? '_scrollMethod' : ''}}"
+    bindscrolltolower= "{{item.type&&item.type.bindscrolltolower ? '_scrollMethod' : ''}}"  
+    bindscroll= "{{item.type&&item.type.bindscroll ? '_scrollMethod' : ''}}"
+    bindrefresherpulling= "{{item.type&&item.type.bindrefresherpulling ? '_scrollMethod' : ''}}"
+    bindrefresherrefresh= "{{item.type&&item.type.bindrefresherrefresh ? '_scrollMethod' : ''}}"
+    bindrefresherrestore= "{{item.type&&item.type.bindrefresherrestore ? '_scrollMethod' : ''}}"
+    bindrefresherabort= "{{item.type&&item.type.bindrefresherabort ? '_scrollMethod' : ''}}"
+    data-evt="{{util.dataEvt(item, ['__drop', '__slip', '_tap', '_longpress', 'tap', 'catchtap', 'longpress', 'catchlongpress', 'longtap', 'catchlongtap', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'touchcancel', 'catchtouchcancel', 'bindrefresherabort', 'bindrefresherrestore', 'bindrefresherrefresh', 'bindrefresherpulling', 'bindscroll', 'bindscrolltolower', 'bindscrolltoupper' ])}}"
+  >
+    <include src="../slot.wxml" />
+  </scroll-view>
+</template>
+
+<block wx:if="{{item._tap || item._longpress || item.touchstart ||item.touchmove||item.touchend}}">
+  <block wx:if="{{item.touchoption && item.touchoption.stopPropagation}}">
+    <template is="catchtouch" data="{{item}}"></template>
+  </block>
+  <block wx:else>
+    <template is="bindtouch" data="{{item}}"></template>
+  </block>
+</block>
+
+<block wx:elif="{{item._aim || item._catchlongpress || item.catchtouchstart || item.catchtouchmove || item.catchtouchend}}">
+  <block wx:if="{{item.touchoption && item.touchoption.stopPropagation===false}}">
+    <template is="bindtouch" data="{{item}}"></template>
+  </block>
+  <block wx:else>
+    <template is="catchtouch" data="{{item}}"></template>
+  </block>
+</block>
+

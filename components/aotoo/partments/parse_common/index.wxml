@@ -253,11 +253,20 @@
         bindload=         "{{item.bindload ? 'itemMethod' : ''}}"
         data-evt="{{util.dataEvt(item, ['preview', 'tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
       /> -->
+      <block wx:if="{{item.type === 'cover'}}">
+        <cover-image 
+          src="{{item.src}}"
+          binderror= "{{item.binderror ? 'itemMethod' : ''}}"
+          bindload= "{{item.bindload ? 'itemMethod' : ''}}"
+          data-evt="{{util.dataEvt(item, ['bindload', 'binderror', 'preview', 'tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
+        ></cover-image>
+      </block>
       <image 
+        wx:else
         style="{{item.style||item.itemStyle||''}}" 
         lazy-load="{{true}}" 
         class="himg {{item.class||item.itemClass||''}}" 
-        mode="{{item.mode || 'widthFix'||''}}" 
+        mode="{{item.mode || 'widthFix'}}" 
         src="{{item.src}}" 
         data-src = "{{item.src}}"
         webp="{{item.webp||''}}" 

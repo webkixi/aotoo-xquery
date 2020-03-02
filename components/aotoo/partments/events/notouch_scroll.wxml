@@ -1,7 +1,7 @@
 <wxs src="../../util.wxs" module="util" />
 
 <template name="bindEvent">
-  <view 
+  <scroll-view 
     data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
     data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}" 
     id="{{item.id || id||''}}" 
@@ -14,11 +14,11 @@
     bind:longpress= "{{item.longpress ? 'itemMethod' : ''}}"
   >
     <include src="../slot.wxml" />
-  </view>
+  </scroll-view>
 </template>
 
 <template name="catchEvent">
-  <view 
+  <scroll-view 
     data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
     data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
     id="{{item.id || id||''}}" 
@@ -31,11 +31,11 @@
     catch:longpress= "{{item.catchlongpress ? 'catchItemMethod' : ''}}"
   >
     <include src="../slot.wxml" />
-  </view>
+  </scroll-view>
 </template>
 
 <template name="noEvent">
-  <view 
+  <scroll-view 
     data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
     data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
     id="{{item.id || id||''}}" 
@@ -44,7 +44,7 @@
     class="{{item.class||item.itemClass}}"  
   >
     <include src="../slot.wxml" />
-  </view>
+  </scroll-view>
 </template>
 
 
@@ -57,37 +57,4 @@
 <block wx:else>
   <template is="noEvent" data="{{item}}"></template>
 </block>
-
-<!-- <block wx:if="{{item.longtap||item.longpress}}">
-  <view 
-    data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
-    data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}" 
-    id="{{item.id || id||''}}" 
-    animation="{{item.animation||''}}"
-    style="{{item.style||item.itemStyle||''}}"
-    class="{{item.class||item.itemClass}}"  
-    data-evt="{{util.dataEvt(item, ['tap', 'longtap', 'longpress'])}}"
-    bind:tap= "{{item.tap ? 'itemMethod' : ''}}" 
-    bind:longtap= "{{item.longtap ? 'itemMethod' : ''}}"
-    bind:longpress= "{{item.longpress ? 'itemMethod' : ''}}"
-  >
-    <include src="../slot.wxml" />
-  </view>
-</block>
-<block wx:elif="{{item.catchlongtap || item.catchlongpress}}">
-  <view 
-    data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
-    data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
-    id="{{item.id || id||''}}" 
-    animation="{{item.animation||''}}"
-    style="{{item.style||item.itemStyle||''}}"
-    class="{{item.class||item.itemClass}}"  
-    data-evt="{{util.dataEvt(item, ['catchtap', 'catchlongtap', 'catchlongpress'])}}"
-    catch:tap= "{{item.catchtap ? 'catchItemMethod' : ''}}" 
-    catch:longtap= "{{item.catchlongtap ? 'catchItemMethod' : ''}}"
-    catch:longpress= "{{item.catchlongpress ? 'catchItemMethod' : ''}}"
-  >
-    <include src="../slot.wxml" />
-  </view>
-</block> -->
 

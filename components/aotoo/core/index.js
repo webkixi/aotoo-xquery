@@ -291,6 +291,7 @@ function core(params) {
 
     const oldLoad = params.onLoad
     params.onLoad = function () {
+      app.activePage = activePage = this
       let that = this
       this.vars = {}
       this.elements = this.elements || {}
@@ -300,6 +301,7 @@ function core(params) {
       this.hooks = lib.hooks(this.uniqId)
       this.getElementsById = function(key) {
         if (key) {
+          key = key.replace('#', '')
           return this.elements[key] || this.selectComponent('#'+key) || this.selectComponent('.'+key)
         } else {
           return this.elements
@@ -319,11 +321,10 @@ function core(params) {
         oldSetData.call(that, param, function () {
           if (lib.isFunction(cb)) {
             that.doReady()
-            cb()
+            cb.call(that)
           }
         })
       }
-      app.activePage = activePage = this
       app.hooks.emit('activePage', activePage)
       app.hooks.emit('changeActivePage', activePage)
       if (typeof oldLoad == 'function') {
@@ -349,15 +350,15 @@ function core(params) {
 
       mkFind(this, app)
       this.find = wx.$$find
-      this.doReady(true)
       
       if (typeof oldReady == 'function') {
         oldReady.apply(this, arguments)
       }
-
+      
+      this.__rendered = true
+      this.doReady()
       setTimeout(() => {
         this.hooks.emit('onReady')
-        this.__rendered = true
       }, 200);
     }
 

@@ -2,7 +2,8 @@ const lib = require('../../lib/index')
 import {
   commonBehavior,
   commonMethodBehavior,
-  setPropsHooks
+  setPropsHooks,
+  reactFun
 } from "./common";
 
 
@@ -263,6 +264,11 @@ export const itemBehavior = function(app, mytype) {
         //   }
         // }
       },
+
+      _scrollMethod: function (e) {
+        reactFun.call(this, app, e)
+        // return listReactFun.call(this, app, e, 'scroll')
+      }
     }
   })
 }

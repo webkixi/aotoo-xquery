@@ -15,13 +15,21 @@
     decode="{{item.decode||''}}"
   >{{item.text}}</text>
 </block>
-<block wx:elif="{{util.hasEvent(item, 'url')}}">
+<block wx:elif="{{item.touchoption||item._tap || item._aim || item._longpress || item._catchlongpress || item.touchstart || item.catchtouchstart || item.touchmove || item.catchtouchmove || item.touchend || item.catchtouchend}}">
+  <include src="../partments/events/touch.wxml" />
+</block>
+<block wx:else>
+  <include src="../partments/events/notouch.wxml" />
+</block>
+<!-- <block wx:elif="{{util.hasEvent(item, 'url')}}">
   <include src="../partments/events/normal.wxml" />
+</block>
+<block wx:elif="{{item.touchoption}}">
+  <include src="../partments/events/touch.wxml" />
 </block>
 <block wx:elif="{{item._tap || item._aim || item._longpress || item._catchlongpress || item.touchstart || item.catchtouchstart || item.touchmove || item.catchtouchmove || item.touchend || item.catchtouchend}}">
   <include src="../partments/events/touch.wxml" />
 </block>
-<!-- <block wx:elif="{{util.hasEvent(item, 'longtap') || util.hasEvent(item, 'longpress') || util.hasEvent(item, 'catchlongtap') || util.hasEvent(item, 'catchlongpress')}}"> -->
 <block wx:elif="{{item.longtap||item.longpress||item.catchlongtap||item.catchlongpress}}">
   <include src="../partments/events/longtap.wxml" />
 </block>
@@ -30,4 +38,4 @@
 </block>
 <block wx:else>
   <include src="../partments/events/normal.wxml" />
-</block>
+</block> -->
