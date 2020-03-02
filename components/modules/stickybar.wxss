@@ -9,6 +9,7 @@
   align-items: center;
   background-color: royalblue;
   color: #fff;
+  z-index: 500;
 }
 
 .sticky-bar.bottom {

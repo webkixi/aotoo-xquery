@@ -24,7 +24,7 @@ Pager({
         rangeCount: 15,
         disable: true,
         data: mydata,
-        value: ['2020-01-20', '2020-01-28'],
+        value: ['2020-04-20', '2020-04-28'],
         toolbox: {
           rangeEdge: function (nexts) {
             let that = this
