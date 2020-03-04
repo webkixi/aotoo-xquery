@@ -10,7 +10,7 @@ const lib = Pager.lib
 const iKit = lib.innerKit
 let source = require('../common/source')  
 
-let key = 'JKDBZ-XZVLW-IAQR2-OROZ6-XR4G6-UYBD3'
+let key = 'JKDB1-XZVLW-IAQR2-OROZ6-XR4G6-UYBD3'
 
 // 搜索地区的...
 function searchRegion(kw, region) {
@@ -159,5 +159,8 @@ Pager({
       Pager.alert('需要授权访问您的位置信息')
       wx.openSetting()
     })
+  },
+  onReady(){
+    Pager.alert('该demo需要申请一个腾讯位置服务的key，请自行申请并替换代码中顶部的key变量')
   }
 })
