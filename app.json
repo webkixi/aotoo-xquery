@@ -1,31 +1,34 @@
 {
   "pages": [
     "pages/markdown/index",
+    "pages/navball/index",
+    "pages/list/index",
+    "pages/tab/index",
     "pages/poi/index",
+    "pages/fruit/index",
     "pages/collapse/index",
     "pages/tabdetail/index",
-    "pages/fruit/index",
-    "pages/guagua/index",
     "pages/tabside/index",
     "pages/turntable/index",
+    "pages/guagua/index",
     "pages/locker/index",
-    "pages/tabpro/index",
-    "pages/html/index",
-    "pages/item/index",
-    "pages/itempop/index",
-    "pages/list/index",
-    "pages/popup/index",
     "pages/indexlist/index",
-    "pages/calendar/index",
+    "pages/itempop/index",
+    "pages/tabpro/index",
+    "pages/popup/index",
+    "pages/tabbar/index",
     "pages/steper/index",
-    "pages/tab/index",
-    "pages/tabbar/index"
+    "pages/html/index",
+    "pages/calendar/index",
+    "pages/appstorelist/index",
+    "pages/item/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "xquery",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "navigationStyle": "custom"
   },
   "permission": {
     "scope.userLocation": {

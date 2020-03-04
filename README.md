@@ -28,7 +28,21 @@ xquery包含以下这些特性
 
 ## DEMO列表  
 demo图片均有效，github图片需要翻墙才能查看  
-![demo](http://www.agzgz.com/myimgs/demo.jpg)
+![demo](http://www.agzgz.com/myimgs/demo.jpg)  
+
+本项目小程序包含以下DEMO
+
+* markdown
+* html
+* 地址定位  
+* 水果老虎机
+* 折叠面板
+* 双栏分类导航(左右)
+* 双栏分类导航(上下)
+* 刮刮卡  
+* 弹窗
+* 导航球
+。。。
 
 
 ## 如何使用  
