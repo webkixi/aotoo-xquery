@@ -250,6 +250,7 @@ function parseObject(str, type) {
   var objAry = str.match(re)
   var targetAry = []
   var targetObj = {}
+  var flatAry = []
   str = str.replace(re, '__xxx__')
   objAry && objAry.forEach(function (it, ii) {
     var myQuery = {}
@@ -257,12 +258,21 @@ function parseObject(str, type) {
     var ary = it.split(',')
     ary.forEach(function (ele) {
       var aa = ele.split(':')
+      flatAry.push(aa)
       myQuery[aa[0]] = aa[1]
       targetObj[aa[0]] = aa[1]
     })
     targetAry.push(myQuery)
   })
-  return type ? targetAry : targetObj
+
+  if (type) {
+    if (type === 'get-pure-array') {
+      return flatAry
+    }
+    return targetAry
+  } else {
+    return targetObj
+  }
 }
 
 var storeEvts = {}
@@ -365,7 +375,9 @@ var tpos = {
   _lefts: null  // 上一次left值合集
 }
 
-var globleVar = {}
+var globleVar = {
+  touchoption: {}
+}
 
 var touchMethods = ['touchstart', 'touchmove', 'touchend']
 var catchTouchMethods = ['catchtouchstart', 'catchtouchmove', 'catchtouchend']
@@ -392,9 +404,25 @@ function isFakeEvent(allParam) {
   return isFake
 }
 
+function merge(a, b) {
+  var re = getRegExp("([^:,\}\{:]*):", "g")
+  var bstr = JSON.stringify(b).replace(getRegExp('"', "g"), '')
+  var keys = bstr.match(re)
+  keys.forEach(function(_key) {
+    var key = _key.replace(':', '')
+    if (b[key] || b[key]!==undefined) {
+      a[key] = b[key]
+    }
+  })
+  return a
+}
+
 function optionObserver(newValue, oldValue, ownerInstance, instance) {
-  globleVar.touchoption = newValue
+  globleVar.touchoption = merge(globleVar.touchoption, newValue)
   globleVar.oldTouchoption = oldValue
+  if (newValue.navball === 'fresh' && tpos.current && tpos.current.offsetX) {
+    instance.setStyle('transform: translate3d(' + tpos.current.offsetX + 'px, ' + tpos.current.offsetY + 'px, 0)')
+  }
 }
 
 function initTouchEnv(e, ins, dsetEvt) {
@@ -588,7 +616,7 @@ function tStart(e, slip, ins, stopPropagation) {
   var treeid = dataset.treeid
   var param = e.__query
   var allParam = tpos.__allParam
-  var target = e.touches[0] || e.changedTouches[0]
+  var target = e.changedTouches[0]
   var pageX = target.pageX
   var pageY = target.pageY
   tpos.timeStamp.start = e.timeStamp
@@ -605,8 +633,8 @@ function tStart(e, slip, ins, stopPropagation) {
   var inst = e.instance
   var tmpTarget = tpos.instance
 
-  tpos.start.x = pageX
-  tpos.start.y = pageY
+  tpos.start.x = parseInt(pageX)
+  tpos.start.y = parseInt(pageY)
   tpos.start.timeStamp = e.timeStamp
 
   if (allParam.__slip) {
@@ -659,6 +687,10 @@ function tStart(e, slip, ins, stopPropagation) {
     dropStart(e, ins)
   }
 
+  if (globleVar.touchoption && globleVar.touchoption.navball){
+    navballStart(e, ins)
+  }
+
 
   // 响应js的touchstart方法
   var tevent = tpos.events.touchstart
@@ -680,7 +712,9 @@ function tStart(e, slip, ins, stopPropagation) {
           if (!tpos.endTouch) ins.requestAnimationFrame(endPoint)
           ts+=17
         } else {
-          callMethod(newE, ins)
+          if (!tpos.moving) {
+            callMethod(newE, ins)
+          }
         }
       }
       ins.requestAnimationFrame(endPoint)
@@ -704,21 +738,19 @@ function tMove(e, slip, ins, stopPropagation) {
 
   // var allInst = ins.selectAllComponents(find)
   var inst = e.instance
-  var target = e.touches[0] || e.changedTouches[0]
+  var target = e.changedTouches[0]
   var pageX = target.pageX
   var pageY = target.pageY
   var startX = tpos.start.x
   var startY = tpos.start.y
-  var curX = tpos.current.x
-  var curY = tpos.current.y
   var diffX = pageX - startX
   var diffY = pageY - startY
   var absDiffx = Math.abs(diffX)
   var absDiffy = Math.abs(diffY)
-  var toX = pageX - curX
-  var toY = pageY - curY
 
   tpos.moving = true
+  tpos.current.x = parseInt(pageX)
+  tpos.current.y = parseInt(pageY)
 
   // tpos.moving = false
   // tpos.instance && (tpos.instance.moving = false)
@@ -853,8 +885,10 @@ function tMove(e, slip, ins, stopPropagation) {
     dropMove(e, ins)
   }
 
-  tpos.current.x = pageX
-  tpos.current.y = pageY
+  if (globleVar.touchoption && globleVar.touchoption.navball) {
+    navballMove(e, ins)
+  }
+  
   tpos.current.timeStamp = e.timeStamp
   var tevent = tpos.events.touchmove
   if (tevent && (tevent !== 'true' || tevent.fun !== 'true')) {
@@ -862,11 +896,65 @@ function tMove(e, slip, ins, stopPropagation) {
   }
 }
 
-function dropStart(e, ins) {
+// 导航球
+function navballStart(e, ins) {
+  var id = e.currentTarget.id
+  if (id.indexOf('navball') === -1) return 
+  var inst = e.instance
+  tpos.current.offLeft = tpos.start.x - e.currentTarget.offsetLeft
+  tpos.current.offTop = tpos.start.y - e.currentTarget.offsetTop
+  tpos.current.navballStartX = tpos.current.navballStartX || tpos.start.x
+  tpos.current.navballStartY = tpos.current.navballStartY || tpos.start.y
+}
+
+function navballMove(e, ins) {
+  var inst = e.instance
+  var id = e.currentTarget.id
+  if (id.indexOf('navball') === -1) return
+  var touchOp = globleVar.touchoption
+  var nbOption = touchOp.navballOption
+  var safeArea = nbOption.safeArea
+  var target = e.changedTouches[0]
+  var current = tpos.current
+  var diffX = target.pageX - tpos.start.x
+  var diffY = target.pageY - tpos.start.y
+
+  var halfWidth = parseInt(nbOption.width / 2)
+  var halfHeight = parseInt(nbOption.height / 2)
+  
+  var edge = {
+    left: safeArea.left,
+    top: safeArea.top,
+    bottom: safeArea.bottom,
+    right: safeArea.right,
+    width: safeArea.width,
+    height: safeArea.height,
+    windowHeight: nbOption.windowHeight,
+    windowWidth: nbOption.windowWidth
+  }
+
+  // log(edge)
+
+  var offsetX = tpos.current.x - tpos.current.navballStartX
+  var offsetY = (tpos.current.y - tpos.current.navballStartY) + (tpos.current.y - tpos.start.y) * 0.5
+
+  if (
+    (diffX > 0 && offsetX < edge.right - halfWidth - current.navballStartX || diffX < 0 && offsetX > edge.left+halfWidth - current.navballStartX) &&
+    ((diffY > 0 && offsetY < edge.windowHeight - current.navballStartY - halfHeight) || (diffY < 0 && offsetY > (0 + halfHeight) - current.navballStartY))
+  ) {
+    tpos.current.offsetX = offsetX
+    tpos.current.offsetY = offsetY
+    inst.setStyle('transform: translate3d(' + offsetX + 'px, ' + offsetY + 'px, 0)')
+  }
+}
+
+function navballEnd(e, ins) {
   
 }
 
-
+function dropStart(e, ins) {
+  
+}
 
 function dropMove(e, ins) {
   
@@ -983,6 +1071,10 @@ function tEnd(e, slip, ins, stopPropagation) {
   // 允许拖动
   if (allParam.__drop) {
     dropEnd(e, ins)
+  }
+
+  if (globleVar.touchoption && globleVar.touchoption.navball) {
+    navballEnd(e, ins)
   }
 
   // 模拟的longtap tap

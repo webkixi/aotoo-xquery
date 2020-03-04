@@ -10,7 +10,7 @@ import {
 } from './util'
 
 const eventName = ['tap', 'catchtap', 'aim', '_tap', '_aim', 
-'longpress', '_longpress', 'longtap', '_longtap',
+'longpress', '_longpress', 'catchlongpress', 'longtap', '_longtap', 'catchlongtap',
 'touchstart', 'touchmove','touchend', 'touchcancel',
 '_touchstart', '_touchmove', '_touchend', '_touchcancel',
 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel',
