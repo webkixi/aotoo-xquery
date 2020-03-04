@@ -124,7 +124,7 @@ Pager({
           if (param.nearby) {
             let loc = locationPosition
             if (gData.nearby) {
-              this.content(gData.region)
+              this.content(gData.nearby)
             } else {
               searchCircle('快餐', {
                 lat: loc.latitude,
