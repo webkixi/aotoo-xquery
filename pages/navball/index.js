@@ -5,13 +5,6 @@ const Pager = require('../../components/aotoo/core/index')
 const mkNavball = require('../../components/modules/navball')
 let source = require('../common/source')
 
-Pager({
-  data: {
-    navballConfig: mkNavball(),
-    ...source
-  }
-})
-
 const md = `
 # 导航球
 模仿华为手机的导航球，个人意志很喜欢导航球的便捷  
