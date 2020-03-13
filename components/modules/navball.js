@@ -1,5 +1,6 @@
 const Pager = require('../../components/aotoo/core/index')
 const lib = Pager.lib
+let navballHooks = lib.hooks('NAVBALL-END-POSITION')
 
 const {
   screenHeight,
@@ -20,7 +21,10 @@ const {
 
 function listenEvent(evtname, opts, event, type) {
   if (lib.isFunction(opts[evtname])) {
-    opts[evtname].call(this, event)
+    let res = opts[evtname].call(this, event)
+    if (res) {
+      wx.navigateBack({ delta: 1 }) 
+    }
   } else if (lib.isString(opts[evtname]) && lib.isFunction(this.activePage[opts[evtname]])) {
     this.activePage[opts[evtname]].call(this.activePage, event)
   } else {
@@ -43,10 +47,12 @@ module.exports = function(params) {
     doubleTap: null,
     longpress: null
   }
+  let itemStyle = ' '
   let opts = Object.assign({}, dft, params)
   return {
-    id: lib.suid('navball_'),
+    id: lib.suid('$$navball_'),
     itemClass: opts.itemClass,
+    itemStyle,
     touchoption: {
       navball: opts.hasOwnProperty('navball') ? opts.navball : true,
       navballOption: { safeArea }
@@ -84,14 +90,38 @@ module.exports = function(params) {
       listenEvent.call(this, 'longpress', opts, e, 'home')
     },
     catchtouchstart(e, param, inst){},
+    catchtouchend(e, param, inst){
+      if (e.currentPosition) {
+        let offset = {
+          x: e.currentPosition.navballOffsetX,
+          y: e.currentPosition.navballOffsetY,
+          start: {
+            x: e.currentPosition.navballStartX,
+            y: e.currentPosition.navballStartY,
+          }
+        }
+        navballHooks.setItem('offset', offset)
+      }
+    },
     methods: {
       dtap(e){ // 双击
         listenEvent.call(this, 'doubleTap', opts, e, 'home')
       },
       fresh(){
-        this.update({'touchoption.navball': 'fresh'})
+        let that = this
+        this.activePage.hooks.on('onShow', function() {
+          let offsetPosition = navballHooks.getItem('offset')
+          that.update({'touchoption.navball': offsetPosition}) 
+        })
+        let offsetPosition = navballHooks.getItem('offset')
+        this.update({'touchoption.navball': offsetPosition}) 
       },
       __ready(){
+        this.fresh()
+
+        if (opts.id) {
+          this.activePage[opts.id] = this
+        }
         this.prevTimeStamp = 0
         let scrollLeft=0, scrollTop=0, scrollHeight = 0, scrollWidth = 0
         let query = wx.createSelectorQuery().in(this)
@@ -106,6 +136,7 @@ module.exports = function(params) {
             if (ret && !done) {
               done = true
               let position = ret[0]
+              this.navballInitPosition = position
               position.top = position.top + scrollTop
               position.left = position.left + scrollLeft
               position.scrollTop = scrollTop

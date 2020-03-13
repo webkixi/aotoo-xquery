@@ -31,7 +31,7 @@ function content(param={}, myclass, op) {
   let hasDot = false
   let closeBtnIndex = []
   dot.forEach((item, ii) => {
-    let cls = item.itemClass || item.class
+    let cls = item.itemClass || item.class || ''
     if (cls.indexOf('crossCircle') > -1) {
       hasDot = true
       closeBtnIndex.push(ii)
@@ -250,10 +250,10 @@ Component({
         let myStyle = sty(param)
         let myContent = content.call(this, param, myclass, op) || {}
         let target = {
-          itemClass: `${op} ${myclass} moveit ${curClass}`,
+          itemClass: `actionSide-common ${op} ${myclass} moveit ${curClass}`,
           // itemStyle: myStyle || this.__cssStyle,
           itemStyle: myStyle,
-          mask: param.enableMask ? 'actionMask show' : (op.indexOf('toast') > -1 || op.indexOf('actionSide-message') > -1) ? 'actionMask' : myContent.__yesCloseBtn ? 'actionMask' : 'actionMask show'
+          mask: param.enableMask ? 'actionMask show' : (op.indexOf('toast') > -1 || op.indexOf('actionSide-message') > -1) ? 'actionMask' : myContent.__yesCloseBtn ? 'actionMask' : param.enableMask === false ? 'actionMask' : 'actionMask show'
         }
         
         let upContent = Object.assign({}, myContent, {

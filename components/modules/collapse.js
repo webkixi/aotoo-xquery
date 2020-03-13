@@ -51,6 +51,9 @@ module.exports = function(params) {
         if (inst.hasClass('.disabled')) return
         lib.vibrateShort()
         let click = opts.tap || opts.catchtap || opts.aim
+        if (lib.isString(click)) {
+          click = this.activePage && this.activePage[click]
+        }
         if (lib.isFunction(click)) {
           let $data = inst.getData()
           let context = {
@@ -74,11 +77,15 @@ module.exports = function(params) {
             },
             content(obj){
               if (obj) {
-                if (lib.isArray(obj)) {
-                  inst.update({ body: obj })
-                } else {
-                  inst.update({ body: [obj] })
+                if (lib.isString(obj) || lib.isNumber(obj)) {
+                  obj = {title: obj}
                 }
+                obj = [].concat(obj)
+                inst.update({ body: obj })
+                // if (lib.isArray(obj)) {
+                // } else {
+                //   inst.update({ body: [obj] })
+                // }
               }
             }
           }

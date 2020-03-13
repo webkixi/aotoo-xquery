@@ -183,6 +183,7 @@ module.exports = function(params) {
     ],
     methods: {
       __ready(){
+        this.times = config.times
         if (config.id) {
           this.activePage[config.id] = this
         }
@@ -263,7 +264,8 @@ module.exports = function(params) {
         let endDeg = (360 / $len) * (selected+1)
         let gapDeg = endDeg-deg
 
-        let preDeg = config.times * 360
+        let preDeg = this.times * 360
+        // let preDeg = config.times * 360
         let targetDeg = parseInt(preDeg - deg - 90 - parseInt(gapDeg * selectedRate));
 
         let turntable = this.find('.turntable')
@@ -292,7 +294,7 @@ module.exports = function(params) {
           if (lib.isFunction(final)) {
             final(res||{message: '谢谢参与'})
           }
-          console.log($data[selected]||'谢谢参与');
+          // console.log($data[selected]||'谢谢参与');
           this.running = false
         } , 5200);
 
