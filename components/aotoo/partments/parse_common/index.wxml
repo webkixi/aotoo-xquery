@@ -167,7 +167,7 @@
   </block>
   <block wx:else>
     <block wx:if="{{item.url}}">
-      <template is="{{@url}}" data="{{props: item}}"></template>
+      <template is="@url" data="{{props: item}}"></template>
     </block>
     <view 
       wx:else

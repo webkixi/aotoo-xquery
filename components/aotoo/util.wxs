@@ -420,8 +420,10 @@ function merge(a, b) {
 function optionObserver(newValue, oldValue, ownerInstance, instance) {
   globleVar.touchoption = merge(globleVar.touchoption, newValue)
   globleVar.oldTouchoption = oldValue
-  if (newValue.navball === 'fresh' && tpos.current && tpos.current.offsetX) {
-    instance.setStyle('transform: translate3d(' + tpos.current.offsetX + 'px, ' + tpos.current.offsetY + 'px, 0)')
+  if (isObject(newValue.navball)) {
+    tpos.current.navballStartX = newValue.navball.start.x
+    tpos.current.navballStartY = newValue.navball.start.y
+    instance.setStyle('transform: translate3d(' + newValue.navball.x + 'px, ' + newValue.navball.y + 'px, 0)')
   }
 }
 
@@ -899,7 +901,7 @@ function tMove(e, slip, ins, stopPropagation) {
 // 导航球
 function navballStart(e, ins) {
   var id = e.currentTarget.id
-  if (id.indexOf('navball') === -1) return 
+  if (id.indexOf('$$navball') === -1) return 
   var inst = e.instance
   tpos.current.offLeft = tpos.start.x - e.currentTarget.offsetLeft
   tpos.current.offTop = tpos.start.y - e.currentTarget.offsetTop
@@ -910,7 +912,7 @@ function navballStart(e, ins) {
 function navballMove(e, ins) {
   var inst = e.instance
   var id = e.currentTarget.id
-  if (id.indexOf('navball') === -1) return
+  if (id.indexOf('$$navball') === -1) return
   var touchOp = globleVar.touchoption
   var nbOption = touchOp.navballOption
   var safeArea = nbOption.safeArea
@@ -935,21 +937,21 @@ function navballMove(e, ins) {
 
   // log(edge)
 
-  var offsetX = tpos.current.x - tpos.current.navballStartX
-  var offsetY = (tpos.current.y - tpos.current.navballStartY) + (tpos.current.y - tpos.start.y) * 0.5
+  var navballOffsetX = tpos.current.x - tpos.current.navballStartX
+  var navballOffsetY = (tpos.current.y - tpos.current.navballStartY) + (tpos.current.y - tpos.start.y) * 0.5
 
   if (
-    (diffX > 0 && offsetX < edge.right - halfWidth - current.navballStartX || diffX < 0 && offsetX > edge.left+halfWidth - current.navballStartX) &&
-    ((diffY > 0 && offsetY < edge.windowHeight - current.navballStartY - halfHeight) || (diffY < 0 && offsetY > (0 + halfHeight) - current.navballStartY))
+    (diffX > 0 && navballOffsetX < edge.right - halfWidth - current.navballStartX || diffX < 0 && navballOffsetX > edge.left+halfWidth - current.navballStartX) &&
+    ((diffY > 0 && navballOffsetY < edge.windowHeight - current.navballStartY - halfHeight) || (diffY < 0 && navballOffsetY > (0 + halfHeight) - current.navballStartY))
   ) {
-    tpos.current.offsetX = offsetX
-    tpos.current.offsetY = offsetY
-    inst.setStyle('transform: translate3d(' + offsetX + 'px, ' + offsetY + 'px, 0)')
+    tpos.current.navballOffsetX = navballOffsetX
+    tpos.current.navballOffsetY = navballOffsetY
+    inst.setStyle('transform: translate3d(' + navballOffsetX + 'px, ' + navballOffsetY + 'px, 0)')
   }
 }
 
 function navballEnd(e, ins) {
-  
+  e.currentPosition = tpos.current
 }
 
 function dropStart(e, ins) {
@@ -1061,13 +1063,6 @@ function tEnd(e, slip, ins, stopPropagation) {
     }
   } 
 
-  var isFake = isFakeEvent(allParam)
-  var newE = JSON.parse(JSON.stringify(e))
-  var tevent = tpos.events.touchend
-  if (tevent && (tevent !== 'true' || tevent.fun !== 'true')) {
-    stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
-  }
-
   // 允许拖动
   if (allParam.__drop) {
     dropEnd(e, ins)
@@ -1075,6 +1070,13 @@ function tEnd(e, slip, ins, stopPropagation) {
 
   if (globleVar.touchoption && globleVar.touchoption.navball) {
     navballEnd(e, ins)
+  }
+
+  var isFake = isFakeEvent(allParam)
+  var newE = JSON.parse(JSON.stringify(e))
+  var tevent = tpos.events.touchend
+  if (tevent && (tevent !== 'true' || tevent.fun !== 'true')) {
+    stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
   }
 
   // 模拟的longtap tap

@@ -20,10 +20,10 @@
     change:data-option= "{{item.touchoption ? util.optionObserver : ''}}"
     data-option= "{{item.touchoption||''}}"
     data-evt="{{util.dataEvt(item, ['__drop', '__slip', '_tap', '_longpress', 'tap', 'catchtap', 'longpress', 'catchlongpress', 'longtap', 'catchlongtap', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'touchcancel', 'catchtouchcancel'])}}"
-    bind:touchstart= "{{util.iMethod}}" 
-    bind:touchmove= "{{util.iMethod}}" 
-    bind:touchend= "{{util.iMethod}}" 
-    bind:touchcancel= "{{util.iMethod}}"
+    mut-bind:touchstart= "{{util.iMethod}}" 
+    mut-bind:touchmove= "{{util.iMethod}}" 
+    mut-bind:touchend= "{{util.iMethod}}" 
+    mut-bind:touchcancel= "{{util.iMethod}}"
   >
     <include src="../slot.wxml" />
   </view>

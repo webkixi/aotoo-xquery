@@ -377,6 +377,7 @@ function core(params) {
       if (typeof oldSshow == 'function') {
         oldSshow.apply(this, arguments)
       }
+      this.hooks.emit('onShow')
     }
 
     const oldHide = params.onHide

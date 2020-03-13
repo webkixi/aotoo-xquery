@@ -100,10 +100,17 @@
   </block>
   <block wx:elif="{{util.isObject(props)}}">
     <icon 
+      type="{{props.type||''}}" 
+      size="{{props.size||''}}" 
+      color="{{props.color||''}}" 
+      class="{{props.itemClass || props.class}}" 
+      style="{{props.style||''}}" 
+    /> 
+    <!-- <icon 
       class="iconfont {{props.itemClass || props.class}}" 
       catch:tap="{{props.aim||''}}" 
       style="{{props.style||''}}" 
-    />
+    /> -->
   </block>
 </template>
 
@@ -128,7 +135,7 @@
 <template name="@button">
   <button 
     type="{{props.typeset||'default'}}" 
-    size="{{props.size||'mini'}}"
+    size="{{props.size||''}}"
     plain="{{props.plain||''}}"
     disabled="{{props.disabled||''}}"
     loading="{{props.loading||''}}"    
@@ -140,18 +147,18 @@
     send-message-path="{{props['send-message-path']||''}}"
     send-message-img="{{props['send-message-img']||''}}"
     show-message-card	="{{props['show-message-card']||''}}"
-    bindcontact="{{props['open-type']=='contact' ? 'inputBtnMethod' : ''}}"
-    bindgetphonenumber="{{props['open-type']=='getPhoneNumber' ? 'inputBtnMethod' : ''}}"
-    bindgetuserinfo="{{props['open-type']=='getUserInfo' ? 'inputBtnMethod' : ''}}"
-    bindopensetting="{{props['open-type']=='openSetting' ? 'inputBtnMethod' : ''}}"
-    bind:tap="{{props['form-type'] ? '' : 'inputItemMethod'}}"
+    bindcontact="{{props['open-type']=='contact' ? 'itemMethod' : ''}}"
+    bindgetphonenumber="{{props['open-type']=='getPhoneNumber' ? 'itemMethod' : ''}}"
+    bindgetuserinfo="{{props['open-type']=='getUserInfo' ? 'itemMethod' : ''}}"
+    bindopensetting="{{props['open-type']=='openSetting' ? 'itemMethod' : ''}}"
+    bind:tap="{{props['form-type'] ? '' : 'itemMethod'}}"
 
     app-parameter	="{{props['app-parameter']||''}}"
-    bindlaunchapp="{{props['open-type']=='launchApp' ? 'inputBtnMethod' : ''}}"
-    binderror="{{props['open-type']=='launchApp' ? 'inputBtnMethod' : ''}}"
+    bindlaunchapp="{{props['open-type']=='launchApp' ? 'itemMethod' : ''}}"
+    binderror="{{props['open-type']=='launchApp' ? 'itemMethod' : ''}}"
 
-    class="{{props.itemClass||''}}"
-    style="{{props.itemStyle||''}}"
+    class="{{props.itemClass||props.class||''}}"
+    style="{{props.itemStyle||props.style||''}}"
     id="{{props.id||''}}"
     data-address="{{props.uAddress}}"
     data-evt="{{util.dataEvt(props, ['bindcontact', 'bindgetphonenumber', 'bindgetuserinfo', 'bindopensetting', 'bindlaunchapp', 'binderror', 'tap'])}}"
@@ -161,8 +168,13 @@
 </template>
 
 <template name="@url">
-  <block wx:if="{{props && props.url && props.title}}">
+  <!-- <block wx:if="{{props && props.url && (props.title||props.value)}}"> -->
+  <block wx:if="{{props && (props.title||props.value)}}">
+    <block wx:if="{{props.value}}">
+      <template is="@button" data="{{props: props}}"/>
+    </block>
     <navigator 
+      wx:else
       target="{{props.target||''}}"
       url="{{props.url||''}}"
       open-type="{{props['open-type']||'navigate'}}"

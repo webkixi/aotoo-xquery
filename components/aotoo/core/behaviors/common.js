@@ -790,7 +790,18 @@ export const commonBehavior = (app, mytype) => {
         let res
 
         if (ctx.treeid && ctx.parentInst && ctx.parentInst.$$is === 'list') {
-          return listInstDelegate(ctx.treeid, ctx.parentInst)
+          if (param) {
+            res = listInstDelegate(ctx.treeid, ctx.parentInst)
+            if (res) {
+              if (res.hasClass(param)) {
+                return res
+              } else {
+                return res.parent(param)
+              }
+            }
+          } else {
+            return listInstDelegate(ctx.treeid, ctx.parentInst)
+          }
         }
 
         if (!param) {

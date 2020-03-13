@@ -34,14 +34,28 @@ function formatImg(props) {
 // hash 传递navigate组件的参数
 function formatUrl(props) {
   let url = props.url
-  if (isString(url)) {
+  if (isString(url) && url.length > 1) {
     let ary = url.split('#')
+    let funName = (()=>{
+      if (url.indexOf('button://') === 0) {
+        ary[0] = ary[0].replace('button://', '')
+        return ary[0]
+      }
+    })()
     if (ary.length === 1) {
-      props.url = {title: props.title, url: url}
+      if (funName) {
+        props.url = {value: props.title, tap: funName}
+      } else {
+        props.url = {title: props.title, url: url}
+      }
     } else {
-      let obj = formatQuery('?'+ary[1])
-      url = ary[0]
-      props.url = {title: props.title, url, ...obj.query}
+      let obj = formatQuery('?'+ary[1])  // 获取navigate的配置
+      if (funName) {
+        props.url = {value: props.title, tap: funName, ...obj.query}
+      } else {
+        url = ary[0]
+        props.url = {title: props.title, url, ...obj.query}
+      }
       
       // let tmp = {}
       // let param = ary[1]
