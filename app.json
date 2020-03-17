@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/markdown/index",
+    "pages/sslider/index",
     "pages/navball/index",
     "pages/list/index",
     "pages/tab/index",
