@@ -1,0 +1,58 @@
+.mut-slider {
+  width: 300px;
+  min-height: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* background-color: red; */
+  background-color: var(--back-color);
+  /* background-color: #2b832b; */
+  position: relative;
+}
+
+.mut-slider .sslider-handle{
+  position: absolute;
+  background-color: #fff;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2), 0 2px 3px 0 #ccc;
+  
+  /* background-color: blue; */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mut-slider .sslider-handle .handle-tip {
+  position: absolute;
+  width: 40px;
+  height: 30px;
+  background-color: var(--tip-color);
+  top: -35px;
+  left: calc(-20px + var(--tip-left));
+  display: none;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+
+.mut-slider .sslider-handle .handle-tip.active {
+  display: flex;
+}
+
+.handle-tip:after {
+  content: '';
+  width:0;
+  height:0;
+  border-right:10rpx solid transparent;
+  border-left:10rpx solid transparent;
+  border-top:10rpx solid var(--tip-color);
+  position: absolute;
+  bottom: -9rpx;
+}
+
+.mut-slider ui-item:first-child .sslider-handle {
+  left: var(--half-block-size)px;
+}
+.mut-slider ui-item:last-child .sslider-handle {
+  right: var(--half-block-size)px;
+}
