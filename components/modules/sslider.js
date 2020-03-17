@@ -53,17 +53,23 @@ module.exports = function(params) {
       if (opts.tip) {
         if (e.currentTarget.id && e.currentTarget.id.indexOf('_1')>-1) {
           let $tip = this.find('#$$slider_tip_1')
-          $tip.update({title: value[0]})
+          if (this.tempValue !== value[0]) {
+            this.tempValue = value[0]
+            $tip.update({title: value[0]})
+          }
         }
     
         if (e.currentTarget.id && e.currentTarget.id.indexOf('_2')>-1) {
           let $tip = this.find('#$$slider_tip_2')
-          $tip.update({title: value[1]})
+          if (this.tempValue !== value[1]) {
+            this.tempValue = value[1]
+            $tip.update({title: value[1]})
+          }
         }
       }
 
       if (lib.isFunction(opts.bindchanging)) {
-        opts.bindchanging(value)
+        opts.bindchanging.call(this, value)
       }
     },
     catchtouchend(e, param, inst){
@@ -74,7 +80,7 @@ module.exports = function(params) {
       this.value = value
       // console.log(this.value);
       if (lib.isFunction(opts.bindchange)) {
-        opts.bindchange(value)
+        opts.bindchange.call(this, value)
       }
 
       if (opts.tip) {
@@ -158,12 +164,18 @@ module.exports = function(params) {
 
           let leftStyle = `;left: ${valuePx[0]}px; top: ${toppx}px; width: ${blockSize}px; height: ${blockSize}px;`
           let rightStyle = `;left: ${valuePx[1]}px; top: ${toppx}px; width: ${blockSize}px; height: ${blockSize}px;`
-          let axisStyle = `;--tip-left:${blockSize/2}px; --back-color: ${bcolor}; --tip-color: blue; --block-size: ${blockSize}; --half-block-size: ${blockSize/2}; background: linear-gradient(0.25turn, #${fcolor} ${valuePx[0]+halfBlockSize}px, ${bcolor} ${valuePx[0]+halfBlockSize}px, ${bcolor} ${valuePx[1]+halfBlockSize}px, #${fcolor} ${valuePx[1]+halfBlockSize}px);`
+          let axisStyle = `;--tip-left:${blockSize/2}px; --back-color: ${bcolor}; --tip-color: blue; --block-size: ${blockSize}; --half-block-size: ${blockSize/2}; background: linear-gradient(0.25turn, ${fcolor} ${valuePx[0]+halfBlockSize}px, ${bcolor} ${valuePx[0]+halfBlockSize}px, ${bcolor} ${valuePx[1]+halfBlockSize}px, ${fcolor} ${valuePx[1]+halfBlockSize}px);`
 
           let handLeft = null, handRight = null
-
+          
           if (opts.button) {
             opts.button = [].concat(opts.button)
+            if (lib.isString(opts.button[0]) || lib.isNumber(opts.button[0])) {
+              opts.button[0] = {title: opts.button[0]}
+            }
+            if (lib.isString(opts.button[1]) || lib.isNumber(opts.button[1])) {
+              opts.button[1] = {title: opts.button[1]}
+            }
             if (opts.button.length === 1) {
               handLeft = Object.assign({}, opts.button[0], touchEvent)
             } else if (opts.button.length > 1) {
