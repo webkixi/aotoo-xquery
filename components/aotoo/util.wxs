@@ -420,6 +420,12 @@ function merge(a, b) {
 function optionObserver(newValue, oldValue, ownerInstance, instance) {
   globleVar.touchoption = merge(globleVar.touchoption, newValue)
   globleVar.oldTouchoption = oldValue
+  if (newValue.ssliderAixs) {
+    globleVar.ssliderAixs = instance
+  }
+  if (newValue.sslider) {
+    globleVar.sslider = globleVar.sslider || {}
+  }
   if (isObject(newValue.navball)) {
     tpos.current.navballStartX = newValue.navball.start.x
     tpos.current.navballStartY = newValue.navball.start.y
@@ -689,10 +695,10 @@ function tStart(e, slip, ins, stopPropagation) {
     dropStart(e, ins)
   }
 
-  if (globleVar.touchoption && globleVar.touchoption.navball){
-    navballStart(e, ins)
+  if (globleVar.touchoption) {
+    if (globleVar.touchoption.navball) navballStart(e, ins)
+    if (globleVar.touchoption.sslider) ssliderStart(e, ins)
   }
-
 
   // 响应js的touchstart方法
   var tevent = tpos.events.touchstart
@@ -887,8 +893,9 @@ function tMove(e, slip, ins, stopPropagation) {
     dropMove(e, ins)
   }
 
-  if (globleVar.touchoption && globleVar.touchoption.navball) {
-    navballMove(e, ins)
+  if (globleVar.touchoption) {
+    if (globleVar.touchoption.navball) navballMove(e, ins)
+    if (globleVar.touchoption.sslider) ssliderMove(e, ins)
   }
   
   tpos.current.timeStamp = e.timeStamp
@@ -935,8 +942,6 @@ function navballMove(e, ins) {
     windowWidth: nbOption.windowWidth
   }
 
-  // log(edge)
-
   var navballOffsetX = tpos.current.x - tpos.current.navballStartX
   var navballOffsetY = (tpos.current.y - tpos.current.navballStartY) + (tpos.current.y - tpos.start.y) * 0.5
 
@@ -952,6 +957,236 @@ function navballMove(e, ins) {
 
 function navballEnd(e, ins) {
   e.currentPosition = tpos.current
+}
+
+function ssliderStart(e, ins) {
+  var inst = e.instance
+  var id = e.currentTarget.id
+  if (id.indexOf('$$slider_') === -1) return
+
+  var currentTarget = e.currentTarget
+  var dataset = currentTarget.dataset
+  var target = e.changedTouches[0]
+  var pageX = target.pageX
+  var pageY = target.pageY
+
+  globleVar.sslider[id] ? globleVar.sslider[id] : globleVar.sslider[id] = { start: {  } }
+  globleVar.sslider[id].start.x = globleVar.sslider[id].start.x || pageX
+  globleVar.sslider[id].start.y = globleVar.sslider[id].start.y || pageY
+
+  var ssliderConfig = globleVar.touchoption.sslider
+  if (ssliderConfig.disable) return 
+  globleVar.sslider.blockSize = ssliderConfig.blockSize
+  globleVar.sslider.halfBlockSize = parseInt(ssliderConfig.blockSize/2)
+  globleVar.sslider.oneStepDraw = false
+}
+
+function ssliderMove(e, ins) {
+  var inst = e.instance
+  var id = e.currentTarget.id
+  if (id.indexOf('$$slider_') === -1) return
+
+  var currentTarget = e.currentTarget
+  var dataset = currentTarget.dataset
+  var offsetLeft = currentTarget.offsetLeft
+  var target = e.changedTouches[0]
+  var pageX = target.pageX
+  var pageY = target.pageY
+
+  var ssliderConfig = globleVar.touchoption.sslider
+  if (ssliderConfig.disable) return
+  var rect = ssliderConfig.rect
+  var frontColor = ssliderConfig.frontColor
+  var backColor = ssliderConfig.backColor
+  var left = rect.left
+  var smooth = rect.smooth
+  var right = rect.right
+  var width = rect.width
+  var value = globleVar.sslider.value || ssliderConfig.value  // value是相对定位的值
+  var perWidth = ssliderConfig.perWidth
+  var scalsPx = ssliderConfig.scalsPx
+  var scals = ssliderConfig.scals
+  var edge = globleVar.sslider.edge || ssliderConfig.edge
+  var halfBlockSize = globleVar.sslider.halfBlockSize
+
+  globleVar.sslider[id]['current'] = { x: pageX, y: pageY }
+  var pointX = globleVar.sslider[id]['current'].pointX || left + offsetLeft + halfBlockSize
+  var diffX = globleVar.sslider[id]['current'].x - globleVar.sslider[id]['start'].x
+
+  var valuePx = globleVar.sslider.valuePx || []
+  var valuePx0Index = scals.indexOf(value[0])
+  if (valuePx0Index > -1) {
+    valuePx[0] = scalsPx[valuePx0Index] - left
+  }
+
+  var valuePx1Index = scals.indexOf(value[1])
+  if (valuePx1Index > -1) {
+    valuePx[1] = scalsPx[valuePx1Index] - left
+  }
+
+  if (pointX + diffX < left) {
+    diffX = -(offsetLeft + halfBlockSize)
+  }
+
+  if (pointX + diffX > right) {
+    diffX = width - offsetLeft - halfBlockSize
+  }
+
+  var len = []
+  if (id.indexOf('_1')>-1)  {
+    if (pointX+diffX > edge.right) {
+      diffX = edge.right - left - offsetLeft -halfBlockSize
+    }
+    valuePx[0] = pointX - left + diffX
+
+    scalsPx.forEach(function(px, ii) {
+      var _px = px - left
+      if (offsetLeft + diffX > _px) {
+        if (len.indexOf(ii) === -1) len.push(ii)
+      }
+    })
+    value[0] = scals[len.length]
+  }
+  if (id.indexOf('_2')>-1)  {
+    if (pointX+diffX < edge.left) {
+      diffX = -((offsetLeft - (edge.left - left))+halfBlockSize)
+    }
+    valuePx[1] = offsetLeft + diffX
+
+    scalsPx.forEach(function(px, ii) {
+      var _px = px - left
+      if (valuePx[1] > _px) {
+        if (len.indexOf(_px) === -1) len.push(_px)
+      }
+    })
+    value[1] = scals[len.length]
+  }
+
+  e.sliderDetail = {diffX: diffX, value: value, valuePx: valuePx}
+  inst.setStyle('transform: translate3d(' + diffX + 'px, 0, 0)')
+  var aixsStyle = 'background: linear-gradient(0.25turn, '+frontColor+' '+ valuePx[0] + 'px, '+backColor+' ' +valuePx[0]+ 'px, '+backColor+' '+valuePx[1]+'px, '+frontColor+' '+valuePx[1]+'px'
+
+  if (smooth) {
+    // 实时渲染
+    globleVar.ssliderAixs.setStyle(aixsStyle)
+  } else {
+    // 按刻度渲染
+    var oneStepDraw = parseInt(diffX / perWidth)
+    if (globleVar.sslider.oneStepDraw !== oneStepDraw) {
+      globleVar.sslider.oneStepDraw = oneStepDraw
+      globleVar.ssliderAixs.setStyle(aixsStyle)
+    }
+  }
+}
+function ssliderEnd(e, ins) {
+  var inst = e.instance
+  var id = e.currentTarget.id
+  if (id.indexOf('$$slider_') === -1) return  
+
+  var currentTarget = e.currentTarget
+  var dataset = currentTarget.dataset
+  var offsetLeft = currentTarget.offsetLeft
+  var target = e.changedTouches[0]
+  var pageX = target.pageX
+  var pageY = target.pageY
+
+  var ssliderConfig = globleVar.touchoption.sslider
+  if (ssliderConfig.disable) return
+  var rect = ssliderConfig.rect
+  var frontColor = ssliderConfig.frontColor
+  var backColor = ssliderConfig.backColor
+  var left = rect.left
+  var right = rect.right
+  var width = rect.width
+  var value = globleVar.sslider.value || ssliderConfig.value
+  var perWidth = ssliderConfig.perWidth
+  var scalsPx = ssliderConfig.scalsPx
+  var scals = ssliderConfig.scals
+  var valuePx = globleVar.sslider.valuePx || []
+  var edge = globleVar.sslider.edge || ssliderConfig.edge
+  var halfBlockSize = globleVar.sslider.halfBlockSize
+
+  var valuePx0Index = scals.indexOf(value[0])
+  if (valuePx0Index > -1) {
+    valuePx[0] = scalsPx[valuePx0Index] - left
+  }
+
+  var valuePx1Index = scals.indexOf(value[1])
+  if (valuePx1Index > -1) {
+    valuePx[1] = scalsPx[valuePx1Index] - left
+  }
+
+  if (!globleVar.sslider[id]['current']){
+    globleVar.sslider[id]['current'] = globleVar.sslider[id]['start']
+  }
+
+  var diffX = globleVar.sslider[id]['current'].x - globleVar.sslider[id]['start'].x
+  var pointX = globleVar.sslider[id]['current'].pointX || left + offsetLeft + halfBlockSize
+  var absX = Math.abs(diffX)
+
+  if (pointX + diffX < left) {
+    diffX = -(offsetLeft + halfBlockSize)
+  }
+
+  if (pointX + diffX > right) {
+    diffX = width - offsetLeft - halfBlockSize
+  }
+
+  if (id.indexOf('_1')>-1)  {
+    if (pointX+diffX > edge.right) {
+      diffX = edge.right - left - offsetLeft - halfBlockSize
+    }
+  }
+  if (id.indexOf('_2')>-1)  {
+    if (pointX+diffX < edge.left) {
+      diffX = -((offsetLeft - (edge.left - left))+halfBlockSize)
+    }
+  }
+
+  var curPointX = pointX + diffX
+  var len = []
+  scalsPx.forEach(function(px, ii) {
+    if (curPointX >= px) {
+      if (len.indexOf(px) === -1) {
+        len.push(px)
+      }
+      if (curPointX > px+(parseInt(perWidth/2))) {
+        if (len.indexOf(scalsPx[ii+1]) === -1) {
+          len.push(scalsPx[ii+1])
+        }
+      }
+    }
+  })
+
+  var endPointX = len[len.length-1]
+  var endValue = scals[len.length-1]
+  globleVar.sslider[id]['current'].pointX = endPointX
+  if (curPointX < endPointX) {
+    diffX += (endPointX - curPointX)
+  } else {
+    diffX -= (curPointX - endPointX)
+  }
+
+  if (id.indexOf('_1') > -1) {
+    value[0] = endValue
+    valuePx[0] = pointX - left + diffX
+    edge.left = endPointX + perWidth
+  }
+
+  if (id.indexOf('_2') > -1) {
+    value[1] = endValue
+    valuePx[1] = endPointX - left
+    edge.right = endPointX - perWidth
+  }
+
+  globleVar.sslider.value = value
+  globleVar.sslider.valuePx = valuePx
+  globleVar.sslider.edge = edge
+  
+  e.sliderDetail = {diffX: diffX, value: value, valuePx: valuePx}
+  inst.setStyle('transform: translate3d(' + diffX + 'px, 0, 0)')
+  var aixsStyle = 'background: linear-gradient(0.25turn, '+frontColor+' ' + valuePx[0] + 'px, '+backColor+' ' + valuePx[0] + 'px, '+backColor+' ' + valuePx[1] + 'px, '+frontColor+' ' + valuePx[1] + 'px'
+  globleVar.ssliderAixs.setStyle(aixsStyle)
 }
 
 function dropStart(e, ins) {
@@ -1068,8 +1303,9 @@ function tEnd(e, slip, ins, stopPropagation) {
     dropEnd(e, ins)
   }
 
-  if (globleVar.touchoption && globleVar.touchoption.navball) {
-    navballEnd(e, ins)
+  if (globleVar.touchoption) {
+    if (globleVar.touchoption.navball) navballEnd(e, ins)
+    if (globleVar.touchoption.sslider) ssliderEnd(e, ins)
   }
 
   var isFake = isFakeEvent(allParam)
