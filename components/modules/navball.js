@@ -67,13 +67,13 @@ module.exports = function(params) {
       let ts = e.timeStamp
       let difTime = ts - this.prevTimeStamp
       this.prevTimeStamp = ts
-      if (difTime <250) {
+      if (difTime <200) {
         clearTimeout(this.taptimmer)
         this.dtap(e)
       } else {
         this.taptimmer = setTimeout(() => {
           listenEvent.call(this, 'tap', opts, e)
-        }, 250);
+        }, 200);
       }
 
 

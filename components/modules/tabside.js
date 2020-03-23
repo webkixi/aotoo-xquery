@@ -41,11 +41,10 @@ module.exports = function mkTab($$id, opts, type) {
       if (contents[ii] && lib.isObject(contents[ii])) {
         contents[ii].id = 'sw-'+id
       } else {
-        contents.push({
-          // title: contents[ii]||(item.title+'内容-'+id),
-          title: '',
+        contents[ii] = {
+          title: contents[ii],
           id: 'sw-' + id
-        })
+        }
       }
     }
 
@@ -126,6 +125,10 @@ module.exports = function mkTab($$id, opts, type) {
         this.hasChangeContent = {'sw-1': true}
         if ($$id) {
           this.activePage[$$id] = this
+        }
+
+        if (opts.mounted && lib.isFunction(opts.mounted)) {
+          opts.mounted.call(this)
         }
       },
       onTap(e, param, inst) {
