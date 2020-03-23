@@ -351,15 +351,13 @@ function core(params) {
       mkFind(this, app)
       this.find = wx.$$find
       
+      this.__rendered = true
+      this.doReady()
+      this.hooks.emit('onReady')
+
       if (typeof oldReady == 'function') {
         oldReady.apply(this, arguments)
       }
-      
-      this.__rendered = true
-      this.doReady()
-      setTimeout(() => {
-        this.hooks.emit('onReady')
-      }, 200);
     }
 
     const oldSshow = params.onShow
@@ -374,10 +372,10 @@ function core(params) {
         // activePage = curPage
       }
       this.__hide = false
+      this.hooks.emit('onShow')
       if (typeof oldSshow == 'function') {
         oldSshow.apply(this, arguments)
       }
-      this.hooks.emit('onShow')
     }
 
     const oldHide = params.onHide

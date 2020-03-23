@@ -426,6 +426,9 @@ function optionObserver(newValue, oldValue, ownerInstance, instance) {
   if (newValue.sslider) {
     globleVar.sslider = globleVar.sslider || {}
   }
+  if (newValue.navpad) {
+    globleVar.navpad = globleVar.navpad || {}
+  }
   if (isObject(newValue.navball)) {
     tpos.current.navballStartX = newValue.navball.start.x
     tpos.current.navballStartY = newValue.navball.start.y
@@ -698,6 +701,7 @@ function tStart(e, slip, ins, stopPropagation) {
   if (globleVar.touchoption) {
     if (globleVar.touchoption.navball) navballStart(e, ins)
     if (globleVar.touchoption.sslider) ssliderStart(e, ins)
+    if (globleVar.touchoption.navpad) navpadStart(e, ins)
   }
 
   // 响应js的touchstart方法
@@ -896,6 +900,7 @@ function tMove(e, slip, ins, stopPropagation) {
   if (globleVar.touchoption) {
     if (globleVar.touchoption.navball) navballMove(e, ins)
     if (globleVar.touchoption.sslider) ssliderMove(e, ins)
+    if (globleVar.touchoption.navpad) navpadMove(e, ins)
   }
   
   tpos.current.timeStamp = e.timeStamp
@@ -927,10 +932,12 @@ function navballMove(e, ins) {
   var current = tpos.current
   var diffX = target.pageX - tpos.start.x
   var diffY = target.pageY - tpos.start.y
+  var absX = Math.abs(diffX)
+  var absY = Math.abs(diffY)
 
   var halfWidth = parseInt(nbOption.width / 2)
   var halfHeight = parseInt(nbOption.height / 2)
-  
+
   var edge = {
     left: safeArea.left,
     top: safeArea.top,
@@ -943,15 +950,129 @@ function navballMove(e, ins) {
   }
 
   var navballOffsetX = tpos.current.x - tpos.current.navballStartX
-  var navballOffsetY = (tpos.current.y - tpos.current.navballStartY) + (tpos.current.y - tpos.start.y) * 0.5
+  var navballOffsetY = (tpos.current.y - tpos.current.navballStartY) + (tpos.current.y - tpos.start.y) * 0.1
 
   if (
-    (diffX > 0 && navballOffsetX < edge.right - halfWidth - current.navballStartX || diffX < 0 && navballOffsetX > edge.left+halfWidth - current.navballStartX) &&
+    (absX > 5 || absY > 5) &&
+    (diffX > 0 && navballOffsetX < edge.right - halfWidth - current.navballStartX || diffX < 0 && navballOffsetX > edge.left + halfWidth - current.navballStartX) &&
     ((diffY > 0 && navballOffsetY < edge.windowHeight - current.navballStartY - halfHeight) || (diffY < 0 && navballOffsetY > (0 + halfHeight) - current.navballStartY))
   ) {
     tpos.current.navballOffsetX = navballOffsetX
     tpos.current.navballOffsetY = navballOffsetY
     inst.setStyle('transform: translate3d(' + navballOffsetX + 'px, ' + navballOffsetY + 'px, 0)')
+  }
+}
+
+function navpadStart(e, ins) {
+  var id = e.currentTarget.id
+  if (id.indexOf('$$navpad') === -1) return
+  var currentTarget = e.currentTarget
+  var inst = e.instance
+  var offsetLeft = currentTarget.offsetLeft
+  var offsetTop = currentTarget.offsetTop
+  var changedTouches = e.changedTouches[0]
+  var pageX = changedTouches.pageX
+  var pageY = changedTouches.pageY
+  var navpad = globleVar.navpad
+  // log(globleVar.touchoption.navpad)
+  navpad.start = {
+    x: (navpad.start && navpad.start.x)|| pageX,
+    y: (navpad.start && navpad.start.y) || pageY,
+    pageX: pageX,
+    pageY: pageY,
+    timeStamp: e.timeStamp,
+    offsetTop: offsetTop
+  }
+  e.navpadOpened = navpad.openPad ? true : false
+}
+function navpadMove(e, ins) {
+  var navpad = globleVar.navpad
+  var inst = e.instance
+  var navpadEnv = globleVar.touchoption.navpad
+  var openHeight = navpadEnv.openHeight
+
+  var changedTouches = e.changedTouches[0]
+  var currentTarget = e.currentTarget
+  var dataset = currentTarget.dataset
+  var id = currentTarget.id
+  if (id.indexOf('$$navpad') === -1) return
+
+  var offsetLeft = currentTarget.offsetLeft
+  var offsetTop = currentTarget.offsetTop
+  var pageX = changedTouches.pageX
+  var pageY = changedTouches.pageY
+
+  var diffX = pageX - navpad.start.x
+  var diffY = pageY - navpad.start.y
+  var realDiffY = pageY - navpad.start.pageY
+  var absY = Math.abs(realDiffY)
+  var diffTs = e.timeStamp - navpad.start.timeStamp
+
+  // console.log(pageY, navpad.start.y);
+
+  navpad.current = {
+    x: pageX,
+    y: pageY,
+    diffX: diffX,
+    diffY: diffY
+  }
+  
+  if (navpad.openPad) {
+    if (realDiffY > 0) {
+      diffY = 'calc('+openHeight+' + ' + realDiffY + 'px)'
+      inst.setStyle('transform: translate3d(0, '+diffY+', 0)')
+    }
+  } else { 
+    if (absY < 300 && realDiffY < 0)  {
+      inst.setStyle('transform: translate3d(0, '+diffY+'px, 0)')
+    }
+  }
+}
+function navpadEnd(e, ins) {
+  var navpad = globleVar.navpad
+  var navpadEnv = globleVar.touchoption.navpad
+  var inst = e.instance
+  var openHeight = navpadEnv.openHeight
+
+  var changedTouches = e.changedTouches[0]
+  var currentTarget = e.currentTarget
+  var dataset = currentTarget.dataset
+  var id = currentTarget.id
+  if (id.indexOf('$$navpad') === -1) return
+
+  var offsetLeft = currentTarget.offsetLeft
+  var offsetTop = currentTarget.offsetTop
+  var pageX = changedTouches.pageX
+  var pageY = changedTouches.pageY
+
+  var diffX = pageX - navpad.start.x
+  var diffY = pageY - navpad.start.y
+  var absY = Math.abs(diffY)
+  var realDiffY = pageY - navpad.start.pageY
+  var diffTs = e.timeStamp - navpad.start.timeStamp
+
+  if (diffY > 0) {
+    inst.setStyle('transform: translate3d(0, 0, 0)')
+  } else {
+    if (navpad.openPad) {
+      if (realDiffY > 100) {
+        navpad.openPad = false
+        e.navpadOpened = false
+        inst.setStyle('transition: all ease-in-out .3s;transform: translate3d(0, 0, 0)')
+      } else {
+        inst.setStyle('transition: all ease-in-out .3s;transform: translate3d(0, '+openHeight+', 0)')
+      }
+    } else {
+      if (diffY < 0) {
+        if (absY > 60) {
+          navpad.openPad = true
+          e.navpadOpened = true
+          inst.setStyle('transition: all ease-in-out .3s;transform: translate3d(0, '+openHeight+', 0)')
+        } else {
+          inst.setStyle('transition: all ease-in-out .3s;transform: translate3d(0, 0, 0)')
+        }
+      } 
+    }
   }
 }
 
@@ -1304,8 +1425,14 @@ function tEnd(e, slip, ins, stopPropagation) {
   }
 
   if (globleVar.touchoption) {
-    if (globleVar.touchoption.navball) navballEnd(e, ins)
     if (globleVar.touchoption.sslider) ssliderEnd(e, ins)
+    if (globleVar.touchoption.navpad) navpadEnd(e, ins)
+    if (globleVar.touchoption.navball) {
+      navballEnd(e, ins)
+      if (absDiffx < 5 && absDiffy < 5) {
+        tpos.moving = false
+      }
+    }
   }
 
   var isFake = isFakeEvent(allParam)

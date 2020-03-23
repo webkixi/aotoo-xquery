@@ -730,6 +730,20 @@ export const listBehavior = function(app, mytype) {
   })
 }
 
+function lookforEventFun(ctx, fun) {
+  if (ctx.parentInst) {
+    if (ctx.parentInst[fun] && lib.isFunction(ctx.parentInst[fun])) {
+      return ctx.parentInst
+    } else {
+      return lookforEventFun(ctx.parentInst, fun)
+    }
+  } else {
+    if (ctx.componentInst && lib.isFunction(ctx.componentInst[fun])) {
+      return ctx.componentInst
+    }
+  }
+}
+
 function listReactFun(app, e, type="list") {
   app = app || getApp()
   const that = this
@@ -753,29 +767,48 @@ function listReactFun(app, e, type="list") {
   }
 
   const activePage = this.activePage
-  let parentInstance = this.componentInst
+  let parentInstance = this.parentInst || this.componentInst
   const {fun, param} = this._rightEvent(e)
 
   if (fun) {
     const evtFun = activePage[fun] || app.activePage[fun]
     const thisFun = this[fun]
-    const isEvt = lib.isFunction(evtFun)
-    if (lib.isEmpty(parentInstance)) {
-      parentInstance = undefined
-    }
-  
-    if (parentInstance && lib.isFunction(parentInstance[fun])) {
-      parentInstance[fun].call(parentInstance, e, param)
-    } else {
-      if (lib.isFunction(thisFun)) {
-        thisFun.call(this, e, param, this)
+
+    if (lib.isFunction(thisFun)) {
+      thisFun.call(this, e, param, this)
+    } else if (lib.isFunction(evtFun)) {
+      evtFun.call(activePage, e, param, that)
+    } else if (parentInstance) {
+      let ctx = lookforEventFun(that, fun)
+      if (ctx) {
+        ctx[fun].call(ctx, e, param, that)
       } else {
-        if (isEvt) evtFun.call(activePage, e, param, (parentInstance||that))
-        else {
-          console.warn(`找不到定义的${fun}方法`);
-        }
+        console.warn(`找不到定义的${fun}方法`);
       }
+    } else {
+      console.warn(`找不到定义的${fun}方法`);
     }
+
+    // const evtFun = activePage[fun] || app.activePage[fun]
+    // const thisFun = this[fun]
+    // const isEvt = lib.isFunction(evtFun)
+    // if (lib.isEmpty(parentInstance)) {
+    //   parentInstance = undefined
+    // }
+  
+    // if (parentInstance && lib.isFunction(parentInstance[fun])) {
+    //   parentInstance[fun].call(parentInstance, e, param)
+    // } else {
+    //   if (lib.isFunction(thisFun)) {
+    //     thisFun.call(this, e, param, this)
+    //   } else {
+    //     if (isEvt) evtFun.call(activePage, e, param, (parentInstance||that))
+    //     else {
+    //       console.warn(`找不到定义的${fun}方法`);
+    //     }
+    //   }
+    // }
+
   }
 }
 
