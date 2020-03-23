@@ -1,6 +1,8 @@
 {
   "pages": [
     "pages/markdown/index",
+    "pages/turntable/index",
+    "pages/navpad/index",
     "pages/sslider/index",
     "pages/navball/index",
     "pages/list/index",
@@ -10,7 +12,6 @@
     "pages/collapse/index",
     "pages/tabdetail/index",
     "pages/tabside/index",
-    "pages/turntable/index",
     "pages/guagua/index",
     "pages/locker/index",
     "pages/indexlist/index",
