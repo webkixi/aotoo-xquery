@@ -305,15 +305,22 @@ export const listBehavior = function(app, mytype) {
                   if (isArray(nval) && key!=='data') {
                     nval = reSetArray.call(this, param[key], $list).data
                   } else {
+                    let re = /\.?(img|animation|type)/
                     if (key.indexOf('title') > -1 || key.indexOf('img')>-1 || isObject(nval)) {
-                      if (key === 'type' || nkey.indexOf('$list.type.') > -1) {
+                      if (
+                        re.test(key)
+                        // key.indexOf('img') > -1 ||
+                        // key.indexOf('animation') > -1 ||
+                        // key === 'type' || 
+                        // nkey.indexOf('$list.type.') > -1
+                      ) {
                         /** 不出来list.type数据 */
                       } else if (isObject(nval)) {
                         nval = reSetItemAttr.call(this, param[key], $list)
                       }
-                      if (key.indexOf('@') === -1) {
-                        nval = reSetItemAttr.call(this, param[key], $list)
-                      }
+                      // if (key.indexOf('@') === -1) {
+                      //   nval = reSetItemAttr.call(this, param[key], $list)
+                      // }
                     }
                   }
                   target[nkey] = nval

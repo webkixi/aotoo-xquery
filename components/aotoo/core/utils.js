@@ -9,7 +9,7 @@ const path = {
     }
     return str.substring(idx + 1);
   },
-  extname: function () {
+  extname: function (filename) {
     if (!filename || typeof filename != 'string') {
       return false
     };

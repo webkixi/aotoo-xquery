@@ -230,6 +230,29 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
   }
 }
 
+function getAllChilds(ctx, loop) {
+  let xxx = []
+  if (ctx.children) {
+    if (loop) xxx = xxx.concat(ctx)
+    if (ctx.children.length) {
+      ctx.children.forEach(cld => {
+        xxx =xxx.concat(getAllChilds(cld, true))
+      })
+    }
+  }
+  return xxx
+}
+
+function syncChildData(ctx, data) {
+  let childs = getAllChilds(ctx)
+  childs.forEach(item => {
+    let _data = item.getData()
+    let rid = _data.__relationId
+    lib.syncChildData(data, rid, _data)
+  })
+  return data
+}
+
 export function listInstDelegate(treeid, listInst, from){
   let index = null
   if (treeid && (treeid.__realIndex || treeid.__realIndex===0)) {
@@ -246,8 +269,8 @@ export function listInstDelegate(treeid, listInst, from){
       parentInst: listInst,
       data: lib.clone(data),
       getData(){
-        // return lib.clone(data)
-        return (listInst.getData()).data[index]
+        let $data = (listInst.getData()).data[index]
+        return syncChildData(listInst, $data)
       },
       exec(cb){
         // 列表实例批量更新方法

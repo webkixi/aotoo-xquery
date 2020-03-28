@@ -98,6 +98,7 @@ export function resetItem(data, context, loop, attrkey) {
     let incAttrs = []
     data['__sort'] = []
     data.show = data.hasOwnProperty('show') ? data.show : true
+    data.__relationId = data.__relationId || suid('relation_')
 
     if (attrkey!=='url' && data.url) {
       data = formatUrl(data)

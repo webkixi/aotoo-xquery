@@ -19,6 +19,29 @@ function _resetItem(data, context) {
 }
 
 
+function getAllChilds(ctx, loop) {
+  let xxx = []
+  if (ctx.children) {
+    if (loop) xxx = xxx.concat(ctx)
+    if (ctx.children.length) {
+      ctx.children.forEach(cld => {
+        xxx = xxx.concat(getAllChilds(cld, true))
+      })
+    }
+  }
+  return xxx
+}
+
+function syncChildData(ctx, data) {
+  let childs = getAllChilds(ctx)
+  childs.forEach(item => {
+    let _data = item.getData()
+    let rid = _data.__relationId
+    lib.syncChildData(data, rid, _data)
+  })
+  return data
+}
+
 
 export const itemBehavior = function(app, mytype) {
   mytype = mytype || 'item'
@@ -145,7 +168,10 @@ export const itemBehavior = function(app, mytype) {
 
       update: function (param, callback) {
         const that = this
-        const $tmp = lib.clone(this.data.$item)
+        // const $tmp = lib.clone(this.data.$item)
+        let $tmp = this.data.$item
+        $tmp = syncChildData(this, $tmp)
+
         this.setData({$tmp})
         const updateFun = (opts) => {
           let target = {}

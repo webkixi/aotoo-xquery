@@ -167,6 +167,55 @@ navFuns.forEach(key => {
 
 export const nav = _nav
 
+export function findChilds(ctx) {
+  if (!ctx) return null
+  let xxx = []
+  if (isArray(ctx)) {
+    ctx.forEach(item => {
+      if (item.$$is === 'fakelist') {
+        if (item.length) xxx = xxx.concat(findChilds(item.parentInst))
+      } else {
+        xxx = xxx.concat(findChilds(item))
+      }
+    })
+  } else {
+    if (ctx.children && ctx.children.length) {
+      ctx.children.forEach(cld => {
+        if (cld.children && cld.children.length) {
+          xxx = findChilds(cld).concat(xxx)
+        } else {
+          xxx = xxx.concat(cld)
+        }
+      })
+    }
+    xxx = xxx.concat(ctx)
+  }
+  return xxx
+}
+
+export function syncChildData(res, rid, data) {
+  if (res.__relationId === rid) {
+    res = data
+  } else {
+    Object.keys(res).forEach(key => {
+      if (key !== '__sort') {
+        let val = res[key]
+        if (isObject(val)) {
+          if (val.__relationId === rid) {
+            res[key] = data
+          } else {
+            res[key] = syncChildData(val, rid, data)
+          }
+        }
+        if (isArray(val)) {
+          res[key] = val.map(it => syncChildData(it, rid, data))
+        }
+      }
+    })
+  }
+  return res
+}
+
 
 // 百度 ”JS实现活动精确倒计时“
 class cdd {

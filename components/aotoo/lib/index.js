@@ -90,6 +90,8 @@ export {
   isEmpty,
   debounce,
   throttle,
+  findChilds,
+  syncChildData,
   nav,  // wx路由的节流封装 1200毫秒,
   countdown,  // 倒计时器
   counter  // 计时器，秒表

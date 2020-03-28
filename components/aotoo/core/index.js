@@ -43,37 +43,7 @@ function mkFind(context, app){
         }
       }
 
-      function findChilds(ctx) {
-        if (!ctx) return null
-        let xxx = []
-        if (lib.isArray(ctx)) {
-          ctx.forEach(item=>{
-            if (item) {
-              if (item.$$is === 'fakelist') {
-                if (item.length) xxx = xxx.concat(findChilds(item.parentInst))
-              } else {
-                xxx = xxx.concat(findChilds(item))
-              }
-            }
-          })
-        } else {
-          // xxx = [ctx]
-          if (ctx.children && ctx.children.length) {
-            ctx.children.forEach(cld => {
-              if (cld.children&&cld.children.length) {
-                // xxx = xxx.concat(findChilds(cld))
-                xxx = findChilds(cld).concat(xxx)
-              } else {
-                xxx = xxx.concat(cld)
-              }
-            })
-          }
-          xxx = xxx.concat(ctx)
-        }
-        return xxx
-      }
-
-      let findScope = findChilds(context) || Object.entries(vars).map(item => item[1])
+      let findScope = lib.findChilds(context) || Object.entries(vars).map(item => item[1])
       let findIt = []
       findScope.forEach(inst => {
         // let inst = item[1] 
