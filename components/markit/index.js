@@ -71,19 +71,19 @@ Component({
     md(content, param){
       const that = this
       this.reset()
-      markdown(content, param).then(cnt => doneHtml(cnt, that))
+      markdown(content, param).then(cnt => doneHtml.call(this, cnt, that))
     },
 
     html(content, param) {
       const that = this
       this.reset()
-      html(content, param).then(cnt => doneHtml(cnt, that))
+      html(content, param).then(cnt => doneHtml.call(this, cnt, that))
     }
   }
 })
 
 function doneHtml(cnt, context) {
   let that = context
-  cnt = lib.reSetList.call(null, cnt)
+  cnt = lib.reSetList.call(this, cnt)
   that.setData({ $list: cnt })
 }
