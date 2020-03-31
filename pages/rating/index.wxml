@@ -1,0 +1,3 @@
+<view class="container">
+  <ui-form dataSource="{{voteConfig}}" />
+</view>

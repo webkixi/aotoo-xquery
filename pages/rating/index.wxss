@@ -1,0 +1,12 @@
+@import '../../css/form.wxss';
+
+.container{
+  padding-top: 100rpx;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
+  display: none;
+}

@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/markdown/index",
+    "pages/rating/index",
     "pages/turntable/index",
     "pages/navpad/index",
     "pages/sslider/index",
