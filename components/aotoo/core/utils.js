@@ -55,8 +55,8 @@ function getImgRealPath(obj) {
 
 function formDataName(param) {
   const basename = path.basename(param)
-  const extname = path.extname(basename)
-  return basename.length > 10 ? lib.uuid('upimg_', 12) + extname : basename
+  const extname = '.'+path.extname(basename)
+  return basename.length > 20 ? lib.uuid('upimg_', 12) + extname : basename
 }
 
 function doUpload(param) {
