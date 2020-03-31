@@ -256,6 +256,7 @@
 <template name="@rating">
     <view 
       wx:for="{{input.range}}"
+      wx:key="_key"
       bind:touchstart="inputItemMethod"
       bind:touchmove="inputItemMethod"
       class="input-item-rating {{item.itemClass||''}}"
@@ -264,6 +265,7 @@
       data-type="rating"
       data-value="{{item.title}}"
       data-address="{{input.uAddress}}" 
+      data-id="{{input.id||input.name}}"
       data-evt="{{util.dataEvt(input, ['tap'])}}"
     ></view>
 </template>

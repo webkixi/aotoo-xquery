@@ -1285,8 +1285,15 @@ function runFormBindFun(fn, res, e, from) {
     fn = undefined
   }
   let funNm = fun
+
+  var id = res.inputData.id || res.inputData.name
+  res.inputData = this.allocation[id]
   res.param ? e.param = res.param : ''
   res.param = res.param || param
+  res.value = res.inputData.value
+  res.values = res.inputData.values
+  res.id = id
+  res.type = res.inputData.type
   if (lib.isString(res.inputData[fn])) {
     let funName = res.inputData[fn]
     // let targetObj = (!lib.isEmpty(this.componentInst) && this.componentInst) || activePage
@@ -1334,6 +1341,11 @@ function ratingTint(e, res, value) {
     })
     res.inputData.range = range
     setAllocation.call(this, res, {value})
+    if (e.detail) {
+      e.detail.value = value
+    } else {
+      e.detail = {value: value}
+    }
     runFormBindFun.call(this, 'tap', res, e)
     lib.vibrateShort()
   }

@@ -1,11 +1,12 @@
 @font-face {
-  font-family: 'iconfont'; /* project id 1074841 */
-  src: url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.eot");
-  src: url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.eot?#iefix") format('embedded-opentype'), url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.woff2") format('woff2'), url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.woff") format('woff'), url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.ttf") format('truetype'), url("//at.alicdn.com/t/font_1074841_m04x4m22rzp.svg#iconfont") format('svg');
+  font-family: 'iconfont';  /* project id 1074841 */
+  src: url('//at.alicdn.com/t/font_1074841_8qcz4rs6rgr.eot');
+  src: url('//at.alicdn.com/t/font_1074841_8qcz4rs6rgr.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_1074841_8qcz4rs6rgr.woff2') format('woff2'),
+  url('//at.alicdn.com/t/font_1074841_8qcz4rs6rgr.woff') format('woff'),
+  url('//at.alicdn.com/t/font_1074841_8qcz4rs6rgr.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_1074841_8qcz4rs6rgr.svg#iconfont') format('svg');
 }
-/**
-  自定义radio checkbox
-*/
 .icon-dot,
 .icon-dot-small {
   background: #f00;
@@ -27,15 +28,15 @@
   border-radius: 16rpx;
 }
 .form-arrows:after {
-  content: '▲';
+  content: '\e6b0';
   color: #999;
-  font-size: 22rpx;
+  font-size: 15rpx;
   margin-left: 10rpx;
 }
 .form-arrows-x:after {
-  content: '▼';
+  content: '\e794';
   color: #4b9afc;
-  font-size: 22rpx;
+  font-size: 15rpx;
   margin-left: 10rpx;
 }
 .form-close-eye:before {
@@ -52,7 +53,7 @@
 }
 .icon-arrows-r:after {
   content: '\e618';
-  color: $arrow-default-color;
+  color: #ccc;
 }
 .icon-arrows-t:before {
   content: '\e617';
@@ -72,10 +73,6 @@
 .icon-right:before {
   content: '\e660';
 }
-.input-container {
-  width: 96%;
-  margin: 0 auto;
-}
 .input-placeholder {
   color: #ccc;
   font-size: 28rpx;
@@ -83,7 +80,6 @@
 input {
   height: 3.34rem;
   min-height: 3.34rem;
-  padding: 0 10px;
 }
 .input-profile-item-title,
 .input-item .profile-item-title {
@@ -102,7 +98,6 @@ input {
 }
 .input-item .profile-item-desc {
   font-size: 30rpx;
-  color: #999;
 }
 .input-item .profile-item-required {
   font-size: 30rpx;
@@ -130,25 +125,33 @@ input {
 .input-item-content:last-child {
   border-bottom: none;
 }
-.input-item-content .input-item-desc {
-  font-size: 24rpx;
-  padding-left: 10px;
-  color: #999;
-}
-.input-item-content .input-item-error {
-  font-size: 24rpx;
-  padding-left: 10px;
-  margin-top: 20rpx;
-  color: #f00;
-}
-.input-item-content .input-item-area {
-  color: #333;
-}
 .input-item-content .input-item-input {
   color: #333;
 }
 .input-item-content .input-item-picker view {
   flex: 1;
+}
+.input-item-content .input-item-dropdown {
+  font-size: 28rpx;
+}
+.input-item-content .input-item-dropdown-options {
+  width: calc(100% - 80rpx);
+  min-height: 100px;
+  max-height: 100px;
+  background-color: #fff;
+  border: 1px solid #e3e3e3;
+  color: #666;
+  line-height: 80rpx;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 7px);
+}
+.input-item-content .input-item-dropdown-options-item {
+  padding: 0 20rpx;
+}
+.input-item-content .input-item-dropdown-options-item:active {
+  color: #fff;
+  background-color: #2585cf;
 }
 .input-item-content .input-item-passwd-eye {
   width: 100%;
@@ -158,40 +161,6 @@ input {
 .input-item-content .input-item-label {
   position: relative;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye view.item-input-dropdown {
-  margin: 15px 10px;
-}
-.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye .input-item-dropdown {
-  font-size: 28rpx;
-}
-.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye .input-item-dropdown-options {
-  width: calc(100% - 80rpx);
-  min-height: 100px;
-  max-height: 100px;
-  background-color: #fff;
-  border: 1px solid #e3e3e3;
-  color: #666;
-  line-height: 80rpx;
-  position: absolute;
-  left: 10px;
-  top: calc(100% - 10px);
-  max-height: 200px;
-  height: 200px;
-  overflow: auto;
-}
-.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye .input-item-dropdown-options-item {
-  padding: 0 20rpx;
-}
-.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye .input-item-dropdown-options-item.active {
-  background-color: #2585cf;
-  color: #fff;
-}
-.input-item-content .input-item-label.input-type-dropdown .input-item-passwd-eye .input-item-dropdown-options-item.disabled {
-  background-color: #ccc;
-  color: #fff;
 }
 .input-item-content .input-item-title {
   min-width: 112rpx;
@@ -199,6 +168,15 @@ input {
   font-weight: bold;
   height: 3.34rem;
   line-height: 3.34rem;
+}
+.input-item-content .input-item-desc {
+  flex: 1;
+  font-size: 20rpx;
+}
+.input-item-content .input-item-error {
+  font-size: 22rpx;
+  color: #f00;
+  margin-top: 20rpx;
 }
 .input-item-content .input-item-rc-group {
   display: flex;
@@ -247,8 +225,6 @@ input {
 .input-item-content .input-item-rc-group .input-item-radio-after.checked:before {
   content: '\e624';
 }
-/*原生swtich样式调整-start*/
-/*swtich整体大小*/
 .wx-switch-input {
   height: 62rpx !important;
 }
@@ -261,6 +237,56 @@ input {
 .switch-sm .wx-switch-input {
   zoom: 0.8;
 }
+.boxer {
+  position: relative;
+}
+.btn {
+  color: #fff;
+}
+.btn:hover {
+  background-color: #4cb0f9;
+  border-color: #2798eb;
+  color: #fff;
+}
+.btn:active {
+  transform: scale(0.98, 0.98);
+  background-color: #2798eb;
+  border-color: #2798eb;
+  color: #0880d7;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+.list-funs {
+  margin-top: 30px;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+.list-funs .fun {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #999;
+  border-radius: 10px;
+  margin: 5px;
+}
+.list-funs .fun:active {
+  border: none;
+  transform: scale(0.99, 0.99);
+  box-shadow: 0 0 0 1px #ddd inset;
+}
+.input-container {
+  width: 96%;
+  margin: 0 auto;
+}
+input {
+  padding: 0 10px;
+}
+input[type=dropdown] {
+  padding: 0 10px;
+}
 .dingwei:after {
   content: '♚';
   font-size: 32px;
@@ -269,12 +295,98 @@ input {
   content: '★';
   font-size: 32px;
 }
-.dd-demo {
-  border: 10px solid #f00;
-  box-sizing: border-box;
-  padding: 10px;
+.switcher .input-item-content .input-item-label,
+.picker .input-item-content .input-item-label,
+.pickers .input-item-content .input-item-label {
+  height: 2.34rem;
+  line-height: 3.34rem;
 }
-.dd-demo .input-item-area {
-  border-bottom: 1px solid #eee;
+.ckboxer .input-item-content .input-item-label,
+.rdboxer .input-item-content .input-item-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.input-item-content view.item-input-dropdown {
+  width: 100%;
+  height: 2.34rem;
+  line-height: 3.34rem;
+  padding: 0 10px;
+}
+.input-item-content .input-item-rc-group .input-item-rc {
+  margin-right: 10px;
+}
+.input-item-content .input-type-rating {
+  display: flex;
+  align-items: center;
+}
+.input-item-content .input-item .profile-item,
+.input-item-content .input-item-rating {
+  color: #f00;
+  margin-right: 10px;
+}
+.input-item-content .input-item .profile-item:after,
+.input-item-content .input-item-rating:after {
+  content: '☆';
+  font-size: 28px;
+}
+.input-item-content .input-item .profile-item.active:after,
+.input-item-content .input-item-rating.active:after {
+  content: '★';
+}
+.input-item-content .input-item-title {
   margin-bottom: 10px;
+  height: 2.34rem;
+  line-height: 3.34rem;
+}
+.input-item-content .input-item-label {
+  font-family: "iconfont" !important;
+  padding-left: 20px;
+}
+.input-item-content .input-item-dropdown-masker {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+.input-item-content .input-item-dropdown-options {
+  max-height: 200px;
+  height: 200px;
+  overflow: auto;
+}
+.input-item-content .input-item-dropdown-options-item.active {
+  background-color: #00f;
+  color: #fff;
+}
+.input-item-content .input-item-dropdown-options-item.disabled {
+  background-color: #ccc;
+  color: #fff;
+}
+.icon-dot:after,
+.form-arrows:after,
+.form-arrows-x:after,
+.icon-arrows-r:after,
+.icon-arrows-t:after,
+.icon-arrows-b:after,
+.icon-silence:after,
+.icon-close-eye:after,
+.icon-right:after {
+  font-size: 16px;
+}
+.icon-dot:before,
+.form-arrows:before,
+.form-arrows-x:before,
+.icon-arrows-r:before,
+.icon-arrows-t:before,
+.icon-arrows-b:before,
+.icon-silence:before,
+.icon-close-eye:before,
+.icon-right:before {
+  font-size: 16px;
+}
+.form-close-eye:before,
+.form-eye:before {
+  font-size: 18px;
 }
