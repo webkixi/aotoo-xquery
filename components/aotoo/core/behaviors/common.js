@@ -1249,6 +1249,10 @@ export const commonMethodBehavior = (app, mytype) => {
         if (is == 'form') {
           dsetEvt = 'bind' + dsetEvt
         }
+
+        if (dataset.isform) {
+          dsetEvt = 'bind' + dsetEvt
+        }
         
         let rEvt = rightEvent(dsetEvt)
         if (!rEvt.fun) {

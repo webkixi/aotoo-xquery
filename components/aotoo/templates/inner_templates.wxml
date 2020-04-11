@@ -35,7 +35,7 @@
   </block>
 </template>
 
-<template name="a">
+<!-- <template name="a">
   <view class="htitle {{item.class || item.itemClass}}" wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" bind:tap="aim" data-aim="{{item.aim}}">{{item.title}}</view>
   <block wx:else>
     <view class="htitle {{item.class || item.itemClass}}" bind:tap="aim" data-aim="{{item.aim}}">{{item.title}}</view>
@@ -47,7 +47,7 @@
   <block wx:else>
     <image catch:tap="catchItemMethod" data-evt="{{util.dataEvt(item, ['catchtap', 'tap', 'longpress', 'aim', 'touchstart', 'tourchend', 'touchmove', 'touchcancel'])}}" class="himg {{ item.class || item.itemClass }}" mode="{{item.mode || 'widthFix'}}" lazy-load="{{true}}" src="{{item.src}}" />
   </block>
-</template>
+</template> -->
 
 <template name="@item">
   <block wx:if="{{util.isObject(props)}}">
@@ -199,4 +199,92 @@
       </block>
     </navigator>
   </block>
+</template>
+
+
+<template name="@myinput">
+  <input 
+    class="{{props.itemClass||props.class||''}}"
+    style="{{props.itemStyle||props.style||''}}"
+    id="{{props.id||''}}"
+
+    value="{{props.value||''}}"
+    type="{{props.type||'text'}}"
+    passsword="{{props.passsword||''}}"
+    placeholder="{{props.placeholder||''}}"
+    placeholder-style="{{props['placeholder-style']||''}}"
+    placeholder-class="{{props['placeholder-class']||''}}"
+    disabled="{{props.disabled||''}}"
+    cursor-spacing="{{props['cursor-spacing']||''}}"
+    maxlength="{{props.maxlength||''}}"
+    focus="{{props.focus||''}}"
+    confirm-type="{{props['confirm-type']||''}}"
+    confirm-hold="{{props['confirm-hold']||''}}"
+    cursor="{{props.cursor||''}}"
+    selection-start="{{props['selection-start']||''}}"
+    selection-end="{{props['selection-end']||''}}"
+    adjust-position="{{props['adjust-position']||''}}"
+    hold-keyboard="{{props['hold-keyboard']||''}}"
+
+    catchtap="{{props.tap||props.aim||props.catchtap ? 'itemMethod' : ''}}"
+
+    bindinput="{{props.bindinput ? 'itemMethod' : ''}}"
+    bindfocus="{{props.bindfocus ? 'itemMethod' : ''}}"
+    bindblur="{{props.bindblur ? 'itemMethod' : ''}}"
+    bindconfirm="{{props.bindconfirm ? 'itemMethod' : ''}}"
+    bindkeyboardheightchange="{{props.bindkeyboardheightchange ? 'itemMethod' : ''}}"
+    data-isform="{{true}}"
+    data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap','bindinput', 'bindfocus', 'bindblur', 'bindconfirm', 'bindkeyboardheightchange'])}}"
+  />
+</template>
+
+<template name="@input">
+  <block wx:if="{{util.isArray(props)}}">
+    <block wx:for="{{props}}" wx:key="index">
+      <template is="@myinput" data="{{props: item}}"></template>
+    </block>
+  </block>
+  <block wx:else>
+    <template is="@myinput" data="{{props}}"></template>
+  </block>
+</template>
+
+<template name="@textarea">
+  <textarea 
+    class="{{props.itemClass||props.class||''}}"
+    style="{{props.itemStyle||props.style||''}}"
+    id="{{props.id||''}}"
+
+    value="{{props.value||''}}"
+    placeholder="{{props.placeholder||''}}"
+    placeholder-style="{{props['placeholder-style']||''}}"
+    placeholder-class="{{props['placeholder-class']||''}}"
+    disabled="{{props.disabled||''}}"
+    cursor-spacing="{{props['cursor-spacing']||''}}"
+    maxlength="{{props.maxlength||''}}"
+    auto-focus="{{props['auto-focus']||''}}"
+    focus="{{props.focus||''}}"
+    auto-height="{{props['auto-height']||''}}"
+    fixed="{{props.fixed||''}}"
+    confirm-type="{{props['confirm-type']||''}}"
+    confirm-hold="{{props['confirm-hold']||''}}"
+    cursor="{{props.cursor||''}}"
+    show-confirm-bar="{{props['show-confirm-bar']||''}}"
+    selection-start="{{props['selection-start']||''}}"
+    selection-end="{{props['selection-end']||''}}"
+    adjust-position="{{props['adjust-position']||''}}"
+    hold-keyboard="{{props['hold-keyboard']||''}}"
+    disable-default-padding="{{props['disable-default-padding']||''}}"
+
+    catchtap="{{props.tap||props.aim||props.catchtap ? 'itemMethod' : ''}}"
+
+    bindlinechange="{{props.bindlinechange ? 'itemMethod' : ''}}"
+    bindinput="{{props.bindinput ? 'itemMethod' : ''}}"
+    bindfocus="{{props.bindfocus ? 'itemMethod' : ''}}"
+    bindblur="{{props.bindblur ? 'itemMethod' : ''}}"
+    bindconfirm="{{props.bindconfirm ? 'itemMethod' : ''}}"
+    bindkeyboardheightchange="{{props.bindkeyboardheightchange ? 'itemMethod' : ''}}"
+    data-isform="{{true}}"
+    data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap','bindinput', 'bindfocus', 'bindblur', 'bindconfirm', 'bindkeyboardheightchange'])}}"
+  />
 </template>

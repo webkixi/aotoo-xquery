@@ -253,7 +253,7 @@
         bindload=         "{{item.bindload ? 'itemMethod' : ''}}"
         data-evt="{{util.dataEvt(item, ['preview', 'tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
       /> -->
-      <block wx:if="{{item.type === 'cover'}}">
+      <block wx:if="{{item.type&&item.type.is === 'cover'}}">
         <cover-image 
           src="{{item.src}}"
           binderror= "{{item.binderror ? 'itemMethod' : ''}}"
