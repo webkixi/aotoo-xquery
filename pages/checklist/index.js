@@ -3,12 +3,13 @@
 const app = getApp()
 const Pager = require('../../components/aotoo/core/index')
 const lib = Pager.lib
+const storeCommon = lib.hooks('CHECK-LIST')
 
-let storeValue = {}
-let storeValids = {}
-let storeContex = {}
-let storeAttrs = {}
-let selectAllValue = {}
+// let storeValue = {}
+// let storeValids = {}
+// let storeContex = {}
+// let storeAttrs = {}
+// let selectAllValue = {}
 
 function setClass(item, cls) {
   if (item.itemClass) {
@@ -101,7 +102,6 @@ function getChilds(item, datas, opts) {
       if (it.idf) {
         it = getChilds(it, datas, opts)
       }
-      // let nit = lib.clone(it)
       let nit = it
       delete nit.idf
       delete nit.parent
@@ -166,24 +166,24 @@ function preAdapter(opts) {
   return opts
 }
 
-function fillSelectAllValue(ckuniqId, item, $v) {
-  let v = item.value
-  if ($v) {
-    v = $v + '--' + v
-  }
+// function fillSelectAllValue(ckuniqId, item, $v) {
+//   let v = item.value
+//   if ($v) {
+//     v = $v + '--' + v
+//   }
 
-  let $content = item.content
-  if ($content) {
-    // let uniqid = $content.checklistUniqId
-    $content.data.forEach(it => {
-      fillSelectAllValue(ckuniqId, it, v)
-    })
-  } else {
-    if (v.indexOf('9999') === -1) {
-      selectAllValue[ckuniqId].push(v)
-    }
-  }
-}
+//   let $content = item.content
+//   if ($content) {
+//     // let uniqid = $content.checklistUniqId
+//     $content.data.forEach(it => {
+//       fillSelectAllValue(ckuniqId, it, v)
+//     })
+//   } else {
+//     if (v.indexOf('9999') === -1) {
+//       selectAllValue[ckuniqId].push(v)
+//     }
+//   }
+// }
 
 function mkCheckList(params, init) {
 
@@ -215,16 +215,30 @@ function mkCheckList(params, init) {
   let opts = Object.assign({}, dft, params)
 
   if (init) {
-    storeValue = {}
-    storeValids = {}
-    storeAttrs = {}
-    storeContex = {}
-    selectAllValue = {}
-
+    // storeValue = {}
+    // storeValids = {}
+    // storeAttrs = {}
+    // storeContex = {}
+    // selectAllValue = {}
     opts.$$id = lib.suid('checklist-root-')
+
+    storeCommon.setItem(opts.$$id, {
+      storeValue: {},
+      storeValids: {},
+      storeAttrs: {},
+      storeContex: {},
+      selectAllValue: {}
+    })
   }
 
-  // opts.checklistUniqId = lib.uuid('ck-list-')
+  let storeHooks = storeCommon.getItem((opts.rootId||opts.$$id))
+  let {
+    storeValue,
+    storeValids,
+    storeAttrs,
+    storeContex,
+    selectAllValue
+  } = storeHooks
 
   let footer = opts.footer
   let checkedClass = opts.checkedClass
@@ -287,6 +301,25 @@ function mkCheckList(params, init) {
 
   if (opts.checkedType === 2 && opts.isSwitch) { // 为switch时，保持原始样式
     checkedBoxItemClass = 'checklist-item'
+  }
+
+  function fillSelectAllValue(ckuniqId, item, $v) {
+    let v = item.value
+    if ($v) {
+      v = $v + '--' + v
+    }
+
+    let $content = item.content
+    if ($content) {
+      // let uniqid = $content.checklistUniqId
+      $content.data.forEach(it => {
+        fillSelectAllValue(ckuniqId, it, v)
+      })
+    } else {
+      if (v.indexOf('9999') === -1) {
+        selectAllValue[ckuniqId].push(v)
+      }
+    }
   }
 
   return {
@@ -762,23 +795,6 @@ Pager({
         {title: 'bbb-4', value: 'bbb-4', parent: 'bbb'},
         {title: 'bbb-5', value: 'bbb-5', parent: 'bbb'},
 
-
-        // {title: 'ccc', value: '3', content: mkCheckList({
-        //   value: ['11'],
-        //   checkedType: 2,
-        //   data: [
-        //     {title: '11', value: '11'},
-        //     {title: '22', value: '22', content: mkCheckList({
-        //       checkedType: 2,
-        //       data: [
-        //         {title: 'xx', value: 'xx'},
-        //         {title: 'yy', value: 'yy'},
-        //         {title: 'zz', value: 'zz'},
-        //       ]
-        //     })},
-        //     {title: '33', value: '33'},
-        //   ]
-        // })},
         
         {title: 'ccc', value: '3', idf: 'ccc', checkListOption: {value: ['3-1'], selectAll: true}},
         { title: 'ccc-1', value: '3-1', idf: 'ccc-1', parent: 'ccc', checkListOption: { value: ['4-1'], checkedType: 2, selectAll: true}},
@@ -801,14 +817,14 @@ Pager({
   },
 
   onReady(){
-    // let xxx = this.xxx
-    // xxx.tap = function(allv) {
-    //   console.log('=======0000', allv);
-    // }
-    // setTimeout(() => {
-    //   console.log('====== kkkk');
-    //   xxx.clear('1')
-    //   console.log(xxx.getValue());
-    // }, 5000);
+    let xxx = this.xxx
+    xxx.tap = function(allv) {
+      console.log('=======0000', allv);
+    }
+    setTimeout(() => {
+      console.log('====== kkkk');
+      xxx.clear('1')
+      console.log(xxx.getValue());
+    }, 5000);
   }
 })
