@@ -78,9 +78,9 @@ page{
   position: relative;
 }
 
-/* .two-column > .checklist-box .checklist-item {
+.checklist-box .checklist-item.checklist-category {
   justify-content: center;
-} */
+}
 
 .checklist-box .checklist-item .htitles {
   display: flex;
@@ -183,6 +183,18 @@ page{
   content: '\e660';
   font-size: 22px;
   display: block;
+}
+
+/* 普通作为分类单选 */
+.checklist-box .checklist-item.checklist-category.checked {
+  /* font-family: "iconfont";
+  color: red; */
+  background-color: #efefef;
+}
+.checklist-box .checklist-item.checklist-category.checked::after {
+  content: '';
+  /* font-size: 22px;
+  display: block; */
 }
 
 /* 普通多选 */

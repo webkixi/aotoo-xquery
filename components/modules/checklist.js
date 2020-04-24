@@ -111,6 +111,7 @@ function getChilds(item, datas, opts) {
   }
 
   if (item.content.length) {
+    item.itemClass = item.itemClass && item.itemClass + ' checklist-category' || 'checklist-category'
     item.content = mkCheckList({
       data: item.content,
       ...checkListOption
@@ -227,6 +228,7 @@ function mkCheckList(params, init) {
       opts.data.unshift({
         title: '不限',
         value: '9999',
+        itemClass: 'checklist-category',
         content: mkCheckList({
           rootId: (opts.$$id || opts.rootId),
           data: [{title: '不限', value: '9999'}]
@@ -301,6 +303,7 @@ function mkCheckList(params, init) {
         let parent = inst.parent()
         let $data = inst.getData()
         let $val = $data.value
+        let $title = $data.title
         let $content = $data.content
         let treeid = $data.attr['data-treeid']
         let rootInst = this.getRoot()
@@ -347,7 +350,6 @@ function mkCheckList(params, init) {
               // 为非选中状态时
               item.addClass(checkedClass)
               this.setValueValid($val, ii, item.data)
-              // this.setValueValid($val, ii, $data)
             }
           } else {
             if (opts.checkedType === 1) {
@@ -360,14 +362,19 @@ function mkCheckList(params, init) {
           if (!hasRadio) $footer.fillContent($content)
         } else {
           rootInst.fromLeaf = true
+          rootInst.tapItem = {
+            title: this.currentTitle,
+            value: this.currentValue
+          }
           this.hooks.emit('set-valid-stat', this)
         }
       }
     },
     methods: {
-      setValueValid (val, index, data){
+      setValueValid (val, index, data={}){
         this.currentValue = val
         this.currentValueIndex = index
+        this.currentTitle = data.title
         const $value = this.value
 
         if ($value.indexOf(val) === -1) {
@@ -512,7 +519,10 @@ function mkCheckList(params, init) {
 
         this.currentValue = null
         this.currentValueIndex = null
+        this.currentTitle = null
         this.currentContent = null
+        this.tapItem = {}   // 叶子节点点击对象的title, value
+        this._value = null //内部使用的value，通过getValue对外暴露
 
         if (opts.$$id) {
           this.allValue = []
@@ -524,7 +534,8 @@ function mkCheckList(params, init) {
             this.tap = opts.tap
           }
           this.getValue = () => {
-            return this.allValue
+            return this._value
+            // return this.allValue
           }
           function clearRelationValids(item) {
             if (item.content) {
@@ -656,16 +667,19 @@ function mkCheckList(params, init) {
             allValue = []
             getAllValue(ctx, opts.checklistUniqId)
             that.allValue = allValue
+            let _value = {
+              title: that.currentTitle,
+              value: that.currentValue,
+              index: that.currentValueIndex,
+              tapItem: that.tapItem,
+              allValue: allValue
+            }
+            that._value = _value
             if (that.fromLeaf) {
               that.fromLeaf = false
               if (lib.isFunction(that.tap)) {
-                that.tap({
-                  value: that.currentValue,
-                  index: that.currentValueIndex,
-                  allValue: allValue
-                })
+                that.tap(_value)
               }
-              // console.log('===== allvalue', allValue);
             }
           } else {
             if (that.parentInstance) {
@@ -731,7 +745,14 @@ function mkCheckList(params, init) {
           }
         })
         if (!renderContentStat) {
-          this.hooks.emit('set-valid-stat', this)
+          setTimeout(() => {
+            let rootInst = this.getRoot()
+            rootInst.tapItem = {
+              title: this.currentTitle,
+              value: this.currentValue
+            }
+            this.hooks.emit('set-valid-stat', this)
+          }, 34);
         }
       }
     }
