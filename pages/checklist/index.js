@@ -4,15 +4,13 @@ const app = getApp()
 const Pager = require('../../components/aotoo/core/index')
 const mkCheckList = require('../../components/modules/checklist')
 
-
 Pager({
   data: {
     checkListConfig: mkCheckList({
       id: 'xxx',
-      // mode: 2,
+      checkedType: 1,
       value: ['3'],
       data: [
-        // {title: 'aaa', value: '1', isSwitch: false, desc: {title: '尾巴'}},
         {title: 'aaa', value: '1', idf: 'aaa'},
         {title: '你好', value: '1-1', parent: 'aaa'},
         {title: '你妹', value: '1-2', parent: 'aaa'},
@@ -38,14 +36,8 @@ Pager({
         {title: 'ccc-2-1', value: '5-1', parent: 'ccc-2'},
         {title: 'ccc-2-2', value: '5-2', parent: 'ccc-2'},
         {title: 'ccc-2-3', value: '5-3', parent: 'ccc-2'},
-
-        // {title: 'ddd', value: '4'},
-        // {title: 'eee', value: '5'},
-        // {title: 'fff', value: '6'},
-        // {title: 'ggg', value: '7'},
-        // {title: 'hhh', value: '8'},
       ]
-    }, true)
+    })
   },
 
   onReady(){
@@ -53,10 +45,5 @@ Pager({
     xxx.tap = function(allv) {
       console.log('=======0000', allv);
     }
-    setTimeout(() => {
-      console.log('====== kkkk');
-      xxx.clear('1')
-      console.log(xxx.getValue());
-    }, 5000);
   }
 })
