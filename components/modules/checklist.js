@@ -172,10 +172,10 @@ function mkCheckList(params, init) {
     mode: 1,
     checkedType: 1, // 1为value互斥单选， 2为多选
     onlyValid: false, // valid互斥关系 true为互斥， false不互斥
-    isSwitch: false,  // 启用switch
-    value: [],
-    data: [],
-    footer: null,
+    isSwitch: false,  // 启用switch，只有checkedType === 2时有效
+    value: [],  // 默认值
+    data: [],  // 配置数据
+    footer: null,  // 自动设置
 
     checkedContainerClass: 'checklist-container',
     checkedBoxClass: 'checklist-box',
@@ -184,9 +184,9 @@ function mkCheckList(params, init) {
     footerId: null,
 
     checklistUniqId: lib.uuid('ck-list-'),
-    separator: '--',
+    separator: '--',  // allValue的分隔符
 
-    selectAll: false,
+    selectAll: false,  // 是否设置全选选项
     tap: null,  // 选取值响应方法
   }
 
@@ -815,4 +815,8 @@ function mkCheckList(params, init) {
   }
 }
 
-module.exports = mkCheckList
+module.exports = function(params) {
+  if (lib.isObject(params)) {
+    return mkCheckList(params, true)
+  }
+}
