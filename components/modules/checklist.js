@@ -54,10 +54,18 @@ function adapter(opts) {
 
     // 设置为switch
     if (opts.isSwitch && opts.checkedType===2) {
+      if (item.desc) {
+        item.isSwitch = false
+      }
+      
       if (item.isSwitch !== false) {
         item['@switch'] = {
           itemClass: 'checklist-switch',
           bindchange: 'onBindSWchange?value='+item.value+'&index='+ii,
+        }
+
+        if (lib.isObject(opts.isSwitch)) {
+          item['@switch'] = Object.assign(item['@switch'], opts.isSwitch)
         }
 
         if (opts.value.indexOf(item.value)>-1) {
@@ -162,7 +170,8 @@ function mkCheckList(params, init) {
 
   let dft = {
     mode: 1,
-    checkedType: 1, // 1为单选， 2为多选
+    checkedType: 1, // 1为value互斥单选， 2为多选
+    onlyValid: false, // valid互斥关系 true为互斥， false不互斥
     isSwitch: false,  // 启用switch
     value: [],
     data: [],
@@ -244,7 +253,6 @@ function mkCheckList(params, init) {
     }
   }
 
-
   let checkedBoxItemClass = 'checklist-item' + (opts.checkedType === 2 ? ' multi-select' : '') // 单选还是多选类名
   opts.checkedBoxItemClass = checkedBoxItemClass
 
@@ -268,7 +276,7 @@ function mkCheckList(params, init) {
   }
 
   if (opts.checkedType === 2 && opts.isSwitch) { // 为switch时，保持原始样式
-    checkedBoxItemClass = 'checklist-item'
+    checkedBoxItemClass = 'checklist-item checklist-switch'
   }
 
   function fillSelectAllValue(ckuniqId, item, $v) {
@@ -290,6 +298,20 @@ function mkCheckList(params, init) {
     }
   }
 
+  function clearRelationValids(item) {
+    if (item.content) {
+      const uniqId = item.content.checklistUniqId
+      storeValids[uniqId] = []
+      storeValue[uniqId] = []
+      storeAttrs[uniqId] = {}
+      selectAllValue[uniqId] = []
+      storeContex[uniqId] = null
+      item.content.data.forEach(it => {
+        clearRelationValids(it)
+      })
+    }
+  }
+
   return {
     checklistUniqId: opts.checklistUniqId,
     containerClass: checkedContainerClass,
@@ -302,6 +324,7 @@ function mkCheckList(params, init) {
         if (opts.isSwitch && opts.checkedType === 2) return // 启用switch，则使tap无效
         let parent = inst.parent()
         let $data = inst.getData()
+        if ($data.desc) return  // 如果有desc描述部分，则不响应选择tap事件
         let $val = $data.value
         let $title = $data.title
         let $content = $data.content
@@ -313,6 +336,7 @@ function mkCheckList(params, init) {
         let $footer = this.footerInst
 
         if (opts.checkedType === 1) this.value = [] // 如果是单选，先清空值
+        if (opts.onlyValid) this.valids = []
         
         if ($val === '9999') {
           selectAllValue[opts.checklistUniqId] = [] // 将全选的值区别存放在selectAllValue全局中
@@ -363,6 +387,7 @@ function mkCheckList(params, init) {
         } else {
           rootInst.fromLeaf = true
           rootInst.tapItem = {
+            checkedType: opts.checkedType,
             title: this.currentTitle,
             value: this.currentValue
           }
@@ -417,20 +442,36 @@ function mkCheckList(params, init) {
       },
       onBindSWchange(e, param, inst){
         let $val = param.value
-        let $index = param.index
+        let $index = parseInt(param.index)
+        let $item = null
+        this.forEach((item, ii)=>{
+          if ($index === ii) {
+            $item = item.data
+          }
+        })
         let stat = e.detail.value
         if (stat) {
-          this.setValueValid($val, $index)
+          this.setValueValid($val, $index, $item)
         } else {
           let $idx = this.value.indexOf($val)
           let $validIdx = this.valids.indexOf($index)
           if ($idx > -1) {
             this.value.splice($idx, 1)
+            storeValue[opts.checklistUniqId] = this.value
           }
           if ($validIdx > -1){
             this.valids.splice($validIdx, 1)
+            storeValids[opts.checklistUniqId] = this.valids
           }
         }
+        let rootInst = this.getRoot()
+        rootInst.fromLeaf = true
+        rootInst.tapItem = {
+          checkedType: opts.checkedType,
+          title: this.currentTitle,
+          value: this.currentValue
+        }
+        this.hooks.emit('set-valid-stat', this)
       },
       validIt(stat=true, childValue){
         const currentValue = this.currentValue
@@ -490,6 +531,14 @@ function mkCheckList(params, init) {
             if (ii === currentValueIndex && stat) {
               $valids.push(ii)
               item.addClass('.valid')
+            } else {
+              let rootInst = this.getRoot()
+              if (rootInst.fromLeaf) {
+                if (opts.onlyValid) {   // 单value，单valid
+                  item.removeClass('.valid')
+                  clearRelationValids(item.data)
+                }
+              }
             }
           }
         })
@@ -535,20 +584,6 @@ function mkCheckList(params, init) {
           }
           this.getValue = () => {
             return this._value
-            // return this.allValue
-          }
-          function clearRelationValids(item) {
-            if (item.content) {
-              const uniqId = item.content.checklistUniqId
-              storeValids[uniqId] = []
-              storeValue[uniqId] = []
-              storeAttrs[uniqId] = {}
-              selectAllValue[uniqId] = []
-              storeContex[uniqId] = null
-              item.content.data.forEach(it=>{
-                clearRelationValids(it)
-              })
-            }
           }
           
           this.clear = (val) => {
@@ -564,6 +599,7 @@ function mkCheckList(params, init) {
                   storeValids[this.checklistUniqId] = this.valids
                   clearRelationValids(item.data)
                   this.allValue = this.allValue.filter(it => !re.test(it))
+                  this._value.allValue = this.allValue
                 }
               })
             } else {
@@ -572,6 +608,25 @@ function mkCheckList(params, init) {
               storeAttrs = {}
               storeContex = {}
               selectAllValue = {}
+
+              let rootInst = this.getRoot()
+              rootInst.currentValue = null
+              rootInst.currentValueIndex = null
+              rootInst.currentTitle = null
+              rootInst.currentContent = null
+              rootInst.tapItem = {}
+              
+              rootInst.value = []
+              rootInst.valids = []
+
+              rootInst.fromLeaf = true
+              rootInst.tapItem = {
+                checkedType: opts.checkedType,
+                title: this.currentTitle,
+                value: this.currentValue
+              }
+              rootInst.forEach(item => item.removeClass(checkedClass))
+              rootInst.hooks.emit('set-valid-stat', rootInst)
             }
           }
         }
@@ -748,6 +803,7 @@ function mkCheckList(params, init) {
           setTimeout(() => {
             let rootInst = this.getRoot()
             rootInst.tapItem = {
+              checkedType: opts.checkedType,
               title: this.currentTitle,
               value: this.currentValue
             }

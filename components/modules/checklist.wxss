@@ -185,6 +185,7 @@ page{
   display: block;
 }
 
+/* 二级分类列表样式 */
 /* 普通作为分类单选 */
 .checklist-box .checklist-item.checklist-category.checked {
   /* font-family: "iconfont";
@@ -211,4 +212,23 @@ page{
 .checklist-box .checklist-item.multi-select.checked::after {
   content: '\e70c';
   color: red;
+}
+
+/* switch的样式 */
+.checklist-box .checklist-item.checklist-switch {
+  content: none;
+  font-size: inherit;
+  color: inherit;
+}
+
+.checklist-box .checklist-item.checklist-switch::after {
+  content: none;
+  font-size: inherit;
+  color: inherit;
+}
+
+.checklist-box .checklist-item.checklist-switch.checked::after {
+  content: none;
+  font-size: inherit;
+  color: inherit;
 }
