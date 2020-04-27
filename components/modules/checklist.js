@@ -201,6 +201,7 @@ function mkCheckList(params, init) {
     storeCommon.setItem(opts.$$id, {
       storeValue: {},
       storeValids: {},
+      storeContent: {},
       storeAttrs: {},
       storeContex: {},
       selectAllValue: {}
@@ -211,6 +212,7 @@ function mkCheckList(params, init) {
   let {
     storeValue,
     storeValids,
+    storeContent,
     storeAttrs,
     storeContex,
     selectAllValue
@@ -325,7 +327,7 @@ function mkCheckList(params, init) {
         let parent = inst.parent()
         let $data = inst.getData()
         if ($data.desc) return  // 如果有desc描述部分，则不响应选择tap事件
-        let $val = $data.value
+        let $val = $data.value||$data.title
         let $title = $data.title
         let $content = $data.content
         let treeid = $data.attr['data-treeid']
@@ -397,6 +399,7 @@ function mkCheckList(params, init) {
     },
     methods: {
       setValueValid (val, index, data={}){
+        if (!lib.isString(val)) val = ''
         this.currentValue = val
         this.currentValueIndex = index
         this.currentTitle = data.title
@@ -451,6 +454,7 @@ function mkCheckList(params, init) {
         })
         let stat = e.detail.value
         if (stat) {
+          $val = $val || $item.title
           this.setValueValid($val, $index, $item)
         } else {
           let $idx = this.value.indexOf($val)
@@ -681,6 +685,9 @@ function mkCheckList(params, init) {
             const $data = item.data
             if ($valids.indexOf(ii)>-1) {
               let value = $data.value
+              if (!value && lib.isString($data.title)) {
+                value = $data.title
+              }
               let theValue = val ? val + opts.separator + value : value // separator: --
 
               if (theValue && theValue.indexOf('9999') > -1) {
@@ -693,7 +700,12 @@ function mkCheckList(params, init) {
                   }
                 })
               }else if ($data.content) {
-                let $ckuniqId = $data.content.checklistUniqId
+                let theContent = $data.content
+                if (lib.isFunction(theContent)) {
+                  let functionid = theContent['functionid']
+                  theContent = storeContent[functionid]
+                }
+                let $ckuniqId = theContent.checklistUniqId
                 let context = storeContex[$ckuniqId]
                 getAllValue(context, $ckuniqId, theValue)
               } else {
@@ -760,6 +772,37 @@ function mkCheckList(params, init) {
           }
 
           $footer.fillContent = function (_content) {
+
+            // 动态生成checkedlist用于填充footer
+            // 需要手动指定mode=2
+            if (lib.isFunction(_content)) {
+              _content['functionid'] = lib.suid('function-content-id-')
+              const context = {
+                fillContent(param){
+                  let theContent = null
+                  if (lib.isObject(param)){
+                    theContent = mkCheckList(param)
+                  }
+                  if (lib.isArray(param)) {
+                    theContent = mkCheckList({ 
+                      rootId: (opts.$$id || opts.rootId),
+                      data: param 
+                    })
+                  }
+                  if (theContent) {
+                    storeContent[_content['functionid']] = theContent
+                    $footer.fillContent(theContent)
+                  }
+                }
+              }
+              if (opts.mode !== 2) {
+                console.warn('需要指定mode参数为2');
+              } else {
+                _content.call(context)
+              }
+              return
+            }
+
             let $content = _content
             that.currentContent = $content
             if ($content) {
@@ -785,7 +828,7 @@ function mkCheckList(params, init) {
           it.removeClass(checkedClass)
           let item = it.data
           if (item.value && $value.indexOf(item.value) > -1) {
-            this.setValueValid(item.value, ii, item)
+            this.setValueValid((item.value||item.title), ii, item)
             it.addClass(checkedClass)
 
             if (item.content && this.footerInst) {
