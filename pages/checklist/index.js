@@ -45,5 +45,14 @@ Pager({
     xxx.tap = function(allv) {
       console.log('=======0000', allv);
     }
+    // setTimeout(() => {
+    //   xxx.clear()
+    // }, 2000);
+
+    // setTimeout(() => {
+    //   console.log('====== kkkk');
+    //   xxx.clear('1')
+    //   console.log(xxx.getValue());
+    // }, 5000);
   }
 })

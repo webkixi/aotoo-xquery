@@ -577,7 +577,7 @@
 }
 .actionMask.show {
   animation: fadeIn ease 0.3s forwards;
-  z-index: 1;
+  z-index: 299;
   display: block;
 }
 .as-common,
@@ -594,7 +594,7 @@
   box-shadow: 0 5px 10px rgba(0,0,0,0.1);
   border-radius: 16rpx;
   position: fixed;
-  z-index: 2;
+  z-index: 300;
   display: block;
 }
 .as-common-tb,
