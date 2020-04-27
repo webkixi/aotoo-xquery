@@ -266,6 +266,7 @@ export function listInstDelegate(treeid, listInst, from){
     let key = `data[${index}]`
     return {
       treeid,
+      index,
       parentInst: listInst,
       data: lib.clone(data),
       getData(){
@@ -382,7 +383,10 @@ export function listInstDelegate(treeid, listInst, from){
         }
       },
       hasClass(params) {
-        return _hasClass(params, data)
+        if (data) {
+          data = this.getData()
+          return _hasClass(params, this.data)
+        }
       },
       update(params, cb) {
         let upData = {}
@@ -634,6 +638,7 @@ export const commonBehavior = (app, mytype) => {
         let that = this
         let pages = getCurrentPages()
         let activePage = this.activePage || pages[pages.length - 1]
+        this.activePage = activePage
 
         this.properties = lib.clone(this.properties)
         let properties = this.properties
@@ -646,7 +651,6 @@ export const commonBehavior = (app, mytype) => {
               Object.keys(ds.methods).forEach(key => {
                 let fun = ds.methods[key]
                 if (lib.isFunction(fun)) {
-                  // this[key] = fun.bind(this)
                   this[key] = fun.bind(this)
                 }
               })
@@ -716,15 +720,9 @@ export const commonBehavior = (app, mytype) => {
         const that = this
         this.init = false
         this.mounted = true
-        this.activePage = app.activePage
         // // let oriData = this.data.item || this.data.list || this.data.dataSource || {}
         // // this.originalDataSource = lib.clone(oriData)
-        
-        
-        
-        
         // this.mount()
-        
         this._mount()
         this.hooks.emit('ready')
         this.hooks.fire('__ready')
@@ -786,10 +784,17 @@ export const commonBehavior = (app, mytype) => {
       },
 
       //组件实例被移动到树的另一个位置
-      moved: function () {},
+      moved: function () {
+        if (this.__moved) {
+          this.__moved()
+        }
+      },
 
       //组件实例从节点树中移除
       detached: function () {
+        if (this.__detached) {
+          this.__detached()
+        }
         this.hooks.emit('componentDetached')
         // this.hooks = null
         // setTimeout(() => {
@@ -1373,7 +1378,11 @@ export function reactFun(app, e, prefix) {
   if (dataset && (dataset['treeid'] || dataset['data-treeid']) && is === 'list') {
     let treeid = (dataset['treeid'] || dataset['data-treeid'])
     if (this.$$type === 'tree') {
+      const that = this
       context = this.find(treeid)
+      context.parent = function() {
+        return that
+      }
     } else {
       context = listInstDelegate(treeid, this)
     }

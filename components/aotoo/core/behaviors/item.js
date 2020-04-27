@@ -166,8 +166,9 @@ export const itemBehavior = function(app, mytype) {
         }
       },
 
-      update: function (param, callback) {
+      update: function (_param, callback) {
         const that = this
+        let param = lib.clone(_param)
         // const $tmp = lib.clone(this.data.$item)
         let $tmp = this.data.$item
         $tmp = syncChildData(this, $tmp)

@@ -255,8 +255,9 @@ export const listBehavior = function(app, mytype) {
 
       },
 
-      update: function (param, callback) {
+      update: function (_param, callback) {
         try {
+          let param = lib.clone(_param)
           const that = this
           const cb = lib.isFunction(callback) ? callback : null
           const updateFun = (opts) => {

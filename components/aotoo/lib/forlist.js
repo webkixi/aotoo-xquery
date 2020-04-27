@@ -20,7 +20,7 @@ export function reSetItemAttr(item, list){
     item = {title: item}
   }
 
-  const clsIndex = suid('index-') // 将data-index置入每条数据的class中，这样不用去动结构
+  const clsIndex = suid('treeid-index-') // 将data-index置入每条数据的class中，这样不用去动结构
   const $ii = clsIndex
 
   if (list.itemMethod ){

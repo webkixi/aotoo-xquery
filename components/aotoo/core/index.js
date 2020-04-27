@@ -29,7 +29,7 @@ import {
 function mkFind(context, app){
   let that = context
   wx.$$find = function (param, context) {
-    let id, cls
+    let id, cls, treeid
     let vars = app['_vars']
     if (param||param === 0) {
       if (lib.isString(param)) {
@@ -40,6 +40,10 @@ function mkFind(context, app){
           id = param.replace('#', '')
         } else {
           cls = param
+          if (param.indexOf('treeid-index-')>-1) {
+            cls = undefined
+            treeid = param
+          }
         }
       }
 
@@ -60,6 +64,7 @@ function mkFind(context, app){
               if (param.charAt(0) === '.') {
                 bywhat = 'class'
               }
+              if (!treeid && !id) bywhat = 'class'
             }
             if (inst.$$is === 'fakelist') {
               listInst = inst.parentInst
@@ -322,8 +327,8 @@ function core(params) {
       this.find = wx.$$find
       
       this.__rendered = true
-      this.doReady()
       this.hooks.emit('onReady')
+      this.doReady()
 
       if (typeof oldReady == 'function') {
         oldReady.apply(this, arguments)

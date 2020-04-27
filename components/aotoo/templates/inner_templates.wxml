@@ -64,10 +64,10 @@
       >{{props.text}}</text>
     </block>
     <block wx:elif="{{props.fromComponent}}">
-      <ui-item item="{{props}}" fromComponent="{{props.fromComponent}}"/>
+      <ui-item item="{{props}}" class="ui-item {{props.containerClass}}" fromComponent="{{props.fromComponent}}"/>
     </block>
     <block wx:else>
-      <ui-item item="{{props}}"/>
+      <ui-item item="{{props}}" class="ui-item {{props.containerClass}}"/>
     </block>
   </block>
 </template>
@@ -75,10 +75,10 @@
 <template name="@list">
   <block wx:if="{{util.isObject(props)}}">
     <block wx:if="{{props.fromComponent || props.fromTree}}">
-      <ui-list list="{{props}}" fromComponent="{{props.fromComponent||props.fromTree}}"/>
+      <ui-list class="ui-list {{props.containerClass}}" list="{{props}}" fromComponent="{{props.fromComponent||props.fromTree}}"/>
     </block>
     <block wx:else>
-      <ui-list list="{{props}}"/>
+      <ui-list list="{{props}}" class="ui-list"/>
     </block>
   </block>
 </template>
@@ -86,10 +86,10 @@
 <template name="@tree">
   <block wx:if="{{util.isObject(props)}}">
     <block wx:if="{{props.fromComponent}}">
-      <ui-tree class="ui-tree" list="{{props}}" fromComponent="{{props.fromComponent}}"/>
+      <ui-tree class="ui-tree {{props.containerClass}}" list="{{props}}" fromComponent="{{props.fromComponent}}"/>
     </block>
     <block wx:else>
-      <ui-tree class="ui-tree" list="{{props}}"/>
+      <ui-tree class="ui-tree {{props.containerClass}}" list="{{props}}"/>
     </block>
   </block>
 </template>
@@ -125,11 +125,11 @@
 </template>
 
 <template name="@html">
-  <ui-markit dataSource="{{props}}" textType="html" />
+  <ui-markit dataSource="{{props}}" class="ui-markit" textType="html" />
 </template>
 
 <template name="@md">
-  <ui-markit dataSource="{{props}}" textType="md" />
+  <ui-markit dataSource="{{props}}" class="ui-markit" textType="md" />
 </template>
 
 <template name="@button">
@@ -195,7 +195,7 @@
     >
       <block wx:if="{{util.isString(props.title)}}"><text>{{props.title}}</text></block>
       <block wx:else>
-        <ui-item item="{{props.title}}" />
+        <ui-item item="{{props.title}}" class="ui-item {{props.containerClass}}" />
       </block>
     </navigator>
   </block>
@@ -286,5 +286,24 @@
     bindkeyboardheightchange="{{props.bindkeyboardheightchange ? 'itemMethod' : ''}}"
     data-isform="{{true}}"
     data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap','bindinput', 'bindfocus', 'bindblur', 'bindconfirm', 'bindkeyboardheightchange'])}}"
+  />
+</template>
+
+<template name="@switch">
+  <switch 
+    class="{{props.itemClass||props.class||''}}"
+    style="{{props.itemStyle||props.style||''}}"
+    id="{{props.id||''}}"
+
+    checked="{{props.checked||''}}"
+    disabled="{{props.disabled||''}}"
+    type="{{props.type||''}}"
+    color="{{props.color||''}}"
+
+    catchtap="{{props.tap||props.aim||props.catchtap ? 'itemMethod' : ''}}"
+
+    bindchange="{{props.bindchange ? 'itemMethod' : ''}}"
+    data-isform="{{true}}"
+    data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap','bindchange'])}}"
   />
 </template>

@@ -23,7 +23,7 @@
     <slot name="top"></slot>
     <block wx:if="{{type && util.isObject(type) && type.is === 'drop'}}">
       <block wx:if="{{item.$$id}}">
-        <ui-item item="{{ {__drop: type.option, ...item} }}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+        <ui-item item="{{ {__drop: type.option, ...item} }}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
       </block>
       <block wx:else>
         <!-- <block wx:if="{{item.attr}}">
@@ -33,13 +33,13 @@
       </block>
     </block>
     <block wx:elif="{{type && util.isObject(type) && type.isItem}}">
-      <ui-item item="{{item}}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
     </block>
     <block wx:elif="{{item.type && util.isObject(item.type) && item.type.isItem}}">
-      <ui-item item="{{item}}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
     </block>
     <block wx:elif="{{item.$$id}}">
-      <ui-item item="{{item}}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
     </block>
     <block wx:else>
       <template is="item" data="{{item}}" />
@@ -281,7 +281,7 @@
   <slot name="header"></slot>
   <slot></slot>
   <block wx:if="{{list.header}}">
-    <ui-item item="{{list.header}}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+    <ui-item item="{{list.header}}" class="ui-item list-header" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
   </block>
   <block wx:if="{{list.type && util.isObject(list.type)}}">
     <block wx:if="{{list.type.is == 'swiper'}}"> <template is="swiperWrap" data="{{list}}" /> </block>
@@ -292,7 +292,7 @@
     <template is="listWrap" data="{{list}}" />
   </block>
   <block wx:if="{{list.footer}}">
-    <ui-item item="{{list.footer}}" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+    <ui-item item="{{list.footer}}" class="ui-item list-footer" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
   </block>
   <slot name="footer"></slot>
 </template>
