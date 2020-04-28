@@ -102,9 +102,29 @@ class htmlparser {
         }
         else
         if (ky === 'src') {
-          // attribs["src"] = attribs[ky];
+          attribs["src"] = attribs[ky];
         }
         else {
+          if (ky === 'align' && ['td', 'th'].indexOf(name)>-1) {
+            let alignStr = attribs[ky]
+            let itStyle = ''
+            switch (alignStr) {
+              case 'center':
+                itStyle = ';justify-content: center;'
+                break;
+              case 'left':
+                itStyle = ';justify-content: flex-start;'
+                break;
+              case 'right':
+                itStyle = ';justify-content: flex-end;'
+                break;
+            }
+            if (attribs["itemStyle"]) {
+              attribs["itemStyle"] = attribs["itemStyle"] + itStyle;
+            } else {
+              attribs["itemStyle"] = itStyle
+            }
+          }
           delete attribs[ky];
         }
       });
@@ -144,7 +164,7 @@ class htmlparser {
         let curTag = _codes[_codes.length - 1]
         curTag.text = text || ''
       } else {
-        _codes.push({text, decode: true, space: true})
+        _codes.push({text, decode: true, space: true, itemClass: 'code-zoom'})
       }
     }
     else {
@@ -152,7 +172,7 @@ class htmlparser {
       if (tags.length && /[\w\u4e00-\u9fa5]/g.test(text)) {
         let curTag = tags[tags.length - 1];
         if (curTag.title) {
-          curTag.dot = (curTag.dot||[]).concat(text)
+          curTag.dot = (curTag.dot||[]).concat({text})
         } else {
           curTag.title = text;
         }
@@ -204,7 +224,6 @@ class htmlparser {
     content = htmlDecodeByRegExp(content)
     return new Promise((resolve, reject)=>{
       parser.onend = function() {
-        // console.log(that._html);
         resolve({...param, data: that._html})
       }
       parser.write(content)
@@ -215,6 +234,7 @@ class htmlparser {
   md(content, param={}){
     param.listClass = 'markdown-body ' + (param.listClass||param.class||'')
     marked.setOptions({
+      sanitize: true,
       highlight: function (code) {
         let val = hl.highlightAuto(code).value
         return val

@@ -1,3 +1,6 @@
+.markdown-body{
+  counter-reset: section;
+}
 .markdown-body .octicon {
   display: inline-block;
   fill: currentColor;
@@ -95,7 +98,7 @@
   background-color: #d73a49;
   color: #fafbfc;
 }
-.markdown-body .pl-c2:before {
+.markdown-body .pl-c2::before {
   content: "^M";
 }
 .markdown-body .pl-sr .pl-cce {
@@ -218,7 +221,7 @@
   margin: 15px 0;
   overflow: hidden;
 }
-/* .markdown-body .hr:before {
+/* .markdown-body .hr::before {
   content: "";
   display: table;
 } */
@@ -305,15 +308,29 @@
 }
 
 .markdown-body .code {
-  display: inline;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+  font-size: 14px;
+  white-space: nowrap;
+  display: inline-block;
 }
 
-.markdown-body .code,
+.markdown-body .pre .code,
 .markdown-body .pre {
   font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
   font-size: 14px;
   white-space: nowrap;
 }
+
+.markdown-body .p .code{
+  font-size: 14px;
+  background-color: #efefef;
+  color: red;
+  margin: 0;
+  padding: 0 5px;
+  padding-top: 2px;
+  vertical-align: middle;
+}
+
 .markdown-body .pre {
   margin-bottom: 0;
   margin-top: 0;
@@ -399,7 +416,7 @@
 .markdown-body .text-bold {
   font-weight: 600 !important;
 }
-/* .markdown-body:before {
+/* .markdown-body::before {
   content: "";
   display: table;
 } */
@@ -425,7 +442,7 @@
 .markdown-body .hr {
   background-color: #e1e4e8;
   border: 0;
-  height: 0.25em;
+  height: 2px;
   margin: 24px 0;
   padding: 0;
 }
@@ -477,7 +494,7 @@
 }
 .markdown-body .ol,
 .markdown-body .ul {
-  padding-left: 2em;
+  padding-left: 1.5em;
 }
 .markdown-body .ol .ol,
 .markdown-body .ol .ul,
@@ -486,21 +503,33 @@
   margin-bottom: 0;
   margin-top: 0;
 }
-.markdown-body .ol .ol .li:before,
-.markdown-body .ol .ul .li:before,
-.markdown-body .ul .ol .li:before,
-.markdown-body .ul .ul .li:before {
+.markdown-body .ol .ol .li::before,
+.markdown-body .ol .ul .li::before,
+.markdown-body .ul .ol .li::before,
+.markdown-body .ul .ul .li::before {
   content: '◦';
 }
 .markdown-body .li {
   word-wrap: break-all;
 }
-.markdown-body .li:before {
+.markdown-body .li::before {
   content: '•';
+  font-size: 20px;
+  /* position: absolute; */
   margin-right: 0.2em;
   margin-left: -1em;
-  font-size: 24px;
 }
+.markdown-body .ol {
+  counter-reset: section;
+}
+.markdown-body .ol .li::before {
+  counter-increment: section;
+  content: counter(section) ". ";
+  margin-right: 0.2em;
+  margin-left: -1em;
+  font-size: 14px;
+}
+
 .markdown-body .li .p:first-child {
   margin-top: 16px;
 }
@@ -525,21 +554,30 @@
   display: block;
   overflow: auto;
   width: 100%;
+  border-right: 1px solid #dfe2e5;
+  border-bottom: 1px solid #dfe2e5;
 }
 .markdown-body .table .th {
   font-weight: 600;
 }
 .markdown-body .table .td,
 .markdown-body .table .th {
-  border: 1px solid #dfe2e5;
+  border-left: 1px solid #dfe2e5;
+  display: flex;
   padding: 6px 13px;
 }
 .markdown-body .table .tr {
+  display: flex;
+  justify-content: space-between;
   background-color: #fff;
   border-top: 1px solid #c6cbd1;
 }
-.markdown-body .table .tr:nth-child(2n) {
-  background-color: #f6f8fa;
+.markdown-body .table .tr .ui-item{
+  flex: 1;
+  flex-shrink: 1;
+}
+.markdown-body .table .tbody > .ui-item:nth-child(odd) .tr {
+  background-color: rgba(179, 179, 179, 0.15);
 }
 .markdown-body .img {
   background-color: #fff;
