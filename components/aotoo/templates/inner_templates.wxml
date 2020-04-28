@@ -58,7 +58,7 @@
         id="{{props.id||''}}" 
         data-treeid="{{props && util.isObject(props.attr) && (props.attr['data-treeid']||props.attr['treeid']||'')}}"
         data-id="{{(props && util.isObject(props.attr) && (props.attr['id'] || props.attr['data-id']) || '')}}"
-        selectable="{{props.selectable||true}}"
+        selectable="{{props.selectable === false ? false : true}}"
         space="{{props.space||''}}"
         decode="{{props.decode||''}}"
       >{{props.text}}</text>
