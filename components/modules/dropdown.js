@@ -19,7 +19,8 @@ module.exports = function mkDropdown(params) {
     id: '',
     listClass: 'dropdown-tab',
     tap: null,
-    data: []
+    data: [],
+    footerId: lib.suid('dd-footer-')
   }
 
   let opts = Object.assign({}, dft, params)
@@ -29,7 +30,7 @@ module.exports = function mkDropdown(params) {
     listClass: opts.listClass,
     itemClass: 'dropdown-item',
     data: opts.data,
-    footer: {itemClass: 'dropdown-mask', aim: 'closePop'},
+    footer: {$$id: opts.footerId, itemClass: 'dropdown-mask', aim: 'closePop'},
     itemMethod: {
       aim(e, param, inst) {
         let $data = inst.getData()
@@ -53,10 +54,42 @@ module.exports = function mkDropdown(params) {
     methods: {
       fillContent(item, idx){
         let that = this
+        let id = '#pop-'+idx
+        let contentInst = this.find(id)
+        this.currentContent = contentInst
+
+        let $data = item.data
+
+        function filling(content) {
+          if (contentInst && content) {
+            if (lib.isObject(content)) {
+              contentInst.update(content)
+            }
+            if (lib.isArray(content)) {
+              contentInst.update({
+                "@list": {listClass: 'pop-'+idx, data: content}
+              })
+            }
+            if (lib.isString(content)) {
+              contentInst.update({
+                "@md": content
+              })
+            }
+          }
+        }
+
+
+        if ($data.content && contentInst) {
+          if (lib.isFunction($data.content)) {
+            let res = $data.content(item.data, idx)
+            filling(res)
+          } else {
+            filling($data.content)
+          }
+        }
+
+
         if (lib.isFunction(opts.tap)) {
-          let id = '#pop-'+idx
-          let contentInst = this.find(id)
-          this.currentContent = contentInst
           if (contentInst) {
             const context = {
               resetContent(){
@@ -71,7 +104,7 @@ module.exports = function mkDropdown(params) {
                 }
               },
               updateTitle(param){
-                that.updateTitle(param)
+                that.updateTitle.call(that, param)
               },
               getTitle() {
                 return that.currentMenu.getData().title
@@ -82,10 +115,16 @@ module.exports = function mkDropdown(params) {
         }
       },
       closePop(){
+        if (!this.footer) {
+          this.footer = this.getFooter()
+        }
         this.currentMenu.removeClass('.active')
         this.footer.removeClass('show-masker')
       },
       showMask(){
+        if (!this.footer) {
+          this.footer = this.getFooter()
+        }
         this.footer.addClass('show-masker')
       },
       updateContent(param){
@@ -101,9 +140,16 @@ module.exports = function mkDropdown(params) {
             this.currentMenu.update({ title: param })
           }
           if (lib.isObject(param)) {
-            this.currentMenu.update(param)
+            setTimeout(() => {
+              this.currentMenu.update(param)
+            }, 100);
           }
         }
+      },
+      getFooter(){
+        let footerInst = Pager.getElementsById('#'+opts.footerId)
+        this.footer = footerInst
+        return footerInst
       },
       __ready(){
         this.contentRendered = []

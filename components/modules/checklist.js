@@ -136,6 +136,9 @@ function preAdapter(opts) {
 
     if (item.content) {
       hasContent = true
+      if (lib.isFunction(item.content)) {
+        item.content.checklistUniqId = lib.uuid('ck-list-')
+      }
       tmpAry.push(item)
       return
     }
@@ -283,6 +286,7 @@ function mkCheckList(params, init) {
 
   function fillSelectAllValue(ckuniqId, item, $v) {
     let v = item.value
+    if (!v) return
     if ($v) {
       v = $v + '--' + v
     }
@@ -777,15 +781,19 @@ function mkCheckList(params, init) {
             // 需要手动指定mode=2
             if (lib.isFunction(_content)) {
               _content['functionid'] = lib.suid('function-content-id-')
+              let checklistUniqId = _content['checklistUniqId']
               const context = {
                 fillContent(param){
                   let theContent = null
                   if (lib.isObject(param)){
+                    param.rootId = opts.$$id || opts.rootId
+                    param.checklistUniqId = checklistUniqId
                     theContent = mkCheckList(param)
                   }
                   if (lib.isArray(param)) {
                     theContent = mkCheckList({ 
                       rootId: (opts.$$id || opts.rootId),
+                      checklistUniqId,
                       data: param 
                     })
                   }
