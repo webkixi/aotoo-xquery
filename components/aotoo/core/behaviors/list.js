@@ -134,13 +134,20 @@ export const listBehavior = function(app, mytype) {
 
       ready: function () { //组件布局完成，这时可以获取节点信息，也可以操作节点
         let that = this
-        this.activePage.hooks.on('onReady', function(){
+        function setHeaderFooter() {
           that.children.forEach(child=>{
             let $data = child.getData()
             if ($data.__header) that.header = child
             if ($data.__footer) that.footer = child
           })
-        })
+        }
+        if (this.activePage && this.activePage.__rendered) {
+          setHeaderFooter()
+        } else {
+          this.activePage.hooks.on('onReady', function(){
+            setHeaderFooter()
+          })
+        }
       }
     },
     methods: {
