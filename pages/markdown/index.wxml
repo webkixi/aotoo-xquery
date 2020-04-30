@@ -1,5 +1,3 @@
 <view class="container">
   <ui-markit dataSource="{{htmlConfig}}" textType="md" />
 </view>
-<ui-item item="{{codeButton}}" />
-<ui-pop item="{{readme}}" />

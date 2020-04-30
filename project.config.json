@@ -27,7 +27,7 @@
 		"bundle": true
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.10.1",
+	"libVersion": "2.10.4",
 	"appid": "wxf3ea6bf81c6ef85a",
 	"projectname": "xquery%E6%B5%8B%E8%AF%95",
 	"debugOptions": {

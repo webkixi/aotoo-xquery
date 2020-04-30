@@ -6,35 +6,42 @@
  * @Description: In User Settings Edit
  * @FilePath: /xquery/README.md
  -->
-# XQUERY
-xquery是一个开发库(小程序原生)，剥离自原项目aotoo-hub，xquery基于小程序类似于jquery基于web，可以方便的融入到现有的小程序项目中  
-
-小程序社区： https://developers.weixin.qq.com/community/personal/oCJUsw9JDs23M0Y9XuAMiTuUX214  
-更多说明及demo代码片段  
-
-xquery包含以下这些特性  
-
-* 组件选取
-* 嵌套结构
-* 事件函数封装
-* 钩子方法
-* 支持数据过期机制    
-* lru缓存机制  
-* markdown支持
-* html支持
-* 方便扩展内置/外部插件 
-
-> xquery源码中有`.styl`类型的样式文件，使用stylus命令行编译  
-
-## DEMO列表  
 demo图片均有效，github图片需要翻墙才能查看  
+
 ![demo](http://www.agzgz.com/myimgs/demo.jpg)  
 
-本项目小程序包含以下DEMO
 
-* markdown
+# XQUERY
+小程序端更名为`queryUI`，在微信中搜索`queryUI`可以查看更多的DEMO  
+
+本项目是一个精简小程序项目，包含丰富的小程序组件及其演示demo，不定期更新，欢迎关注并在github上点赞我们   
+
+`queryUI`是一套我们内部项目孵化而出的小程序核心库(基于原生小程序)，糅合了一些jQuery特性及一些方便好用的特性，用于简化小程序开发成本及帮助后期能更好的维护项目  
+
+为保持本项目干净，项目不包含路由等配置，切换项目修改app.json。 
+
+小程序社区： https://developers.weixin.qq.com/community/personal/oCJUsw9JDs23M0Y9XuAMiTuUX214  
+
+
+`queryUI`包含以下这些特性  
+
+* 原生微信小程序  
+* 动态模板构建
+* 几乎无模板维护成本，方便集成
+* 事件函数封装
+* 钩子方法
+* lru缓存机制  
+* 支持内嵌语法/模板方式引入组件
+
+完整DEMO列表
+
+* 下拉菜单
+* 通用型筛选列表
+* 索引列表
+* markdown(包含表格)
 * html
-* 地址定位  
+* 腾讯地址定位  
+* 评分组件
 * 水果老虎机
 * 折叠面板
 * 双栏分类导航(左右)
@@ -42,13 +49,17 @@ demo图片均有效，github图片需要翻墙才能查看
 * 刮刮卡  
 * 弹窗
 * 导航球
-。。。
+* 导航面板
+* 双向slider
+* 俄罗斯大转盘
+* 手势锁
+* 强大的日历
 
 
 ## 如何使用  
-clone或下载本项目  
-* 本项目本身是一个完整的小程序示例demo，引入小程序开发工具中即可直接打开  
-* 或者导入下例核心文件及配置，可以融入到已有项目中  
+clone或下载本项目，`queryUI`基于微信小程序的原生库，不影响小程序原生开发使用，引入核心库文件后就能方便的引入queryUI的组件  
+
+> 本项目本身是一个完整的小程序示例demo，引入小程序开发工具中即可直接打开，或者导入下例核心文件及配置，即可以融入到已有项目中  
 
 ### 源码目录
     components 
@@ -57,6 +68,7 @@ clone或下载本项目
         ├─ form  表单组件
         ├─ calendar  日历组件
         ├─ markit  文档组件
+        ├─ modules ✔︎  # 该目录下的文件为组件合集
         ├─ templates 模板 ✔︎
         │
        css  日历、文档、表单等样式
@@ -65,55 +77,122 @@ clone或下载本项目
         │
       app.json  注册全局组件
  
+### 引入核心目录/文件   
+融合项目中必须引入以下核心目录、文件  
 
-app.json中定义全局组件
- ```js
+    components 
+      ├─ aotoo 核心代码必须有 ✔︎
+      ├─ form  表单组件 ✔︎
+      ├─ markit  文档组件 ✔︎
+      ├─ modules ✔︎  # 该目录下的文件为组件合集，视需求选择
+      ├─ templates 模板 ✔︎
+
+在app.json中定义全局组件  
+
+ ```json
   "usingComponents": {
-    "ui-item": "/components/aotoo/item/index",   // 基础item组件 ✔︎
-    "ui-list": "/components/aotoo/list/index",   // 基础list组件 ✔︎
-    "ui-tree": "/components/aotoo/tree/index",   // 基础tree组件 ✔︎
-    "ui-pop": "/components/actionSide/index",    // 弹窗组件
-    "ui-form": "/components/form/index",         // 表单组件
-    "ui-markit": "/components/markit/index",     // 文档组件，支持html/markdown
-    "ui-calendar": "/components/calendar/index"  // 日历组件
+    "ui-item": "/components/aotoo/item/index",
+    "ui-list": "/components/aotoo/list/index",
+    "ui-tree": "/components/aotoo/tree/index",
+    "ui-form": "/components/form/index",
+    "ui-markit": "/components/markit/index"
   }
  ```
 
-> 勾选文件必须有，属于核心文件，组件可以按照需求增减    
+ 核心文件内置支持  
+1. markdown(全语法)
+2. html
+3. from表单 
+4. item
+5. list
+6. tree
+7. img
 
-#### 小程序放置目录
-![](./css/structor.jpeg)
+且支持外挂组件， 方便扩展使用  
+> 一套引入未压缩核心代码包大概为500k左右，后期考虑插件化可以大大降低小程序包容量   
 
 
-## 文件及目录说明  
+### Pager与Page的关系  
+Demo代码中有大量Pager的相关使用，需要注意正确的使用方式  
+Pager是queryUI对于Page的封装方法，该方法与Page一脉相承，使用逻辑，用法均保持一致，因此你可以使用Pager代替Page使用  
+queryUI的组件需要在Pager的环境中才能生效    
+```js
+const Pager = require('../../components/aotoo/core/index')
+Pager({
+  data: {},
+  onLoad(){},
+  onReady(){}
+})
+```
 
-#### components
-基础目录  
+### 超级组件  
+可以观察项目modules组件集合目录，该目录中存放各种组件库，可以看到组件的wxml结构非常简单，使用时模板方面的维护成本几乎为0，可以做到拿来即用
+所有逻辑几乎都在JS部分完成，方便扩展、升级。  
 
-#### components/aotoo
-核心代码目录  
+#### 超级组件item
+item是核心元组件，该组件支持输出非常丰富的结构, 组件结构支持递归item组件来生成复杂结构  
+```js
+Pager({
+  data: {  // item组件的基础配置
+    $$id: {String} // item组件实例化后查找id
+    title: {String|Array|{Object}},  // 标题，标题组
+    img: {String|Array|Object},  // 图片，图组
+    itemClass: {String} // item样式  
+    body: {Array}  // body子容器，item集合
+    footer: {Array} // footer子容器，item集合
+    dot: {Array} // dot子容器，item集合
+    tap: {String|Function}  // bind:tap方法
+    aim: {String|Function} // catch:tap方法
+    longpress: {String|Function} // bind:longpress方法
+    catchlongpress: {String|Function} // catch:longpress方法
+  }
+})
+```
 
-#### components/actionSide
-弹窗组件  
+#### 超级组件list
+list是核心元组件，该组件基于item元组件构建而成，适用于列表类的场景使用，项目中的各种组件几乎都是基于list组件构建  
+```js
+Pager({
+  data: {  // list组件的基础配置
+    $$id: {String} // list组件实例化后查找id
+    listClass: {String} // 列表样式  
+    itemClass: {String} // 列表项样式  
+    header: {Object} // item配置
+    footer: {Object} // item配置
+    data: {Array} // 列表项数据配置，item集合
+    itemMethod: {Object} // 自动为列表项绑定方法，支持(tap, aim, longpress...)
+    methods: {Object} // 设置list实例对象的内部方法
+  }
+})
+```
 
-#### components/calendar
-日历组件  
+#### 超级组件tree
+tree是核心元组件，该组件基于list组件构建而成，在扁平化的数据结构的基础上，能够输出层次化的结构   
+tree元组件配置如同list元组件
 
-#### components/form
-表单组件  
+### 如何在Pager中查找组件实例并使用其API方法  
+```js
+Pager({
+  data: {
+    item: {/* item配置*/},  // $$id = 'abc'
+    list: {/* list配置*/}  // $$id = 'xyz'
+  }
+  onReady(){
+    let abc = this.getElementsById('#abc')
+    abc.update({title: '新标题'})
 
-#### components/markit
-markdown/html组件  
+    let xyz = this.getEelementsById('#xyz')
+    xyz.forEach(item=>{
+      // item.addclass/removeClass/hasClass/css/update... 等类jquery的API方法
+    })
 
-#### css
-一些组件的样式库，需要在小程序项目中引入  
-
-#### pages
-基础示例代码  
-
-#### app.json
-文件中`usingComponents`字段必须设置，否则无法使用(可以根据需求删减)  
+    this.find('.class-name').addClass('other-class-name') // 批量追加类名
+  }
+})
+```
 
 ## DEMO小程序 
+
+![DEMO小程序](http://www.agzgz.com/myimgs/wxzan.jpg)
 
 ![DEMO小程序](http://www.agzgz.com/myimgs/xquery.png)

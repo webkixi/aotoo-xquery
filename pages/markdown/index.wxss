@@ -5,6 +5,21 @@
   padding: 10px;
 }
 
+.markdown-body {
+  width: 95vw;
+  overflow: hidden;
+}
+
 .markdown-body .img{
   padding-left: 0;
+}
+
+.markdown-body .br{
+  margin-bottom: 10px;
+}
+
+.hdot-item.img{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -1,13 +1,16 @@
 {
   "pages": [
     "pages/markdown/index",
+    "pages/checklist/index",
+    "pages/dropdown/index",
+    "pages/tab/index",
+    "pages/checklistbase/index",
     "pages/rating/index",
     "pages/turntable/index",
     "pages/navpad/index",
     "pages/sslider/index",
     "pages/navball/index",
     "pages/list/index",
-    "pages/tab/index",
     "pages/poi/index",
     "pages/fruit/index",
     "pages/collapse/index",
@@ -28,7 +31,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "xquery",
+    "navigationBarTitleText": "queryui",
     "navigationBarTextStyle": "black"
   },
   "permission": {
