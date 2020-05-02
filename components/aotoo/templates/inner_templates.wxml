@@ -35,6 +35,12 @@
   </block>
 </template>
 
+<template name="@ext">
+  <block wx:if="{{util.isString(props.is)}}">
+    <template is="{{props.is}}" data="{{item: props, props}}" />
+  </block>
+</template>
+
 <!-- <template name="a">
   <view class="htitle {{item.class || item.itemClass}}" wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" bind:tap="aim" data-aim="{{item.aim}}">{{item.title}}</view>
   <block wx:else>
@@ -169,9 +175,12 @@
 
 <template name="@url">
   <!-- <block wx:if="{{props && props.url && (props.title||props.value)}}"> -->
-  <block wx:if="{{props && (props.title||props.value)}}">
+  <block wx:if="{{props && (props.title||props.value||props.__isAd)}}">
     <block wx:if="{{props.value}}">
       <template is="@button" data="{{props: props}}"/>
+    </block>
+    <block wx:elif="{{props.__isAd}}">
+      <template is="@ad" data="{{props: props}}"/>
     </block>
     <navigator 
       wx:else

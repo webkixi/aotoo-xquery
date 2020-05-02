@@ -37,9 +37,15 @@ function formatUrl(props) {
   if (isString(url) && url.length > 1) {
     let ary = url.split('#')
     let isbutton = url.indexOf('button://') === 0
+    let __isAd = null
     let funName = (()=>{
       if (url.indexOf('button://') === 0) {
         ary[0] = ary[0].replace('button://', '')
+        return ary[0]
+      }
+      if (url.indexOf('ad://') === 0) {
+        __isAd = true
+        ary[0] = ary[0].replace('ad://', '')
         return ary[0]
       }
     })()
@@ -53,6 +59,8 @@ function formatUrl(props) {
       let obj = formatQuery('?'+ary[1])  // 获取navigate的配置
       if (isbutton) {
         props.url = {value: props.title, tap: funName, ...obj.query}
+      } else if(__isAd){
+        props.url = {__isAd: true, tap: funName, ...obj.query}
       } else {
         url = ary[0]
         props.url = {title: props.title, url, ...obj.query}
