@@ -120,8 +120,10 @@ export function resetItem(data, context, loop, attrkey) {
       data.fromComponent = context.data.fromComponent || data.fromComponent || context.data.uniqId
       data.__fromParent = context.data.__fromParent
       if (data.methods) {
-        if (attrkey&&attrkey.indexOf('@')>-1) {
+        if (attrkey && attrkey.indexOf('@') > -1) {
           /** 不处理 @组件的methods */
+        } else if (data.data && loop) {
+          // footer body dot 的子项为list/tree的配置时，不处理methods与itemMethod
         } else {
           const methods = data.methods
           Object.keys(methods).forEach(key=>{

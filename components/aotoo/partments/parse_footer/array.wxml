@@ -20,6 +20,9 @@
         <text>{{son}}</text>
       </view>
     </block>
+    <block wx:elif="{{son.data && util.isArray(son.data)}}">
+      <template is="@list"  data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'hf-item'} }}" />
+    </block>
     <block wx:else>
       <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), itemClass: son.itemClass ?  'hf-item ' + son.itemClass : 'hf-item'} }}" />
     </block>
