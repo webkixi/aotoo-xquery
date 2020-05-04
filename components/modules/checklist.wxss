@@ -82,6 +82,30 @@ page{
   justify-content: center;
 }
 
+.checklist-box .checklist-item.checklist-pad {
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 5px;
+}
+
+.checklist-box .checklist-item.checklist-pad .hbody {
+  width: 100%;
+}
+
+.checklist-box .checklist-item.checklist-pad .hbody .hb-item {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.checklist-box .checklist-item.checklist-pad .hbody .checklist-item{
+  width: 100px;
+  min-height: 40px;
+  background-color: #dfdfdf;
+  border-radius: 2px;
+  justify-content: center;
+  padding: 0;
+}
+
 .checklist-box .checklist-item .htitles {
   display: flex;
   align-items: center;
@@ -185,6 +209,28 @@ page{
   display: block;
 }
 
+.checklist-box .checklist-item.checklist-pad>.htitle {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  box-sizing: border-box;
+  font-size: 18px;
+  width: 100%;
+  height: 40px;
+  padding: 5px 20px;
+  color: inherit;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.checklist-box .checklist-item.checklist-pad .hbody .checklist-item.checked {
+  background-color: #dee8fd;
+  color: inherit;
+}
+.checklist-box .checklist-item.checklist-pad .hbody .checklist-item.checked::after {
+  content: '';
+}
+
 /* 二级分类列表样式 */
 /* 普通作为分类单选 */
 .checklist-box .checklist-item.checklist-category.checked {
@@ -196,6 +242,14 @@ page{
   content: '';
   /* font-size: 22px;
   display: block; */
+}
+
+.checklist-box .checklist-item.checklist-pad.checked {
+  color: inherit;
+  background-color: #fff
+}
+.checklist-box .checklist-item.checklist-pad.checked::after {
+  content: '';
 }
 
 /* 普通多选 */
@@ -212,6 +266,34 @@ page{
 .checklist-box .checklist-item.multi-select.checked::after {
   content: '\e70c';
   color: red;
+}
+
+.checklist-box .checklist-item.checklist-pad .hbody .checklist-item.multi-select::after {
+  content: '';
+}
+
+.checklist-box .checklist-item.checklist-pad .hbody .checklist-item.multi-select.checked {
+  position: relative;
+}
+.checklist-box .checklist-item.checklist-pad .hbody .checklist-item.multi-select.checked::after {
+  content: '';
+  position: absolute;
+  font-size: 10px;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-top: 16px solid transparent;
+  border-right: 16px solid red;
+}
+.checklist-box .checklist-item.checklist-pad .hbody .checklist-item.multi-select.checked::before {
+  content: '✔︎';
+  font-size: 10px;
+  color: #fff;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
 }
 
 /* switch的样式 */

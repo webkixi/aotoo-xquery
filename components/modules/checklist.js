@@ -93,13 +93,13 @@ function adapter(opts) {
   return opts
 }
 
-function getChilds(item, datas, opts) {
+function getChilds(item, datas, opts, index) {
   const idf = item.idf
   item.content = []
-  datas.forEach(it=>{
+  datas.forEach((it, ii)=>{
     if (it.parent === idf) {
       if (it.idf) {
-        it = getChilds(it, datas, opts)
+        it = getChilds(it, datas, opts, ii)
       }
       let nit = it
       delete nit.idf
@@ -120,11 +120,30 @@ function getChilds(item, datas, opts) {
 
   if (item.content.length) {
     item.itemClass = item.itemClass && item.itemClass + ' checklist-category' || 'checklist-category'
+    
+    // 其他筛选
+    checkListOption.parentValue = item.value
+    checkListOption.parentValueIndex = index
+    if (opts.mode === 3) {
+      checkListOption.fromBody = true
+    }
+
     item.content = mkCheckList({
       data: item.content,
       ...checkListOption
     })
+
+    if (opts.mode === 3) {
+      item.itemClass = item.itemClass.replace('checklist-category', 'checklist-pad')
+      item.content.type = {
+        is: 'exposed'
+      }
+      item.body = [item.content]
+      delete item.content
+    }
   }
+
+
   return item
 }
 
@@ -132,7 +151,7 @@ function preAdapter(opts) {
   let optsData = opts.data
   let tmpAry = []
   let hasContent = false
-  optsData.forEach(item=>{
+  optsData.forEach((item, ii)=>{
 
     if (item.content) {
       hasContent = true
@@ -147,7 +166,7 @@ function preAdapter(opts) {
       tmpAry.push(item)
     } else {
       if (item.idf && !item.parent) {
-        item = getChilds(item, lib.clone(optsData), opts)
+        item = getChilds(item, lib.clone(optsData), opts, ii)
         delete item.idf
         tmpAry.push(item)
       }
@@ -156,10 +175,10 @@ function preAdapter(opts) {
 
   // 扁平数据自动设置content
   if (tmpAry.length && tmpAry.length !== optsData.length) {
-    hasContent = true
+    if (opts.mode !==3 ) hasContent = true
     opts.data = tmpAry
   }
-
+  
   // 当content为true时，表示有子集
   if (hasContent) {
     opts.mode = 2
@@ -323,6 +342,7 @@ function mkCheckList(params, init) {
     containerClass: checkedContainerClass,
     listClass: checkedBoxClass,
     itemClass: checkedBoxItemClass, 
+    value: opts.value,
     data: opts.data,
     footer: footer,
     itemMethod: {
@@ -418,7 +438,7 @@ function mkCheckList(params, init) {
         }
 
         // 
-        if (data && !data.content && opts.checkedType === 1) {
+        if (data && !data.content && !data.body && opts.checkedType === 1) {
           this.valids = [index]
         }
 
@@ -581,6 +601,10 @@ function mkCheckList(params, init) {
         this.tapItem = {}   // 叶子节点点击对象的title, value
         this._value = null //内部使用的value，通过getValue对外暴露
 
+        if (opts.id) {
+          this.activePage[opts.id] = this
+        }
+
         if (opts.$$id) {
           this.allValue = []
           this.activePage[opts.$$id] = this
@@ -660,7 +684,25 @@ function mkCheckList(params, init) {
 
         // 设置父级状态
         function setParentStat(theParent) {
-          // theParent.currentContent.value = that.value
+          if (opts.fromBody) { // 事件是由body中的实例传递过来的
+            let pValue = opts.parentValue
+            let pIndex = opts.parentValueIndex
+            theParent.currentValue = pValue
+            theParent.currentValueIndex = pIndex
+
+            // let pValue = opts.parentValue
+            // let pIndex = -1
+            // if ( theParent.currentValue !== pValue) {
+            //   theParent.forEach((item, ii)=>{
+            //     if (item.data.value === pValue) {
+            //       pIndex = ii
+            //     }
+            //   })
+            //   theParent.currentValue = pValue
+            //   theParent.currentValueIndex = pIndex
+            // }
+          }
+
           if (!that.value.length) {
             theParent.validIt(false)
           } else {
@@ -674,6 +716,22 @@ function mkCheckList(params, init) {
         }
 
         let allValue = []
+        let subValues = []
+        function initValidItem(item, val) {
+          if (item.content || item.body) {
+            subValues = subValues.concat((item.content&&(item.content.value||[])) || (item.body&&(item.body[0].value||[])) || [])
+            if (val) {
+              subValues = subValues.map(v=>val+opts.separator+v)
+            }
+            let $data = (item.content&&item.content.data) || (item.body&&item.body[0].data)
+            if ($data) {
+              $data.forEach(it => {
+                let theVal = val ? val + opts.separator + it.value : it.value
+                initValidItem(it, theVal)
+              })
+            }
+          }
+        }
 
         /**
          * 
@@ -710,6 +768,16 @@ function mkCheckList(params, init) {
                   theContent = storeContent[functionid]
                 }
                 let $ckuniqId = theContent.checklistUniqId
+                let context = storeContex[$ckuniqId]
+                if (context) {
+                  getAllValue(context, $ckuniqId, theValue)
+                } else {
+                  subValues = []
+                  initValidItem($data, theValue)
+                  allValue = allValue.concat(subValues)
+                }
+              } else if ($data.body){
+                let $ckuniqId = $data.body[0].checklistUniqId
                 let context = storeContex[$ckuniqId]
                 getAllValue(context, $ckuniqId, theValue)
               } else {
@@ -830,6 +898,37 @@ function mkCheckList(params, init) {
           }
         }
 
+        this.checkedAll = function(stat=true) {
+          if (opts.checkedType !==1) {
+            let tmp = []
+            let pv = opts.parentValue
+            let pi = opts.parentValueIndex
+            this.forEach(item=>{
+              if (stat) {
+                if (opts.isSwitch && item.data['@switch']) {
+                  let switchCfg = item.data['@switch']
+                  switchCfg.checked = true
+                  item.update({ '@switch': switchCfg })
+                } else {
+                  item.addClass(opts.checkedClass)
+                }
+                let theV = pv ? pv + opts.separator + item.data.value : item.data.value
+                tmp.push(theV)
+              } else {
+                if (opts.isSwitch && item.data['@switch']) {
+                  let switchCfg = item.data['@switch']
+                  switchCfg.checked = false
+                  item.update({ '@switch': switchCfg })
+                } else {
+                  item.removeClass(opts.checkedClass)
+                }
+              }
+            })
+            this.value = tmp
+            return tmp
+          }
+        }
+
         let $value = this.value
         let renderContentStat = false
         this.forEach((it, ii) => {
@@ -843,13 +942,20 @@ function mkCheckList(params, init) {
               renderContentStat = true
               this.footerInst.fillContent(item.content)
             } else {
-              // this.hooks.emit('set-valid-stat', this)
+              
             }
           } else {
-            // renderContentStat = true
-            // this.hooks.emit('set-valid-stat', this)
+            subValues = []
+            initValidItem(item, item.value)
+            if (subValues.length) {
+              if (this.valids.indexOf(ii) === -1) {
+                this.valids.push(ii)
+              }
+            }
           }
         })
+        storeValids[opts.checklistUniqId] = this.valids
+        
         if (!renderContentStat) {
           setTimeout(() => {
             let rootInst = this.getRoot()
@@ -858,6 +964,7 @@ function mkCheckList(params, init) {
               title: this.currentTitle,
               value: this.currentValue
             }
+            // console.log('===== 4444', this.valids, this.value);
             this.hooks.emit('set-valid-stat', this)
           }, 34);
         }
