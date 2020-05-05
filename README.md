@@ -131,44 +131,122 @@ Pager({
 
 #### 超级组件item
 item是核心元组件，该组件支持输出非常丰富的结构, 组件结构支持递归item组件来生成复杂结构  
+
+wxml
+```html
+<ui-item item="{{itemConfig}}" />
+```
+
+js  
 ```js
 Pager({
-  data: {  // item组件的基础配置
-    $$id: {String} // item组件实例化后查找id
-    title: {String|Array|{Object}},  // 标题，标题组
-    img: {String|Array|Object},  // 图片，图组
-    itemClass: {String} // item样式  
-    body: {Array}  // body子容器，item集合
-    footer: {Array} // footer子容器，item集合
-    dot: {Array} // dot子容器，item集合
-    tap: {String|Function}  // bind:tap方法
-    aim: {String|Function} // catch:tap方法
-    longpress: {String|Function} // bind:longpress方法
-    catchlongpress: {String|Function} // catch:longpress方法
+  data: {  
+    // item组件的基础配置
+    itemConfig: { 
+      $$id: {String} // item组件实例化后查找id
+      title: {String|Array|{Object}},  // 标题，标题组
+      img: {String|Array|Object},  // 图片，图组
+      itemClass: {String} // item样式  
+      body: {Array}  // body子容器，item集合
+      footer: {Array} // footer子容器，item集合
+      dot: {Array} // dot子容器，item集合
+      tap: {String|Function}  // bind:tap方法
+      aim: {String|Function} // catch:tap方法
+      longpress: {String|Function} // bind:longpress方法
+      catchlongpress: {String|Function} // catch:longpress方法
+    }
   }
 })
 ```
+    
 
 #### 超级组件list
 list是核心元组件，该组件基于item元组件构建而成，适用于列表类的场景使用，项目中的各种组件几乎都是基于list组件构建  
+
+wxml  
+```html
+<ui-list list="{{listConfig}}" />
+```
+    
+js
 ```js
 Pager({
-  data: {  // list组件的基础配置
-    $$id: {String} // list组件实例化后查找id
-    listClass: {String} // 列表样式  
-    itemClass: {String} // 列表项样式  
-    header: {Object} // item配置
-    footer: {Object} // item配置
-    data: {Array} // 列表项数据配置，item集合
-    itemMethod: {Object} // 自动为列表项绑定方法，支持(tap, aim, longpress...)
-    methods: {Object} // 设置list实例对象的内部方法
+  data: {  
+    // list组件的基础配置
+    listConfig: {
+      $$id: {String} // list组件实例化后查找id
+      listClass: {String} // 列表样式  
+      itemClass: {String} // 列表项样式  
+      header: {Object} // item配置
+      footer: {Object} // item配置
+      data: {Array} // 列表项数据配置，item集合
+      itemMethod: {Object} // 自动为列表项绑定方法，支持(tap, aim, longpress...)
+      methods: {Object} // 设置list实例对象的内部方法
+    }
   }
 })
 ```
 
 #### 超级组件tree
 tree是核心元组件，该组件基于list组件构建而成，在扁平化的数据结构的基础上，能够输出层次化的结构   
-tree元组件配置如同list元组件
+tree元组件配置如同list元组件  
+
+wxml
+```html
+<ui-tree list="{{treeConfig}}" />
+```
+
+js
+```js
+Pager({
+  data: {  
+    // list组件的基础配置
+    treeConfig: {
+      $$id: {String} // list组件实例化后查找id
+      listClass: {String} // 列表样式  
+      itemClass: {String} // 列表项样式  
+      header: {Object} // item配置
+      footer: {Object} // item配置
+      data: {Array} // 列表项数据配置，item集合
+      itemMethod: {Object} // 自动为列表项绑定方法，支持(tap, aim, longpress...)
+      methods: {Object} // 设置list实例对象的内部方法
+    }
+  }
+})
+```
+
+### 内嵌组件  
+内嵌组件不需要额外引入模板，直接嵌入在其他组件中使用的组件，内嵌组件基于寻址算法，会自动处理父子级的组件关系，比如子级使用父级定义的方法，或者\`Page\`中定义的方法
+下列是常用的内嵌组件  
+
+1. @item
+2. @list
+3. @tree
+4. @url
+5. @md
+6. @html
+7. @form
+
+比如我们在`item组件`中需要引入一个`列表组件`  
+
+wxml
+```html
+<ui-item item="{{itemConfig}}" />
+```
+
+```js
+Pager({
+  data: {
+    itemConfig: {
+      title: '列表标题',
+      "@list": {
+        listClass: 'list-class-name'
+        data: [...]
+      }
+    }
+  }
+})
+```
 
 ### 如何在Pager中查找组件实例并使用其API方法  
 ```js
@@ -191,8 +269,8 @@ Pager({
 })
 ```
 
-## DEMO小程序 
-
+#### 随意支持，谢谢
 ![DEMO小程序](http://www.agzgz.com/myimgs/wxzan.jpg)
 
+#### 更多demo请关注小程序
 ![DEMO小程序](http://www.agzgz.com/myimgs/xquery.png)
