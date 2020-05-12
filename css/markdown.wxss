@@ -515,7 +515,7 @@
 .markdown-body .li::before {
   content: '•';
   font-size: 20px;
-  /* position: absolute; */
+  position: absolute;
   margin-right: 0.2em;
   margin-left: -1em;
 }

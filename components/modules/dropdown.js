@@ -92,6 +92,7 @@ module.exports = function mkDropdown(params) {
         if (lib.isFunction(opts.tap)) {
           if (contentInst) {
             const context = {
+              activePage: that.activePage,
               resetContent(){
                 contentInst.reset()
               },

@@ -141,6 +141,8 @@ function getChilds(item, datas, opts, index) {
       item.body = [item.content]
       delete item.content
     }
+  } else {
+    delete item.content
   }
 
 
