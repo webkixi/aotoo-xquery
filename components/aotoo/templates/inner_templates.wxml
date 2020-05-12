@@ -153,20 +153,20 @@
     send-message-path="{{props['send-message-path']||''}}"
     send-message-img="{{props['send-message-img']||''}}"
     show-message-card	="{{props['show-message-card']||''}}"
-    bindcontact="{{props['open-type']=='contact' ? 'itemMethod' : ''}}"
-    bindgetphonenumber="{{props['open-type']=='getPhoneNumber' ? 'itemMethod' : ''}}"
-    bindgetuserinfo="{{props['open-type']=='getUserInfo' ? 'itemMethod' : ''}}"
-    bindopensetting="{{props['open-type']=='openSetting' ? 'itemMethod' : ''}}"
-    bind:tap="{{props['form-type'] ? '' : 'itemMethod'}}"
+    bindcontact="{{props['open-type']=='contact' ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindgetphonenumber="{{props['open-type']=='getPhoneNumber' ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindgetuserinfo="{{props['open-type']=='getUserInfo' ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindopensetting="{{props['open-type']=='openSetting' ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bind:tap="{{props['form-type'] ? '' : props.__form ? 'inputItemMethod' : 'itemMethod'}}"
 
     app-parameter	="{{props['app-parameter']||''}}"
-    bindlaunchapp="{{props['open-type']=='launchApp' ? 'itemMethod' : ''}}"
-    binderror="{{props['open-type']=='launchApp' ? 'itemMethod' : ''}}"
+    bindlaunchapp="{{props['open-type']=='launchApp' ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    binderror="{{props['open-type']=='launchApp' ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
 
     class="{{props.itemClass||props.class||''}}"
     style="{{props.itemStyle||props.style||''}}"
     id="{{props.id||''}}"
-    data-address="{{props.uAddress}}"
+    data-address="{{props.uAddress||''}}"
     data-evt="{{util.dataEvt(props, ['bindcontact', 'bindgetphonenumber', 'bindgetuserinfo', 'bindopensetting', 'bindlaunchapp', 'binderror', 'tap'])}}"
   >
     {{props.value}}
@@ -235,7 +235,7 @@
     adjust-position="{{props['adjust-position']||''}}"
     hold-keyboard="{{props['hold-keyboard']||''}}"
 
-    catchtap="{{props.tap||props.aim||props.catchtap ? 'itemMethod' : ''}}"
+    catch:tap="{{props.tap||props.aim||props.catchtap ? 'itemMethod' : ''}}"
 
     bindinput="{{props.bindinput ? 'itemMethod' : ''}}"
     bindfocus="{{props.bindfocus ? 'itemMethod' : ''}}"
@@ -260,7 +260,7 @@
 
 <template name="@textarea">
   <textarea 
-    class="{{props.itemClass||props.class||''}}"
+    class="{{props.itemClass||props.class||''}} input-item-textarea"
     style="{{props.itemStyle||props.style||''}}"
     id="{{props.id||''}}"
 
@@ -287,32 +287,93 @@
 
     catchtap="{{props.tap||props.aim||props.catchtap ? 'itemMethod' : ''}}"
 
-    bindlinechange="{{props.bindlinechange ? 'itemMethod' : ''}}"
-    bindinput="{{props.bindinput ? 'itemMethod' : ''}}"
-    bindfocus="{{props.bindfocus ? 'itemMethod' : ''}}"
-    bindblur="{{props.bindblur ? 'itemMethod' : ''}}"
-    bindconfirm="{{props.bindconfirm ? 'itemMethod' : ''}}"
-    bindkeyboardheightchange="{{props.bindkeyboardheightchange ? 'itemMethod' : ''}}"
+    bindlinechange="{{props.bindlinechange ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindinput="{{props.__form ? 'inputItemMethod' : props.bindinput ? 'itemMethod' : ''}}"
+    bindfocus="{{props.bindfocus ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindblur="{{props.bindblur ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindconfirm="{{props.bindconfirm ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindkeyboardheightchange="{{props.bindkeyboardheightchange ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
     data-isform="{{true}}"
-    data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap','bindinput', 'bindfocus', 'bindblur', 'bindconfirm', 'bindkeyboardheightchange'])}}"
-  />
+    data-address="{{props.__form ? props.uAddress : ''}}"
+    data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindinput', 'bindfocus', 'bindblur', 'bindconfirm', 'bindkeyboardheightchange'])}}"
+  >
+  </textarea>
 </template>
 
 <template name="@switch">
   <switch 
-    class="{{props.itemClass||props.class||''}}"
-    style="{{props.itemStyle||props.style||''}}"
-    id="{{props.id||''}}"
+    id="{{props.id}}" 
+    class="{{props.itemClass}} input-item-switch" 
+    style="{{props.itemStyle||''}}"
 
-    checked="{{props.checked||''}}"
-    disabled="{{props.disabled||''}}"
+    checked="{{props.value||props.checked||''}}" 
+    disabled="{{props.disabled}}" 
     type="{{props.type||''}}"
     color="{{props.color||''}}"
 
-    catchtap="{{props.tap||props.aim||props.catchtap ? 'itemMethod' : ''}}"
+    catch:tap="{{props.tap||props.aim||props.catchtap ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindchange="{{props.bindchange ? props.__form ? 'rcChange' : 'itemMethod' : ''}}"
 
-    bindchange="{{props.bindchange ? 'itemMethod' : ''}}"
     data-isform="{{true}}"
-    data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap','bindchange'])}}"
+    data-address="{{props.uAddress}}" 
+    data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindchange'])}}" 
+  />
+</template>
+
+<template name="@slider">
+  <slider 
+    id="{{props.id||''}}"
+    class="{{props.itemClass}} input-item-slider"
+    style="{{props.itemStyle||''}}"
+
+    value="{{props.value||''}}"
+    disabled="{{props.disabled||''}}"
+    min="{{props.min||0}}"
+    max="{{props.max||100}}"
+    step="{{props.step||1}}"
+    color="{{props.color||''}}"
+    selected-color="{{props['selected-color']||''}}"
+    activeColor="{{props.activeColor||''}}"
+    backgroundColor="{{props.backgroundColor||''}}"
+    block-size="{{props['block-size']||''}}"
+    block-color="{{props['block-color']||''}}"
+    show-value="{{props['show-value']||''}}"
+
+    catch:tap="{{props.tap||props.aim||props.catchtap ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindchange="{{props.bindchange ? props.__form ? 'rcChange' : 'itemMethod' : ''}}"
+    bindchanging="{{props.bindchanging ? props.__form ? 'rcChange' : 'itemMethod' : ''}}"
+
+    data-isform="{{true}}"
+    data-address="{{props.uAddress||''}}"
+    data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindchange', 'bindchanging'])}}"
+
+  />
+</template>
+
+<template name="@slider2">
+  <ui-item item="{{props}}" />
+</template>
+
+<template name="@editor">
+  <editor 
+    id="{{props.id||''}}"
+    class="{{props.itemClass}} input-item-editor"
+    style="{{props.itemStyle||''}}"
+
+    placeholder="{{props.placeholder||''}}"
+    show-img-size="{{props['show-img-size']||''}}"
+    show-img-toolbar="{{props['show-img-toolbar']||''}}"
+    show-img-resize="{{props['show-img-resize']||''}}"
+
+    catch:tap="{{props.tap||props.aim||props.catchtap ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindready="{{props.bindready ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindfocus="{{props.bindfocus ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindblur="{{props.bindblur ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindstatuschange="{{props.bindstatuschange ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindinput="{{props.__form ? 'inputItemMethod' : props.bindinput ? 'itemMethod' : ''}}"
+
+    data-isform="{{true}}"
+    data-address="{{props.uAddress||''}}"
+    data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindready', 'bindfocus', 'bindblur', 'bindstatuschange', 'bindinput'])}}"
   />
 </template>

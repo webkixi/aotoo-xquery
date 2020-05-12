@@ -75,6 +75,8 @@ export function timestampFormat(time, fmt) {
 
 export {
   md5,
+  strlen,
+  subcontent,
   isString,
   isObject,
   isArray,

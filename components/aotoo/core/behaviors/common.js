@@ -646,6 +646,12 @@ export const commonBehavior = (app, mytype) => {
         if (lib.isObject(ds) || lib.isArray(ds)) this.originalDataSource = lib.clone(ds)
         else this.originalDataSource = ds
         if (lib.isObject(ds)) {
+          if (ds.$$id || ds.id || this.data.id) {
+            activePage['elements'] = activePage['elements'] || {}
+            activePage[(ds.$$id||ds.id)] = this
+            activePage['elements'][(ds.$$id || ds.id || this.data.id)] = this
+          }
+
           if (ds.methods) {
             if (lib.isObject(ds.methods)) {
               Object.keys(ds.methods).forEach(key => {
