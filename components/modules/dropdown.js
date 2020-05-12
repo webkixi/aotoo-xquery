@@ -8,7 +8,12 @@ function adapter(params) {
     }
     if (lib.isObject(item)) {
       item._idx_ = ii
-      item.dot = [ {id: `pop-${ii}`, itemClass: 'dropdown-item-content', aim: function(params) {} } ]
+      let content = {id: `pop-${ii}`, itemClass: 'dropdown-item-content', aim: function(params) {} }
+      if (item.contentStyle) {
+        content.itemStyle = item.contentStyle
+        delete item.contentStyle
+      }
+      item.dot = [ content ]
     }
     return item
   })
@@ -20,7 +25,8 @@ module.exports = function mkDropdown(params) {
     listClass: 'dropdown-tab',
     tap: null,
     data: [],
-    footerId: lib.suid('dd-footer-')
+    footerId: lib.suid('dd-footer-'),
+    maskStyle: '',
   }
 
   let opts = Object.assign({}, dft, params)
@@ -30,7 +36,7 @@ module.exports = function mkDropdown(params) {
     listClass: opts.listClass,
     itemClass: 'dropdown-item',
     data: opts.data,
-    footer: {$$id: opts.footerId, itemClass: 'dropdown-mask', aim: 'closePop'},
+    footer: {$$id: opts.footerId, itemClass: 'dropdown-mask', itemStyle: opts.maskStyle, aim: 'closePop'},
     itemMethod: {
       aim(e, param, inst) {
         let $data = inst.getData()
