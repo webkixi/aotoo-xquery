@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/markdown/index",
+    "pages/form/index",
     "pages/checklist/index",
     "pages/dropdown/index",
     "pages/tab/index",
