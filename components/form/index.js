@@ -46,6 +46,7 @@ const containerAttributs = { // attrs
   itemClass: 'input-item',
   listClass: '',
   formClass: '',
+  formStyle: '',
   itemStyle: undefined,
   listStyle: '',
   required: undefined,
@@ -154,6 +155,9 @@ const inputAttributs = {
   'confirm-hold': undefined,
   'confirm-hold': undefined,
   'adjust-position': undefined,
+
+  // textarea
+  'strCount': undefined
 }
 
 const inputAttributsAccessKeys = Object.keys(inputAttributs)
@@ -193,6 +197,7 @@ function resetPickersValues(params, e) {
     let value = params.value ? params.value : []
     let values = params.values
     let len = values.length
+    let column = e && e.detail.column
 
     for (let ii = 0; ii < len; ii++) {
       let columnVals = values[ii]
@@ -211,8 +216,10 @@ function resetPickersValues(params, e) {
           _titles.push(item.title)
         }
       })
-      if (e && (value[ii] || value[ii]==0)) {
-        _select = value[ii]
+      if (e && (value[ii] || value[ii]===0)) {
+        if ((column || column === 0) && ii <= column) {
+          _select = value[ii]
+        }
       }
       value[ii] = _select
       titles[ii] = _titles
@@ -221,6 +228,18 @@ function resetPickersValues(params, e) {
     params.titles = titles
   }
   return params
+}
+
+function buildDropdownOptions(params, address) {
+  return params.map((item, ii) => {
+    if (typeof item == 'string') item = {title: item}
+    if (!item.disabled) {
+      item.aim = `inputItemDropdownOptions?address=${address}&index=${ii}&value=${item.value}&text=${item.title||item.text||''}`
+    } else {
+      item.itemClass = (item.itemClass||'') + ' disabled'
+    }
+    return item
+  })
 }
 
 // let _watcher = {}
@@ -286,6 +305,11 @@ function normInput(params, profile) {
 
       if (params.type === 'rating') {
         let max = params.max = parseInt(params.max) || 5
+        if (params.value || params.value === 0) {
+          params.value = parseInt(params.value)
+        } else {
+          params.value = 0
+        }
         params.range = Array.from(new Array(max), (item, index) => {
           return {title: index+1}
         })
@@ -297,6 +321,10 @@ function normInput(params, profile) {
   
       if (params.type == 'picker') {
         params = resetPickersValues(params)
+      }
+
+      if (params.type == 'textarea') {
+        params.maxlength = params.maxlength || 0
       }
   
       if (params.type == 'dropdown') {
@@ -317,20 +345,7 @@ function normInput(params, profile) {
             params.titles.show = false
             params.titles.listClass = params.titles.listClass ? `input-item-dropdown-options ${params.titles.listClass}` : 'input-item-dropdown-options'
             params.titles.itemClass = params.titles.itemClass ? `input-item-dropdown-options-item ${params.titles.itemClass}` : 'input-item-dropdown-options-item'
-            params.titles.data = params.titles.data.map((item, ii)=>{
-              if (typeof item == 'string') item = {title: item}
-              if (!item.disabled) {
-                item.aim = `inputItemDropdown?address=${params.uAddress}&index=${ii}&value=${item.value}&text=${item.title||item.text||''}`
-              } else {
-                item.itemClass = (item.itemClass||'') + ' disabled'
-              }
-              // if (item.parent) {
-              //   item.aim = `inputItemDropdown?address=${params.uAddress}&index=${ii}&value=${item.value}&text=${item.title}`
-              // } else {
-              //   item.aim = `inputItemDropdown?address=${params.uAddress}&index=${ii}&value=${item.value}&text=${item.title}`
-              // }
-              return item
-            })
+            params.titles.data = buildDropdownOptions(params.titles.data, params.uAddress)
           }
         }
       }
@@ -508,7 +523,7 @@ Component({
   behaviors: [Core.baseBehavior(app, 'form')],
   lifetimes: {
     created: function () {
-      this.generateUpdate('$dataSource')
+      // this.generateUpdate('$dataSource')
       this.$$is = 'form'
       this.query = wx.createSelectorQuery().in(this)
     },
@@ -531,6 +546,34 @@ Component({
     }
   },
   methods: {
+    update(id, param) {
+      if (lib.isObject(id) && id.data) {
+        this.reset(id)
+      } else {
+        if (lib.isArray(id)) {
+          let tmp = lib.clone(this.originalDataSource)
+          tmp.data = id
+          this.reset(tmp)
+        } else {
+          this.value(id, param)
+        }
+      }
+    },
+    reset(params) {
+      let that = this
+      if (params && params.data) {
+        this.setData({
+          $dataSource: {},
+          $validInputs: {},
+          $props: {}
+        }, function() {
+          initForm.call(that, params)
+        })
+      } else {
+        let orid = this.originalDataSource
+        initForm.call(this, orid)
+      }
+    },
     find(param){
       return wx.$$find(param, this)
     },
@@ -627,16 +670,45 @@ Component({
     empty: function(keyid) {
       const allocation = this.allocation
       let willEmpty = {}
-      if (keyid) {
-        Object.keys(allocation).forEach(id=>{
-          if (id === keyid) willEmpty[id] = {value: ''}
-        })
-      } else {
-        Object.keys(allocation).forEach(id=>{
-          willEmpty[id] = {value: ''}
-        })
-      }
+
+      Object.keys(allocation).forEach(id=>{
+        let profile = allocation[id]
+        let val = profile.value
+        let emptyValue = null
+        if (lib.isArray(val)) emptyValue = []
+        if (lib.isString(val) || lib.isNumber(val)) emptyValue = ''
+        if (keyid) {
+          if (id === keyid) {
+            willEmpty[id] = {value: emptyValue}
+          }
+        } else {
+          willEmpty[id] = {value: emptyValue}
+        }
+      })
       this.value(willEmpty)
+
+      // if (keyid) {
+      //   Object.keys(allocation).forEach(id=>{
+      //     if (id === keyid) {
+      //       let profile = allocation[id]
+      //       let val = profile.value
+      //       let emptyValue = null
+      //       if (lib.isArray(val)) emptyValue = []
+      //       if (lib.isString(val) || lib.isNumber(val)) emptyValue = ''
+      //       willEmpty[id] = {value: emptyValue}
+      //     }
+      //   })
+      // } else {
+      //   Object.keys(allocation).forEach(id=>{
+      //     let profile = allocation[id]
+      //     let val = profile.value
+      //     let emptyValue = null
+      //     if (lib.isArray(val)) emptyValue = []
+      //     if (lib.isString(val) || lib.isNumber(val)) emptyValue = ''
+      //     willEmpty[id] = {value: emptyValue}
+      //   })
+      // }
+      // this.value(willEmpty)
     },
     
     /**
@@ -769,12 +841,37 @@ Component({
      * @param {Boolean} forData true获得完整数据，false只获取表单的value值
      */
     getValue(id, forData){
-      let val = this.value(id)
-      if (val) {
+      let val = this.value(id) || {}
+      let tmpValue = {}
+      if (id) {
+        Object.keys(val).forEach(ky=>{
+          if (val[ky] !== undefined) {
+            tmpValue[ky] = val[ky]
+          }
+        })
+      } else {
+        Object.keys(val).forEach(ky=>{
+          if (val[ky]) {
+            let element = val[ky]
+            let tmp = {}
+            Object.keys(element).forEach(key=>{
+              if (element[key]!==undefined) {
+                tmp[key] = element[key]
+              }
+            })
+            tmpValue[ky] = tmp
+          }
+        })
+      }
+
+      if (id) {
         if (val.type === 'dropdown') {
-          return forData ? {type: val.type, id: (val.id||val.name), text: val.text, value: val.value} : val.value
+          // return forData ? {type: val.type, id: (val.id||val.name), text: val.text, value: val.value} : val.value
+          return {type: tmpValue.type, id: (tmpValue.id||tmpValue.name), text: tmpValue.text, value: tmpValue.value}
         }
-        return forData ? val : val.value
+        return forData ? tmpValue : tmpValue.value
+      } else {
+        return tmpValue
       }
     },
 
@@ -785,6 +882,12 @@ Component({
      */
     setValue(id, val){
       this.value(id, val)
+    },
+
+    updateDropdownOptions(id, options){
+      if (lib.isArray(options)) {
+        this.value(id, options)
+      }
     },
 
     setInputProfile(param={}){
@@ -806,7 +909,7 @@ Component({
       }
     },
     
-    value: function(id, val) {
+    value(id, val){
       const allocation = this.allocation
       if (id) {
         if (val) {
@@ -818,7 +921,7 @@ Component({
               let res = this.getAddressInfo(address)
               if (res) {
                 let inputType = res.inputData.type
-                if (lib.isString(val)) {
+                if (lib.isString(val) || lib.isNumber(val)) {
                   res.inputData.value = val
                   let resault = res.inputData
                   res.inputData = resault = normInput.call(this, resault, res.profile)
@@ -826,7 +929,7 @@ Component({
                 } else {
                   // 下拉菜单允许数组
                   if (lib.isArray(val) && inputType === 'dropdown') {
-                    val = {titles: {data: val}}
+                    val = {titles: {data: buildDropdownOptions(val, address)}}
                   }
                   if (lib.isObject(val)) {
                     let resault = Object.assign({}, res.inputData, val)
@@ -846,6 +949,7 @@ Component({
               const myval = id[$id]
               const ipData = allocation[$id]
               if (ipData) {
+                const inputType = ipData.type
                 const address = ipData['uAddress']
                 let res = this.getAddressInfo(address)
                 if (res) {
@@ -958,6 +1062,25 @@ Component({
       const dataset = e.currentTarget.dataset
       this.hooks.emit('dropdown-off')
     },
+
+    inputItemDropdownOptions(e, param, inst){
+      if (param && param.address) {
+        // 下拉菜单选项点击
+        let ddV = this.dropdownValue || {}
+        this.dropdownValue = ddV
+        let add = param.address
+        let oldValue = ddV[add] || {}
+        if (oldValue.value !== param.value) {
+          this.dropdownValue[add] = param
+          this.inputItemDropdown(e, param, inst)
+        } else {
+          this.hooks.emit('dropdown-off', e.currentTarget.dataset)
+        }
+      } else {
+        // 下拉菜单栏点击
+        this.inputItemDropdown(e, {fromMenu: true}, inst)
+      }
+    },
     // dropdown
     // e evtent
     // param 经过 core itemMethod解析过后的数据，包含?abc=xxx等query信息
@@ -967,7 +1090,7 @@ Component({
       const mytype = e.type
       const dataset = e.currentTarget.dataset
       const detail = e.detail
-      let {address, index, value, text} = param
+      let {address, index, value, text, fromMenu} = param
       let res = this.getAddressInfo(address||dataset.address)
       this.hooks.emit('dropdown-off', dataset)
       if (res) {
@@ -993,6 +1116,7 @@ Component({
 
             this.hooks.off('dropdown-off')
             this.hooks.on('dropdown-off', function (param) {
+            // this.hooks.once('dropdown-off', function (param) {
               let beable = false
               if (param) {
                 if (param.address !== res.inputData.uAddress) {
@@ -1012,7 +1136,6 @@ Component({
                 runFormBindFun.call(that, null, res, e)
               }
             })
-
           } else {
             style = (style || '').replace(';z-index: 698', '')
             ddlistStyle = (ddlistStyle || '').replace(';z-index: 699', '')
@@ -1059,10 +1182,13 @@ Component({
             res.inputData.eye = 'form-arrows'
           }
           setAllocation.call(this, res, {value: (value||''), text, __param: param })
-          res.inputData.value = text||''
+          // res.inputData.value = text||''
+          res.inputData.value = {title: text, value}
           res.param = param
         }
-        runFormBindFun.call(this, 'bindchange', res, e)
+        if (!fromMenu) {
+          runFormBindFun.call(this, 'bindchange', res, e)
+        }
         runFormBindFun.call(this, 'bindinput', res, e)
         runFormBindFun.call(this, 'bindblur', res, e)
       }
@@ -1140,7 +1266,12 @@ Component({
           break;
           
         case 'focus':
-          runFormBindFun.call(this, 'bindfocus', res, e)
+          if (res.inputData.type == 'dropdown') {
+            e.currentTarget.dataset.eye = true
+            this.inputItemDropdown(e, {fromMenu: true})
+          } else {
+            runFormBindFun.call(this, 'bindfocus', res, e)
+          }
           break;
 
         case 'blur':
@@ -1156,6 +1287,16 @@ Component({
 
         case 'input':
           if (!res.inputData.readonly && (detail.value || detail.value === '')) {
+            if (res.inputData.type === 'textarea') {
+              if (res.inputData.maxlength >0) {
+                let counter = lib.strlen(detail.value)
+                if (counter > res.inputData.maxlength) {
+                  counter = res.inputData.maxlength
+                  detail.value = lib.subcontent(counter, res.inputData.maxlength)
+                }
+                res.inputData.strCount = counter
+              }
+            }
             setAllocation.call(this, res, {value: detail.value})
             res.inputData.value = detail.value
             runFormBindFun.call(this, 'bindinput', res, e)
@@ -1222,10 +1363,28 @@ Component({
       if (res) {
         const type = e.type
         if (type === 'change') {
-          res.inputData.value = detail.value
+          let oldValue = res.inputData.value
+          let newValue = detail.value
+          let valueIndex = undefined
+          let column = (()=>{
+            let changeColumn = undefined
+            for (let ii=0; ii<oldValue.length; ii++) {
+              if (oldValue[ii] !== newValue[ii]) {
+                changeColumn = ii
+                valueIndex = newValue[ii]
+                break;
+              }
+            }
+            return changeColumn
+          })()
+          detail.columnValue = {
+            column,
+            value: valueIndex
+          }
+          e.detail = detail
           setAllocation.call(this, res, {value: detail.value})
         }
-        runFormBindFun.call(this, 'bindchange', res, e)
+        runFormBindFun.call(this, 'bindchange', res, e, 'picker-view')
         runFormBindFun.call(this, 'bindpickstart', res, e)
         runFormBindFun.call(this, 'bindpickend', res, e)
       }
@@ -1266,6 +1425,9 @@ function setAllocation(res, val) {
       this.allocation[id] = Object.assign({}, itemInput, val)
       if (val.value) {
         if (itemInput.value != val.value) {
+          if (itemInput.type === 'dropdown') {
+            this.allocation[id].value = {title: val.text, value: val.value}
+          }
           itemInput = this.allocation[id]
           this.hooks.emit('change', {id, point: itemInput})
         }
@@ -1275,21 +1437,35 @@ function setAllocation(res, val) {
 }
 
 function runFormBindFun(fn, res, e, from) {
+  let that = this
   let activePage = this.activePage
   let inputType = res.inputData.type
   let fun, param, allParam
-  if (fn !== 'bindcolumnchange') {
+
+  if (fn === 'bindcolumnchange' && res && res.inputData[fn] === true) {
+    fn = undefined
+  } else {
     let tmp = this._rightEvent(e)
     fun = tmp.fun; param = tmp.param; allParam = tmp.allParam
-  } else {
-    fn = undefined
   }
+
+  // if (fn !== 'bindcolumnchange') {
+  //   let tmp = this._rightEvent(e)
+  //   fun = tmp.fun; param = tmp.param; allParam = tmp.allParam
+  // } else {
+  //   fn = undefined
+  // }
+
+  // let tmp = this._rightEvent(e)
+  // fun = tmp.fun; param = tmp.param; allParam = tmp.allParam
   let funNm = fun
 
   var id = res.inputData.id || res.inputData.name
+  if (!id) throw new Error('表单元素必须指定id')
   res.inputData = this.allocation[id]
   res.param ? e.param = res.param : ''
-  res.param = res.param || param
+  res.param = res.param || param || {}
+  e.param = Object.assign(res.param, e.detail)
   res.value = res.inputData.value
   res.values = res.inputData.values
   res.id = id
@@ -1302,6 +1478,50 @@ function runFormBindFun(fn, res, e, from) {
     // let fun = (funNm&&targetObj[funNm]) || targetObj[funName] || activePage[funName]
     let fun = this[(funNm || funName)] || targetObj[(funNm || funName)] || activePage[(funNm || funName)]
     let context = this[(funNm || funName)] ? this : targetObj[(funNm || funName)] ? targetObj : activePage
+
+    if (from === 'pickers' || from === 'picker-view') {
+      let value = res.inputData.value
+      let _values = res.inputData.values
+      if (fn !== 'bindcolumnchange') {
+        const values = []
+        value.forEach((idx, ii) => {
+          values.push({
+            title: _values[ii][idx].title,
+            id: _values[ii][idx].id
+          })
+        })
+        e.detail = e.detail || {}
+        e.detail.pickerValue = values
+        e.param.pickerValue = values
+        res.pickerValue = values
+        if (from === 'picker-view') {
+          e.param.columnValue = e.detail.columnValue
+          let {column, value} = e.detail.columnValue
+          context.updateNextColumn = function(param) {
+            if (column > -1 && lib.isArray(param)) {
+              let $column = column + 1
+              if (res.inputData.values[$column]) {
+                res.inputData.values[$column] = param
+                that.setData({[res.address]: res.inputData})
+              }
+            }
+          }
+        }
+      } else {
+        context.updateNextColumn = function(param) {
+          let column = e.detail.column
+          if (column > -1 && lib.isArray(param)) {
+            let $column = column + 1
+            if (res.inputData.values[$column]) {
+              res.inputData.values[$column] = param
+              let resData = resetPickersValues(res.inputData, e)
+              that.setData({[res.address]: resData})
+            }
+          }
+        }
+      }
+    }
+    
     if (lib.isFunction(fun)) {
       let resData = null
       let result = fun.call(context, e, res, this)
@@ -1321,7 +1541,7 @@ function runFormBindFun(fn, res, e, from) {
       from == 'cancel' ? '' : this.setData({[res.address]: res.inputData})
     }
   } else {
-    let selfUpdate = ['picker-view', 'picker', 'pickers', 'dropdown', 'checkbox', 'radio']
+    let selfUpdate = ['picker-view', 'picker', 'pickers', 'dropdown', 'checkbox', 'radio', 'textarea']
     if (selfUpdate.indexOf(res.inputData['type'])>-1) {
       from == 'cancel' ? '' : this.setData({[res.address]: res.inputData})
     }
