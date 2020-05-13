@@ -350,10 +350,6 @@
   />
 </template>
 
-<template name="@slider2">
-  <ui-item item="{{props}}" />
-</template>
-
 <template name="@editor">
   <editor 
     id="{{props.id||''}}"

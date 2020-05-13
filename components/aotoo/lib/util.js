@@ -66,7 +66,7 @@ export function isEmpty(params) {
 
 //计算字符变量的长度，包含处理中文
 export function strlen(str) {
-  return str.replace(/[^\x00-\xff]/g, "aaa").length;
+  return str.replace(/[^\x00-\xff]/g, "aa").length;
 }
 
 /* 2007-11-28 XuJian */
@@ -78,7 +78,7 @@ export function subcontent(content, len, ellipse) {
   var newStr = "";
   var chineseRegex = /[^\x00-\xff]/g;
   var singleChar = "";
-  var strLength = content.replace(chineseRegex, "**").length;
+  var strLength = content.replace(chineseRegex, "aa").length;
   for (var i = 0; i < strLength; i++) {
     singleChar = content.charAt(i).toString();
     if (singleChar.match(chineseRegex) != null) {
