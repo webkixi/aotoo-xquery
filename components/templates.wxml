@@ -8,7 +8,11 @@
 
 <template name="@ad">
   <block wx:if="{{util.isObject(props)}}">
+    <block wx:if="{{props.video==='front'}}">
+      <video unit-id="{{props['unit-id']||''}}"></video>
+    </block>
     <ad 
+      wx:else
       class="{{props.itemClass||props.class||''}}"
       style="{{props.itemStyle||props.style||''}}"
       id="{{props.id||''}}"

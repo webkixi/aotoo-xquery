@@ -273,9 +273,11 @@ input {
   left: 0;
   border-radius: 20rpx;
   z-index: 1;
-  display: flex;
+  /* display: flex;
   justify-content: flex-end;
-  align-items: center;
+  align-items: center; */
+  display: block;
+  text-align: right;
   padding: 0 10rpx;
   padding-right: 20rpx;
   box-sizing: border-box;
@@ -291,6 +293,8 @@ input {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  box-sizing: border-box;
+  padding-right: 20rpx;
 }
 .input-item-content .input-item-desc {
   flex: 1;
@@ -448,7 +452,7 @@ input[type=dropdown] {
 .input-item-content .input-item-label {
   font-family: "iconfont" !important;
   box-sizing: border-box;
-  padding-left: 30rpx;
+  /* padding-left: 30rpx; */
 }
 .input-item-content .input-item-dropdown-masker {
   position: fixed;

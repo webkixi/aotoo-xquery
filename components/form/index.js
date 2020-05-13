@@ -1292,7 +1292,7 @@ Component({
                 let counter = lib.strlen(detail.value)
                 if (counter > res.inputData.maxlength) {
                   counter = res.inputData.maxlength
-                  detail.value = lib.subcontent(counter, res.inputData.maxlength)
+                  detail.value = lib.subcontent(detail.value, res.inputData.maxlength)
                 }
                 res.inputData.strCount = counter
               }
