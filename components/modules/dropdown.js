@@ -27,6 +27,7 @@ module.exports = function mkDropdown(params) {
     data: [],
     footerId: lib.suid('dd-footer-'),
     maskStyle: '',
+    show: true
   }
 
   let opts = Object.assign({}, dft, params)
@@ -36,6 +37,7 @@ module.exports = function mkDropdown(params) {
     listClass: opts.listClass,
     itemClass: 'dropdown-item',
     data: opts.data,
+    show: opts.show,
     footer: {$$id: opts.footerId, itemClass: 'dropdown-mask', itemStyle: opts.maskStyle, aim: 'closePop'},
     itemMethod: {
       aim(e, param, inst) {

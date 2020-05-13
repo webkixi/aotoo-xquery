@@ -12,8 +12,8 @@ function setClass(item, cls) {
   return item
 }
 
-function adapter(opts) {
-  let params = preAdapter(opts).data
+function adapter(opts, init) {
+  let params = preAdapter(opts, init).data
 
   let checkedClass = opts.checkedClass
   let checkedContainerClass = opts.checkedContainerClass
@@ -93,13 +93,13 @@ function adapter(opts) {
   return opts
 }
 
-function getChilds(item, datas, opts, index) {
+function getChilds(item, datas, opts, index, init) {
   const idf = item.idf
   item.content = []
   datas.forEach((it, ii)=>{
     if (it.parent === idf) {
       if (it.idf) {
-        it = getChilds(it, datas, opts, ii)
+        it = getChilds(it, datas, opts, ii, init)
       }
       let nit = it
       delete nit.idf
@@ -134,9 +134,49 @@ function getChilds(item, datas, opts, index) {
     })
 
     if (opts.mode === 3) {
+      let maxCount = opts.maxCount
       item.itemClass = item.itemClass.replace('checklist-category', 'checklist-pad')
       item.content.type = {
         is: 'exposed'
+      }
+      if (item.content.data.length > maxCount) {
+        // console.log(item.content.data);
+        item.content.data = item.content.data.map((it, ii)=>{
+          if (lib.isString(it)) {
+            it = {title: it, value: it}
+          }
+
+          if (lib.isObject(it) && ii > (maxCount-1)) {
+            it.itemClass = it.itemClass ? it.itemClass + ' disN' : 'disN'
+          }
+          return it
+        })
+        item.title = [].concat(item.title).concat({title: '展开', targetId: item.content.checklistUniqId, containerClass: 'unfold', aim(e, param, inst){
+
+          let $data = inst.getData()
+          let targetId = $data.targetId
+          this.children.forEach(ele=>{
+            if (ele.$$is === 'list' && ele.checklistUniqId === targetId) {
+              if (ele.__unfork) {
+                inst.update({title: '展开'})
+                inst.removeClass('fold')
+                ele.__unfork = false
+                ele.forEach((element, ii)=>{
+                  if (ii > (maxCount-1)) {
+                    element.addClass('disN')
+                  }
+                })
+              } else {
+                inst.update({title: '收起'})
+                inst.addClass('fold')
+                ele.__unfork = true
+                ele.forEach((element, ii)=>{
+                  element.removeClass('disN')
+                })
+              }
+            }
+          })
+        }})
       }
       item.body = [item.content]
       delete item.content
@@ -149,7 +189,7 @@ function getChilds(item, datas, opts, index) {
   return item
 }
 
-function preAdapter(opts) {
+function preAdapter(opts, init) {
   let optsData = opts.data
   let tmpAry = []
   let hasContent = false
@@ -168,7 +208,7 @@ function preAdapter(opts) {
       tmpAry.push(item)
     } else {
       if (item.idf && !item.parent) {
-        item = getChilds(item, lib.clone(optsData), opts, ii)
+        item = getChilds(item, lib.clone(optsData), opts, ii, init)
         delete item.idf
         tmpAry.push(item)
       }
@@ -201,6 +241,8 @@ function mkCheckList(params, init) {
     data: [],  // 配置数据
     footer: null,  // 自动设置
 
+    maxCount: 9,  // mode为3的时候有效，块状选择时有效
+
     checkedContainerClass: 'checklist-container',
     checkedBoxClass: 'checklist-box',
     checkedBoxItemClass: 'checklist-item',
@@ -212,6 +254,8 @@ function mkCheckList(params, init) {
 
     selectAll: false,  // 是否设置全选选项
     tap: null,  // 选取值响应方法
+
+    show: true
   }
 
   if (lib.isArray(params)) {
@@ -221,6 +265,9 @@ function mkCheckList(params, init) {
   let opts = Object.assign({}, dft, params)
 
   if (init) {
+    if (!opts.data.length) {
+      throw new Error('数据项data不能为空')
+    }
     opts.$$id = lib.suid('checklist-root-')
     storeCommon.setItem(opts.$$id, {
       storeValue: {},
@@ -246,7 +293,20 @@ function mkCheckList(params, init) {
   let checkedClass = opts.checkedClass
   let checkedContainerClass = opts.checkedContainerClass
   let checkedBoxClass = opts.checkedBoxClass
-  opts = adapter(opts)
+  opts = adapter(opts, init)
+
+  if (init) {
+    // 如果没有设置默认value，则默认第一条数据为默认值
+    function setDefaultValue(config) {
+      if (!config.value || !config.value.length) {
+        config.value = [].concat(config.data[0].value)
+        if (config.data[0].content) {
+          setDefaultValue(config.data[0].content)
+        }
+      }
+    }
+    setDefaultValue(opts)
+  }
 
   let childHasContent = false
 
@@ -296,6 +356,11 @@ function mkCheckList(params, init) {
     opts.isSwitch = false
   }
 
+  if (opts.mode === 3) {
+    opts.checkedType = 1
+    opts.isSwitch = false
+  }
+
   // 单选模式时，默认值为数组0项
   if (opts.checkedType === 1 && opts.value.length > 1) {
     opts.value = [opts.value[0]]
@@ -326,14 +391,23 @@ function mkCheckList(params, init) {
   }
 
   function clearRelationValids(item) {
-    if (item.content) {
-      const uniqId = item.content.checklistUniqId
+    let content = item.content || (item.body&&item.body[0])
+    if (content) {
+      const uniqId = content.checklistUniqId
       storeValids[uniqId] = []
       storeValue[uniqId] = []
       storeAttrs[uniqId] = {}
       selectAllValue[uniqId] = []
-      storeContex[uniqId] = null
-      item.content.data.forEach(it => {
+      if (storeContex[uniqId]) {
+        storeContex[uniqId].forEach(item=>{
+          item.removeClass(opts.checkedClass + ' valid')
+        })
+      }
+      setTimeout(() => {
+        storeContex[uniqId] = null
+      }, 100);
+      
+      content.data.forEach(it => {
         clearRelationValids(it)
       })
     }
@@ -347,6 +421,7 @@ function mkCheckList(params, init) {
     value: opts.value,
     data: opts.data,
     footer: footer,
+    show: opts.show,
     itemMethod: {
       aim(e, param, inst) {
         if (opts.isSwitch && opts.checkedType === 2) return // 启用switch，则使tap无效
@@ -637,30 +712,11 @@ function mkCheckList(params, init) {
                 }
               })
             } else {
-              storeValue = {}
-              storeValids = {}
-              storeAttrs = {}
-              storeContex = {}
-              selectAllValue = {}
-
-              let rootInst = this.getRoot()
-              rootInst.currentValue = null
-              rootInst.currentValueIndex = null
-              rootInst.currentTitle = null
-              rootInst.currentContent = null
-              rootInst.tapItem = {}
-              
-              rootInst.value = []
-              rootInst.valids = []
-
-              rootInst.fromLeaf = true
-              rootInst.tapItem = {
-                checkedType: opts.checkedType,
-                title: this.currentTitle,
-                value: this.currentValue
-              }
-              rootInst.forEach(item => item.removeClass(checkedClass))
-              rootInst.hooks.emit('set-valid-stat', rootInst)
+              this.forEach(item => {
+                item.removeClass(checkedClass + ' valid')
+                clearRelationValids(item.data)
+              })
+              // this.hooks.emit('set-valid-stat', this)
             }
           }
         }
