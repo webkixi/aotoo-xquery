@@ -21,7 +21,7 @@ const checkListConfig = {
       {title: '你好', value: '2-1', parent: 'bbb'},
       {title: '你妹', value: '2-2', parent: 'bbb'},
 
-      {title: 'ccc', value: '3', idf: 'ccc', checkListOption: {value: ['3-1']}},
+      {title: 'ccc', value: '3', idf: 'ccc', checkListOption: {checkedType: 2, value: ['3-1']}},
       {title: '你好', value: '3-1', parent: 'ccc'},
       {title: '你妹', value: '3-2', parent: 'ccc'},
 
@@ -48,6 +48,35 @@ const checkListConfig = {
   }, true)
 }
 
+const listConfig = {
+  "@list": {
+    data: [
+      '列表子项-1',
+      '列表子项-2',
+      '列表子项-3',
+    ]
+  }
+}
+const listConfig2 = {
+  "@list": {
+    data: [
+      {title: '列表子项-1'},
+      {title: '列表子项-2'},
+      {title: '列表子项-3'},
+    ]
+  }
+}
+
+const imgListConfig = {
+  "@list": {
+    data: [
+      {title: '嘻嘻', img: {src: '/images/huawei.jpg', itemStyle: 'width: 40px;'}},
+      {img: {src: '/images/logo.jpg', itemStyle: 'width: 40px;'}},
+      {img: {src: '/images/wxzan.jpg', itemStyle: 'width: 40px;'}},
+    ]
+  }
+}
+
 Pager({
   data: {
     tabConfig: mkDropdown({
@@ -63,6 +92,15 @@ Pager({
           this.updateContent({ ...checkListConfig })
           let title = this.getTitle()
           // console.log(title);
+        }
+        if (index === 1) {
+          this.updateContent({ ...listConfig })
+        }
+        if (index === 2) {
+          this.updateContent({ ...listConfig2 })
+        }
+        if (index === 3) {
+          this.updateContent({ ...imgListConfig })
         }
       }
     }),
