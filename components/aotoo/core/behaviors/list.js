@@ -1,4 +1,5 @@
 const lib = require('../../lib/index')
+const getmyApp = require('../getapp')
 import {
   commonBehavior,
   commonMethodBehavior,
@@ -84,7 +85,7 @@ function updateSelf(params) {
 }
 
 export const listBehavior = function(app, mytype) {
-  app = app || getApp()
+  app = getmyApp(app)
   mytype = mytype || 'list'
   return Behavior({
     behaviors: [commonBehavior(app, mytype), commonMethodBehavior(app, mytype)],
@@ -760,7 +761,7 @@ function lookforEventFun(ctx, fun) {
 }
 
 function listReactFun(app, e, type="list") {
-  app = app || getApp()
+  app = getmyApp(app)
   const that = this
   if (this.treeInst) {
     return type == 'swiper' ? this.treeInst._swiperMethod.call(this.treeInst, e, type) : this.treeInst._scrollMethod.call(this.treeInst, e, type)

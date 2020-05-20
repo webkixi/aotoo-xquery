@@ -1,4 +1,5 @@
 const lib = require('../../lib/index')
+const getmyApp = require('../getapp')
 
 let storeEvts = {}
 export function resetStoreEvts(params) {
@@ -551,7 +552,7 @@ export function listInstDelegate(treeid, listInst, from){
 }
 
 export const commonBehavior = (app, mytype) => {
-  app = app || getApp()
+  app = getmyApp(app)
   mytype = mytype || 'behavior'
   return Behavior({
     properties: {
@@ -639,6 +640,11 @@ export const commonBehavior = (app, mytype) => {
         let pages = getCurrentPages()
         let activePage = this.activePage || pages[pages.length - 1]
         this.activePage = activePage
+        if (!this.activePage) {
+          app.__active_page__.push(function(actpage){
+            that.activePage = actpage
+          })
+        }
 
         this.properties = lib.clone(this.properties)
         let properties = this.properties
@@ -1181,7 +1187,7 @@ export const commonBehavior = (app, mytype) => {
 }
 
 export const commonMethodBehavior = (app, mytype) => {
-  app = app || getApp()
+  app = getmyApp(app)
   return Behavior({
     behaviors: [],
     methods: {
@@ -1335,7 +1341,7 @@ function getParent(ctx, f) {
 }
 
 export function reactFun(app, e, prefix) {
-  app = app || getApp()
+  app = getmyApp(app)
   if (this.treeInst) {
     this.treeInst[(prefix ? 'catchItemMethod' : 'itemMethod')].call(this.treeInst, e, prefix)
     return false

@@ -1,4 +1,5 @@
 const lib = require('../lib/index')
+const getmyApp = require('./getapp')
 import {
   resetStoreEvts,
   commonBehavior,
@@ -250,9 +251,9 @@ core.getElementsById = function (id) {
   }
 }
 
-function core(params) {
+function core(params, _page) {
   if (lib.isObject(params)) {
-    let app = getApp(params.appConfig)
+    let app = getmyApp(params.appConfig, true)
     app.hooks = lib.hooks('aotoo')
 
     if (params.data) {
@@ -264,9 +265,19 @@ function core(params) {
       }
     }
 
+    function doneActivePage(ctx){
+      app.__active_page__.forEach(item=>{
+        if (typeof item === 'function') {
+          item(ctx)
+        }
+      })
+      app.__active_page__ = []
+    }
+
     const oldLoad = params.onLoad
     params.onLoad = function () {
       app.activePage = activePage = this
+      doneActivePage(activePage)
       let that = this
       this.vars = {}
       this.elements = this.elements || {}
@@ -381,7 +392,8 @@ function core(params) {
       core.toolkit = null
     }
 
-    Page(params)
+    let $page = _page || Page
+     $page(params)
   }
 }
 
