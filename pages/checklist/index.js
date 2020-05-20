@@ -13,7 +13,7 @@ const levelConfig = mkCheckList({
   value: ['333'],
   data: [
     {title: '222', value: '222', idf: '222'},
-    {title: '333', value: '333', idf: '333'},
+    {title: '333', value: '333', idf: '333', checkListOption: {value: ['888'], checkedType: 2}},
 
     {title: '444', value: '444', parent: '222'},
     {title: '666', value: '666', parent: '222'},
@@ -64,6 +64,9 @@ Pager({
 
     setTimeout(() => {
       xxx.clear()
+      setTimeout(() => {
+        xxx.clear()
+      }, 3000);
     }, 3000);
   }
 })

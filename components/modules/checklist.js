@@ -296,7 +296,7 @@ function mkCheckList(params, init) {
   opts = adapter(opts, init)
 
   if (init) {
-    // 如果没有设置默认value，则默认第一条数据为默认值
+    // 如果没有设置默认值时，则默认第一条数据的value为默认值
     function setDefaultValue(config) {
       if (!config.value || !config.value.length) {
         config.value = [].concat(config.data[0].value)
@@ -370,6 +370,7 @@ function mkCheckList(params, init) {
     checkedBoxItemClass = 'checklist-item checklist-switch'
   }
 
+  // 选中当前分类的所有选项
   function fillSelectAllValue(ckuniqId, item, $v) {
     let v = item.value
     if (!v) return
@@ -390,6 +391,7 @@ function mkCheckList(params, init) {
     }
   }
 
+  // 清除相关选项的所有数据
   function clearRelationValids(item) {
     let content = item.content || (item.body&&item.body[0])
     if (content) {
@@ -399,13 +401,14 @@ function mkCheckList(params, init) {
       storeAttrs[uniqId] = {}
       selectAllValue[uniqId] = []
       if (storeContex[uniqId]) {
+        storeContex[uniqId].value = []
+        storeContex[uniqId].valids = []
         storeContex[uniqId].forEach(item=>{
           item.removeClass(opts.checkedClass + ' valid')
         })
-      }
-      setTimeout(() => {
+      } else {
         storeContex[uniqId] = null
-      }, 100);
+      }
       
       content.data.forEach(it => {
         clearRelationValids(it)

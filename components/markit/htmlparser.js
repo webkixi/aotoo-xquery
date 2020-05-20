@@ -78,6 +78,7 @@ class htmlparser {
       this._span = true
     }
 
+    const events = ['tap', 'aim', 'catchtap', 'longpress', 'longtap', 'catchlongtap', 'catchlongpress']
     if (attribs) {
       Object.keys(attribs).forEach(ky => {
         if (ky.indexOf("data-") === 0) {
@@ -85,6 +86,10 @@ class htmlparser {
           let _key = ky.replace("data-", "");
           attr[_key] = attribs[ky];
           // delete attribs[ky];
+        }
+        else 
+        if (events.indexOf(ky)>-1) {
+          // attribs[ky] = attribs[ky]
         }
         else
         if (ky === "class") {
@@ -195,6 +200,17 @@ class htmlparser {
       if (tagname === 'code' && this._codes.length) {
         curTag.dot = (curTag.dot||[]).concat(this._codes)
       }
+
+      if (tagname === 'br') {
+        curTag.text = ' '
+        curTag.itemStyle = 'display: block;'
+      }
+
+      if (tagname === 'span') {
+        curTag.text = curTag.title
+        delete curTag.title
+      }
+      
       if (stack.length) {
         let last = tags[tags.length - 1];
         let dot = last.dot || [];
