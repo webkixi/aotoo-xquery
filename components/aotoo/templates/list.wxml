@@ -92,6 +92,7 @@
   <swiper 
     id="{{list.id||list.type.id||''}}"  
     class="hlist {{list.listClass||list.class||''}}" 
+    style="{{list.listStyle||list.style||''}}"
     indicator-dots="{{  list.type['indicator-dots']||'' }}" 
     indicator-color="{{ list.type['indicator-color']||'' }}" 
     indicator-active-color="{{ list.type['indicator-active-color']||'' }}" 
