@@ -41,21 +41,17 @@ Component({
 
       // <ui-markit dataSource="{{content: '', type: '', itemClass: '', itemStyle: ''  }}" textType="html"/>
       if (lib.isObject(dataSource)) {
-        dataSource.type = dataSource.type || textType
-        if (textType === 'html') {
-          let cnt = dataSource.content
-          let type = dataSource.type
-          delete dataSource.content
-          delete dataSource.type
+        let cnt = dataSource.content
+        let type = dataSource.type || textType
+        delete dataSource.content
+        delete dataSource.type
+        // dataSource.type = dataSource.type || textType
+        if (type === 'html') {
           let props = dataSource
           this.html(cnt, props)
         }
 
-        if (textType === 'md' || textType === 'markdown') {
-          let cnt = dataSource.content
-          let type = dataSource.type
-          delete dataSource.content
-          delete dataSource.type
+        if (type === 'md' || type === 'markdown') {
           let props = dataSource
           this.md(cnt, props)
         }

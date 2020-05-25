@@ -63,6 +63,8 @@ export const {
 
 } = require('./helper/index')
 
+const getCalendarHeader = require('./helper/calendarheader')
+
 const {
   weeksTils
 } = require('./helper/weektils')
@@ -184,7 +186,7 @@ function tintRange(fromInit) {
  *  start: null, // 起始日期
  *  end: null, // 结束日期
  *  total: 180, 总共多少天  // 优先于end
- *  mode: 1, mode=1 scroll-view展现 mode=2 swiperview展示
+ *  mode: 1, mode=1 scroll-view展现 mode=2 swiperview展示, mode=3 swiperview 纵向滚动
  *  toolbox: [], // 需要显示的部分 header, footer, curDate, descript, 农历， 节假日
  *  lazy: true, // 默认启用懒加载
  * 
@@ -317,11 +319,20 @@ function adapter(source={}) {
         "bindscroll": '_bindscroll'
       }
   
-      if (mode === 2) {
+      if (mode === 2 || mode === 3) {
         modeConfig = {
           is: 'swiper',
           bindchange: '_bindswiper'
         }
+        if (mode === 3) {
+          modeConfig.vertical = true
+        }
+      }
+      
+      if (mode === 4) {
+        modeConfig = {}
+        total = 5
+        this.value = []
       }
   
       let calendarItems = calendarDays.call(this, start, total)
@@ -353,8 +364,9 @@ function adapter(source={}) {
         if (mode === 1) {
           dateList.type['scrollIntoView'] = targetId
         }
+        
         // swiper-view 跳转到响应的位置
-        if (mode === 2) {
+        if (mode === 2 || mode === 3) {
           dateList.type['scrollIntoView'] = targetId
           calendarItems.forEach((item, ii)=>{
             if (item.id === targetId) {
@@ -381,88 +393,10 @@ function adapter(source={}) {
   
       // 头部
       // 如果是日历为横向swiper滚动，则需要添加一个年月导航
-      if (mode === 2) {
-        let theHeader = header || {}
-        let allMonths = that.allMonths.map(item=>{
-          let ymd = getYmd(item)
-          let myDate = `${ymd.year}-${ymd.month}-1`
-          let attrDate = `${ymd.year}-${ymd.month}`
-          return {
-            id: `menus-${ymd.year}-${ymd.month}`,
-            title: `${ymd.year}-${ymd.month}`,
-            aim: `gotoMonth?ym=${myDate}`,
-            attr: {date: attrDate}
-          }
-        })
-        theHeader['@list'] = {
-          type: {
-            is: 'scroll',
-            'scroll-x': true,
-          },
-          data: allMonths,
-          listClass: 'calendar-nav',
-          itemClass: 'calendar-nav-item',
-          methods: {
-            __ready(){
-              that.header = this
-              this.selectedElement = ''
-            },
-            moveTo(){
-              // let sysInfo = that.sysInfo
-              // console.log(sysInfo);
-              // let query = wx.createSelectorQuery().in(this)
-              // query.selectAll('.calendar-nav >>> .calendar-nav-item').boundingClientRect(ret => {
-              //   if (ret.length) {
-              //     // console.log(ret);
-              //   }
-              // }).exec()
-            },
-            selected(date){
-              if (this.selectedElement===date) return
-              this.selectedElement = date
-              // this.moveTo()
-              // console.log(this.data.$list.data);
-              let datas = this.data.$list.data
-              let len = datas.length
-              let index = -1
-              this.forEach((item, ii) => {
-                let $date = item.data.title
-                if ($date === date) {
-                  index = ii
-                  item.addClass('.selected')
-                } else {
-                  if (item.hasClass('.selected')) item.removeClass('.selected')
-                }
-              })
-              if (~index) {
-                let target = -1
-                if (index === 0) {
-                  target = 0 
-                  this.update({ "type.scroll-left": 0 })
-                } else {
-                  target = index - 3
-                  if (target > -1) {
-                    let targetItem = datas[target]
-                    let targetId = targetItem.id
-                    this.update({ "type.scroll-into-view": targetId })
-                  }
-                }
-              }
-              // let findIt = this.find({date})
-              // if (findIt) {
-              //   this.forEach(item=>item.removeClass('selected'))
-              //   findIt.addClass('selected')
-              // }
-            },
-            gotoMonth(e, param, inst){
-              // inst.siblings().removeClass('selected')
-              // inst.addClass('selected')
-              that.goto(param.ym)
-            }
-          }
-        }
-        header = theHeader
-      }
+      header = getCalendarHeader.call(this, mode, {
+        header, 
+        getYmd
+      })
   
       if (header) header.$$id = this.headerId
       if (footer) footer.$$id = this.footerId
@@ -508,7 +442,8 @@ Component({
     $header: null,
     $footer: null,
     $dateList: null,
-    $popwin: null
+    $popwin: null,
+    $style: ''
   },
   behaviors: [Core.baseBehavior(app, 'calendar')],
   lifetimes: {
@@ -573,6 +508,11 @@ Component({
             that.header.selected(id)
           }
 
+          let instId = `${that.calenderId}-${id}`
+          let monInst = that.activePage.getElementsById(instId)
+          if (monInst.days.length > 35) {
+            that.setData({ $style: `--append-date-item-height: var(--date-item-height)` })
+          }
           if (param.index || param.index === 0){
             that.calendar.update({"type.current": param.index})
           }
@@ -580,13 +520,13 @@ Component({
 
         // 延时为了不去污染orienDataSource，保证原始数据不被污染
         let $dl = that.data.$dateList
-        if (mode===1) {
+        if (mode === 1) {
           if ($dl.type['scrollIntoView']) {
             that.hooks.emit('scroll-into-view', {id: $dl.type['scrollIntoView']})
           }
         }
 
-        if (mode===2) {
+        if (mode === 2 || mode === 3) {
           if ($dl.type['scrollIntoView']) {
             that.hooks.emit('swiper-current', {id: $dl.type['scrollIntoView']})
           }
@@ -744,12 +684,12 @@ Component({
         }
       }
 
-      if (mode===1) {
+      if (mode === 1) {
         let id = `id-${ym}`
         this.hooks.emit('scroll-into-view', {id})
       }
 
-      if (mode===2) {
+      if (mode === 2 || mode === 3) {
         this.hooks.emit('swiper-current', {index, id: ym})
       }
     },
@@ -1058,11 +998,17 @@ Component({
       let items = this.elements.items
       let item = items[current]
       if (item) {
+        let that = this
         let {dataset, showed} = item
         let id = dataset.id  // calendar13_calender-2019-11
         let theMon = activePage.getElementsById(id)
         if (!theMon.lazyDisplay) theMon.fillMonth()
         let ym = id.replace(this.calenderId+'-', '')
+        if (theMon.days.length > 35) {
+          this.setData({ $style: `--append-date-item-height: var(--date-item-height)` })
+        }else {
+          this.setData({ $style: `--append-date-item-height: 0px;` })
+        }
         this.header.selected(ym)
       }
       // if (!theMon.lazyDisplay) theMon.fillMonth()
@@ -1085,7 +1031,7 @@ Component({
       // width: 414
 
       let mode = this.coptions.mode   //mode=1 scroll-view  mode=2 swiper
-      if (mode === 2) return this.__computZoneItemsSwiper()
+      if (mode === 2 || mode === 3) return this.__computZoneItemsSwiper()
 
       let that = this
       let container = this.elements.container

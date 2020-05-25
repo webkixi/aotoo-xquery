@@ -67,6 +67,7 @@ class htmlparser {
     let stack = this.stack
     let tags = this.tags
     let _html = this._html
+    let options = this.options
 
     this._open = true
 
@@ -78,7 +79,7 @@ class htmlparser {
       this._span = true
     }
 
-    const events = ['tap', 'aim', 'catchtap', 'longpress', 'longtap', 'catchlongtap', 'catchlongpress']
+    const events = ['mode', 'tap', 'aim', 'catchtap', 'longpress', 'longtap', 'catchlongtap', 'catchlongpress']
     if (attribs) {
       Object.keys(attribs).forEach(ky => {
         if (ky.indexOf("data-") === 0) {
@@ -107,7 +108,7 @@ class htmlparser {
         }
         else
         if (ky === 'src') {
-          attribs["src"] = attribs[ky];
+          // attribs["src"] = attribs[ky];
         }
         else {
           if (ky === 'align' && ['td', 'th'].indexOf(name)>-1) {
@@ -140,8 +141,12 @@ class htmlparser {
     tag.itemClass = tag.itemClass ? name + " " + tag.itemClass : name;
 
     if (name === "img") {
-      tag.img = attribs.src || "";
-      delete tag.src;
+      let $imgOption = options.img
+      attribs = Object.assign({}, $imgOption, attribs)
+      tag = {img: attribs}
+
+      // tag.img = attribs.src || "";
+      // delete tag.src;
     }
     
     if (!this._code || name === 'code') {
@@ -230,6 +235,14 @@ class htmlparser {
   }
 
   html(content, param={}, fromMd){
+    let dft = {
+      img: {mode: 'scaleToFill'},
+      url: {}
+    }
+    let opts = {}
+    opts.img = Object.assign({}, dft.img, param.img)
+    opts.url = Object.assign({}, dft.url, param.url)
+    this.options = Object.assign({}, dft, opts)
     this._codes = []
     this._html = []
     let stack = this.stack
@@ -240,6 +253,7 @@ class htmlparser {
     content = htmlDecodeByRegExp(content)
     return new Promise((resolve, reject)=>{
       parser.onend = function() {
+        // console.log(that._html);
         resolve({...param, data: that._html})
       }
       parser.write(content)

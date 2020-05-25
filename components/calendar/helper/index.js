@@ -273,6 +273,7 @@ export function completeMonth(timestart) {
 export function oneMonthListConfig(timestart) {
   let that = this
   let coptions = this.coptions
+  let mode = coptions.mode
   let allowBox = this.allowBox
   let checkType = coptions.type   // single/range/mutiple
   let rangeCount = coptions.rangeCount
@@ -413,22 +414,32 @@ export function oneMonthListConfig(timestart) {
       })
     }
   }
+
+  let monthHeader = {
+    title: `${year}年${month}月`,
+    show: this.allowBox.monthHeader,
+    aim: `onSelectedMonth?type=month&date=${year}-${month}`,
+    itemClass: 'calendar-header'
+  }
+
+  if (mode === 2 || mode === 3 || mode === 4) {
+    delete monthHeader.aim
+    monthHeader.itemClass += ' month-watermark'
+    monthHeader.title = month
+  }
   
   return {
     "@list": {
       $$id: `${this.calenderId}-${year}-${month}`,
-      header: {
-        title: `${year}年${month}月`,
-        show: this.allowBox.monthHeader,
-        aim: `onSelectedMonth?type=month&date=${year}-${month}`,
-        itemClass: 'calendar-header'
-      },
+      header: monthHeader,
       data: [],
       itemClass: 'date-item',
       listClass: 'date-list',
+      containerClass: 'date-list-wrap',
       methods: {
         __ready(){
           let theMon = this
+          this.days = monthDays
 
           this.checkedIndex = null // 当前月份选中的日期在数组中的index下标
 

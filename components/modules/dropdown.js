@@ -45,7 +45,6 @@ module.exports = function mkDropdown(params) {
         let idx = $data._idx_
         this.currentMenu = inst
         this.forEach(it=>{
-          it.removeClass('.active')
           if (it.data._idx_ === idx) {
             if (it.hasClass('.active')) {
               this.closePop()
@@ -55,6 +54,8 @@ module.exports = function mkDropdown(params) {
               this.showMask()
               this.fillContent(it, idx)
             }
+          } else {
+            it.removeClass('.active')
           }
         })
       }
@@ -68,8 +69,11 @@ module.exports = function mkDropdown(params) {
 
         let $data = item.data
 
-        function filling(content) {
+        function filling(content, reset) {
           if (contentInst && content) {
+            if (reset) {
+              contentInst.reset()
+            }
             if (lib.isObject(content)) {
               contentInst.update(content)
             }
@@ -88,11 +92,14 @@ module.exports = function mkDropdown(params) {
 
 
         if ($data.content && contentInst) {
-          if (lib.isFunction($data.content)) {
-            let res = $data.content(item.data, idx)
-            filling(res)
-          } else {
-            filling($data.content)
+          if (that.contentRendered.indexOf(id) === -1){
+            that.contentRendered.push(id)
+            if (lib.isFunction($data.content)) {
+              let res = $data.content(item.data, idx)
+              filling(res)
+            } else {
+              filling($data.content)
+            }
           }
         }
 
@@ -106,10 +113,10 @@ module.exports = function mkDropdown(params) {
               },
               updateContent(param, forceUpdate){
                 if ((that.contentRendered.indexOf(id) === -1) || forceUpdate === true) {
-                  that.contentRendered.push(id)
-                  if (lib.isObject(param)) {
-                    contentInst.update(param)
+                  if (that.contentRendered.indexOf(id) === -1) {
+                    that.contentRendered.push(id)
                   }
+                  filling(param, forceUpdate)
                 }
               },
               updateTitle(param){
