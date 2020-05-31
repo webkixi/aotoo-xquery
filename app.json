@@ -1,8 +1,10 @@
 {
   "pages": [
     "pages/markdown/index",
-    "pages/form/index",
+    "pages/calendar/index",
+    "pages/html/index",
     "pages/checklist/index",
+    "pages/form/index",    
     "pages/dropdown/index",
     "pages/tab/index",
     "pages/rating/index",
@@ -24,8 +26,6 @@
     "pages/popup/index",
     "pages/tabbar/index",
     "pages/steper/index",
-    "pages/html/index",
-    "pages/calendar/index",
     "pages/item/index"
   ],
   "window": {

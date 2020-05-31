@@ -7,6 +7,9 @@ let source = require('../common/source')
 Pager({
   data: {
     htmlConfig: {
+      options: {
+        img: {mode: 'scaleToFill'}
+      },
       listClass: 'card-it',
       content: `
 <div class="card-container">
