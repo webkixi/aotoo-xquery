@@ -3,22 +3,22 @@
 // mode = 4 生成固定头部，包含上一月，下一月按钮
 
 // param.header 是否有从外部传入的header
-module.exports = function (mode, param={}) {
+export function getNavHeader(mode, param = {}) {
   let {header, getYmd} = param
   let that = this
   let theHeader = header || {}
 
   if (mode === 4) {
-    let curMonth = this.allMonths[0]
+    let curMonth = this.allMonths[2]
     let ymd = getYmd(curMonth)
     let myDate = `${ymd.year}-${ymd.month}-1`
     let attrDate = `${ymd.year}-${ymd.month}`
     theHeader = {
       id: `menus-${ymd.year}-${ymd.month}`,
       title: [
-        {title: '上一月', aim: 'prevMonth'},
+        {title: '上一月', aim: `prevMonth?ym=${myDate}`},
         `${ymd.year}年${ymd.month}月`,
-        {title: '下一月', aim: 'nextMonth'}
+        {title: '下一月', aim: `nextMonth?ym=${myDate}`}
       ],
       attr: {
         date: attrDate
@@ -102,9 +102,25 @@ module.exports = function (mode, param={}) {
           // }
         },
         gotoMonth(e, param, inst){
+          let coptions = that.coptions
+          let navTap = coptions.navTap
+          let activePage = that.activePage
           // inst.siblings().removeClass('selected')
           // inst.addClass('selected')
+
+          // let curDate = getYmd(param.ym)
+          // let instId = `${that.calenderId}-${curDate.year}-${curDate.month}`
+          // let monInst = activePage.getElementsById(instId)
           that.goto(param.ym)
+
+          if (navTap) {
+            if (that[navTap]) {
+              that[navTap](e, param, inst)
+            }
+            if (typeof activePage[navTap] === 'function') {
+              activePage[navTap].call(activePage, e, param, inst)
+            }
+          }
         }
       }
     }

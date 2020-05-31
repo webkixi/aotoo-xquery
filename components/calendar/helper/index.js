@@ -2,12 +2,45 @@ const Core = require('../../aotoo/core/index')
 const $lunar = require('./lunar').calendar
 const lib = Core.lib
 
-export const festival = $lunar.festival
-export const lfestival = $lunar.lfestival
-export const getFestival = $lunar.getFestival
-export const setFestival = $lunar.setFestival
-export const getLunarFestival = $lunar.getLunarFestival
-export const setLunarFestival = $lunar.setLunarFestival
+const festival = $lunar.festival
+const lfestival = $lunar.lfestival
+const getFestival = $lunar.getFestival
+const setFestival = $lunar.setFestival
+const getLunarFestival = $lunar.getLunarFestival
+const setLunarFestival = $lunar.setLunarFestival
+
+import { 
+  getYmd,
+  rightYmd,
+  formatDate,
+  newDate,
+  sortDates,
+  isLeapYear,
+  getWeekday,
+  getMonthCount,
+  getNextMonthCount,
+  getPreMonthCount
+} from './util/index'
+
+export {
+  getYmd,
+  rightYmd,
+  formatDate,
+  newDate,
+  sortDates,
+  isLeapYear,
+  getWeekday,
+  getMonthCount,
+  getNextMonthCount,
+  getPreMonthCount,
+
+  festival,
+  lfestival,
+  getFestival,
+  setFestival,
+  getLunarFestival,
+  setLunarFestival
+}
 
 function indexData(data=[]) {
   let tmp = {}
@@ -19,104 +52,11 @@ function indexData(data=[]) {
   return tmp
 }
 
-export function sortDates(params) {
-  if (lib.isArray(params)) {
-    params = params.filter(item=>{
-      if (item.date) {
-        item.date = formatDate(item.date)
-        return item
-      }
-    })
-
-    return params.sort((a, b)=>{
-      let astamp = newDate(a.date)
-      let bstamp = newDate(b.date)
-      return astamp - bstamp
-    })
-  }
-}
-
-export function formatDate(date) {
-  let ymd = getYmd(date)
-  return `${ymd.year}-${ymd.month}-${ymd.day}`
-}
-
-// 工具方法 - start
-// 1.为了获得每个月的日期有多少，我们需要判断 平年闰年[四年一闰，百年不闰，四百年再闰]
-export function isLeapYear(year) {
-  return (year % 400 === 0) || (year % 100 !== 0 && year % 4 === 0);
-}
-
 let aboutMonth = [
   31, null, 31, 30,
   31, 30, 31, 31,
   30, 31, 30, 31
 ]
-// 2.获得每个月的日期有多少，注意 month - [0-11]
-export function getMonthCount(year, month) {
-  let arr = [
-    31, null, 31, 30,
-    31, 30, 31, 31,
-    30, 31, 30, 31
-  ];
-  let count = arr[month] || (isLeapYear(year) ? 29 : 28);
-  aboutMonth[1] = arr[1]
-  return Array.from(new Array(count), (item, value) => value + 1);
-}
-
-// 3.获得某年某月的 1号 是星期几，这里要注意的是 JS 的 API-getDay() 是从 [日-六](0-6)，返回 number
-export function getWeekday(year, month) {
-  let date = new Date(year, month, 1);
-  return date.getDay();
-}
-
-// 4.获得上个月的天数
-export function getPreMonthCount(year, month) {
-  if (month === 0) {
-    return getMonthCount(year - 1, 11);
-  } else {
-    return getMonthCount(year, month - 1);
-  }
-}
-
-// 5.获得下个月的天数
-export function getNextMonthCount(year, month) {
-  if (month === 11) {
-    return getMonthCount(year + 1, 0);
-  } else {
-    return getMonthCount(year, month + 1);
-  }
-}
-
-export function newDate(timepoint){
-  if (timepoint) {
-    if (timepoint.getDate && timepoint.getFullYear) return timepoint
-
-    if (lib.isNumber(timepoint)) {
-      return new Date(timepoint)
-    }
-
-    if (lib.isString(timepoint)) {
-      timepoint = timepoint.replace(/\-/g, '/')
-      timepoint = timepoint.replace(/\:/g, '/')
-      return new Date(timepoint)
-    }
-  } else {
-    return new Date()
-  }
-}
-
-// 获取年月日
-// 接受时间 戳或者/2019-10-1/2019:10:1 输入格式
-// export function getYmd(year, month, day) {
-export function getYmd(timepoint) {
-  let nowDate = newDate()
-  if (timepoint) nowDate = newDate(timepoint)
-  let year = nowDate.getFullYear()
-  let month = (nowDate.getMonth()+1)
-  let day = nowDate.getDate()
-  return {year, month, day}
-}
 
 // 这里获得我们第一次的 数据 数组
 export function completeMonth(timestart) {
@@ -124,6 +64,7 @@ export function completeMonth(timestart) {
   let fillupData = this.fillData
   let defaultDate = this.date // 默认日期显示，item类型
   let validFestival = this.coptions.festival
+  let alignMonth = this.coptions.alignMonth
   let dataIndexs = indexData(fillupData)
   // 生成日历数据，上个月的 x 天 + 当月的 [28,29,30,31]天 + 下个月的 y 天 = 42
   let res = [];
@@ -137,6 +78,11 @@ export function completeMonth(timestart) {
   let whereMonday = getWeekday(year, month-1);
   let preArr = preMonth.slice(-1 * (whereMonday || -(preMonth.length)));
   let patchDay = (42 - currentMonth.length - whereMonday)%7
+
+  // 使每月日期总数为42
+  if (alignMonth && (preArr.length + currentMonth.length + patchDay) < 42) {
+    patchDay += 42 - (preArr.length + currentMonth.length + patchDay)
+  }
   let nextArr = nextMonth.slice(0, patchDay);
 
   let startDayStamp = this.validStartDay
@@ -433,6 +379,7 @@ export function oneMonthListConfig(timestart) {
       $$id: `${this.calenderId}-${year}-${month}`,
       header: monthHeader,
       data: [],
+      _data: monthDays,
       itemClass: 'date-item',
       listClass: 'date-list',
       containerClass: 'date-list-wrap',
@@ -440,6 +387,8 @@ export function oneMonthListConfig(timestart) {
         __ready(){
           let theMon = this
           this.days = monthDays
+          this.year = year
+          this.month = month
 
           this.checkedIndex = null // 当前月份选中的日期在数组中的index下标
 
@@ -490,7 +439,7 @@ export function oneMonthListConfig(timestart) {
                 param.forEach(item=>{
                   let date = formatDate(item.date)
                   if (date === day.date) {
-                    day = Object.assign({},day, (item.content||item))
+                    day = Object.assign({}, day, (item.content||item))
                   }
                 })
                 return day
@@ -533,7 +482,7 @@ export function oneMonthListConfig(timestart) {
         },
 
         getDate(){
-          return {year, month}
+          return {year: this.year, month: this.month}
         },
 
         // 渲染当月特定日期
@@ -632,10 +581,11 @@ export function oneMonthListConfig(timestart) {
         },
 
         // 选中状态处理
-        checked(e, param, inst){
+        checked(param, inst, cb){
+          if (lib.isString(param)) this.setChecked(param)
           let theMon = this
           let date = param.date
-          that.setValue(date, function (val) {
+          that.setValue(date, {inst: theMon}, function (val) {
             inst.removeClass('range')
             
             if (checkType === 'multiple' && inst.hasClass('selected')) {
@@ -651,14 +601,19 @@ export function oneMonthListConfig(timestart) {
               // inst.addClass('selected')
               theMon.setChecked(inst)
             }
-            that.selectDate(e, param, inst) // tap=selected?date=2019-11-21 that.itemMethod.call(inst, e)
+            if (lib.isFunction(cb)) {
+              cb()
+            }
+            // that.selectDate(e, param, inst) // tap=selected?date=2019-11-21 that.itemMethod.call(inst, e)
           })
         },
-
+        
         // 响应tap事件
         onSelected(e, param, inst){
           if (inst.hasClass('invalid')) return
-          this.checked(e, param, inst)
+          this.checked(param, inst, function() {
+            that.selectDate(e, param, inst) // tap=selected?date=2019-11-21 that.itemMethod.call(inst, e)
+          })
         },
 
         setChecked(targetDate){
@@ -736,7 +691,11 @@ export function oneMonthListConfig(timestart) {
         },
 
         // lazy时用于填充数据
-        fillMonth(cb){
+        fillMonth(param, cb){
+          if (lib.isFunction(param)) {
+            cb = param
+            param = undefined
+          }
           let that = this
           if (this.showStat===false) return
           this.lazyDisplay = true
@@ -744,7 +703,11 @@ export function oneMonthListConfig(timestart) {
             let date = year+'+'+month
             cb.call(this, date, monthDays)
           } else {
-            this.update(monthDays, function() {
+            let updata = monthDays
+            if (lib.isArray(param)) {
+              updata = param
+            }
+            this.update(updata, function() {
               that.hooks.emit('lazy')
             })
           }
