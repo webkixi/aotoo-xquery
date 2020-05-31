@@ -373,3 +373,40 @@
     data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindready', 'bindfocus', 'bindblur', 'bindstatuschange', 'bindinput'])}}"
   />
 </template>
+
+<template name="@image">
+  <block wx:if="{{util.isString(props.src)}}">
+      <block wx:if="{{props.type&&props.type.is === 'cover'}}">
+        <cover-image 
+          src="{{props.src}}"
+          binderror= "{{props.binderror ? 'itemMethod' : ''}}"
+          bindload= "{{props.bindload ? 'itemMethod' : ''}}"
+          data-evt="{{util.dataEvt(props, ['bindload', 'binderror', 'preview', 'tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
+        ></cover-image>
+      </block>
+      <image 
+        wx:else
+        style="{{props.style||props.itemStyle||''}}" 
+        lazy-load="{{true}}" 
+        class="himg {{props.class||props.itemClass||''}}" 
+        mode="{{props.mode || 'widthFix'}}" 
+        src="{{props.src}}" 
+        data-src = "{{props.src}}"
+        webp="{{props.webp||''}}" 
+        show-menu-by-longpress="{{props['show-menu-by-longpress']||''}}"
+
+        catch:touchstart= "{{(props.touchstart || props.catchtouchstart) ? 'itemMethod' : ''}}"
+        catch:touchmove=  "{{(props.touchmove || props.catchtouchmove) ? 'itemMethod' : ''}}"
+        catch:touchend =  "{{(props.touchend  || props.catchtouchend) ? 'itemMethod' : ''}}"
+        catch:cancel=     "{{(props.cancel || props.catchcancel) ? 'itemMethod' : ''}}"
+
+        catch:tap=        "{{(props.tap || props.aim||props.catchtap) ? 'catchItemMethod' : props.preview ? 'imgPreview' : ''}}"
+        catch:longpress=  "{{props.longpress || props.catchlongpress ? 'catchItemMethod' : ''}}"
+        catch:longtap=    "{{props.longtap || props.catchlongtap ? 'catchItemMethod' : ''}}"
+
+        binderror=        "{{props.binderror ? 'itemMethod' : ''}}"
+        bindload=         "{{props.bindload ? 'itemMethod' : ''}}"
+        data-evt="{{util.dataEvt(props, ['bindload', 'binderror', 'preview', 'tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
+      />
+    </block>
+</template>

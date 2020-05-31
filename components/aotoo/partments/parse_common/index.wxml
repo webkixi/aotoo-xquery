@@ -230,29 +230,9 @@
   </block>
   <block wx:else>
     <block wx:if="{{util.isString(item.src)}}">
-      <!-- <image 
-        style="{{item.style||item.itemStyle||''}}" 
-        lazy-load="{{true}}" 
-        class="himg {{item.class||item.itemClass||''}}" 
-        mode="{{item.mode || 'widthFix'||''}}" 
-        src="{{item.src}}" 
-        webp="{{item.webp||''}}" 
-        show-menu-by-longpress="{{item['show-menu-by-longpress']||''}}"
-        bind:tap="{{item.tap ? 'itemMethod' : item.preview ? 'imgPreview' : ''}}" 
-        bind:longtap="{{item.longtap ? 'itemMethod' : ''}}" 
-        bind:longpress="{{item.longpress ? 'itemMethod' : ''}}"
-        bind:touchstart="{{item.touchstart ? 'itemMethod' : ''}}"
-        bind:touchmove="{{item.touchmove ? 'itemMethod' : ''}}"
-        bind:touchend="{{item.touchend ? 'itemMethod' : ''}}"
-        bind:cancel="{{item.cancel ? 'itemMethod' : ''}}"
-        catch:tap="{{(item.aim||item.catchtap) ? 'catchItemMethod' : ''}}"
-        catch:longpress="{{item.catchlongpress ? 'catchItemMethod' : ''}}"
-        catch:longtap="{{item.catchlongtap ? 'catchItemMethod' : ''}}"
-
-        binderror=        "{{item.binderror ? 'itemMethod' : ''}}"
-        bindload=         "{{item.bindload ? 'itemMethod' : ''}}"
-        data-evt="{{util.dataEvt(item, ['preview', 'tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
-      /> -->
+      <template is="@image" data="{{ props: item }}"></template>
+    </block>
+    <!-- <block wx:if="{{util.isString(item.src)}}">
       <block wx:if="{{item.type&&item.type.is === 'cover'}}">
         <cover-image 
           src="{{item.src}}"
@@ -285,18 +265,6 @@
         bindload=         "{{item.bindload ? 'itemMethod' : ''}}"
         data-evt="{{util.dataEvt(item, ['bindload', 'binderror', 'preview', 'tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
       />
-
-      <!-- <block wx:if="{{util.hasEvent(item)}}">
-        <template is="img" data="{{item}}" />
-      </block>
-      <block wx:else>
-        <image wx:if="{{item.style||item.itemStyle}}" style="{{item.style||item.itemStyle}}" lazy-load="{{true}}" class="himg {{item.class||item.itemClass}}" mode="{{item.mode || 'widthFix'}}" src="{{item.src}}" />
-        <block wx:else>
-          <image 
-            class="himg {{item.class||item.itemClass}}"
-            mode="{{item.mode || 'scaleToFill'}}" lazy-load="{{true}}" src="{{item.src}}" />
-        </block>
-      </block> -->
-    </block>
+    </block> -->
   </block>
 </template>
