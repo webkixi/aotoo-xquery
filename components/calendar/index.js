@@ -437,7 +437,7 @@ function adapter(source={}) {
       header = getNavHeader.call(this, mode, {
         header, 
         getYmd
-      })
+      }) || null
   
       if (header) header.$$id = this.headerId
       if (footer) footer.$$id = this.footerId
@@ -1007,7 +1007,7 @@ Component({
       return theDate
     },
 
-    display(){
+    display(fromScroll){
       let that = this
       let activePage = this.activePage
       let zoneItems = this.zoneItems
@@ -1036,7 +1036,7 @@ Component({
           xxx.emptyMonth()
         })
       }
-      this.hooks.emit('done-display')
+      if (!fromScroll) this.hooks.emit('done-display')
     },
     _bindscroll(e){
       if (this.elements.container) {
@@ -1048,7 +1048,7 @@ Component({
         container.scrollLeft = detail.scrollLeft
         container.scrollWidth = detail.scrollWidth
         container.scrollHeight = detail.scrollHeight
-        this.display()
+        this.display(true)
       }
     },
 
