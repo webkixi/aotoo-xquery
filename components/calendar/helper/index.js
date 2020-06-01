@@ -165,7 +165,7 @@ export function completeMonth(timestart) {
           ori.disable = true
         }
       } else {
-        if (globalDisable) ori.disable = true
+        if (globalDisable && ori.disable !== false) ori.disable = true
       }
 
       // 小于开始日期
