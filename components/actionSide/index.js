@@ -276,6 +276,7 @@ Component({
 
         delete upContent.countdown
         
+        this.hooks.emit('open', upContent)
         this.update(upContent, function () {
           if (lib.isFunction(cb)) cb()
           if (cd) {
