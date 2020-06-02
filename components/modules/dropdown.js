@@ -27,7 +27,8 @@ module.exports = function mkDropdown(params) {
     data: [],
     footerId: lib.suid('dd-footer-'),
     maskStyle: '',
-    show: true
+    show: true,
+    __ready: null
   }
 
   let opts = Object.assign({}, dft, params)
@@ -134,6 +135,7 @@ module.exports = function mkDropdown(params) {
         if (!this.footer) {
           this.footer = this.getFooter()
         }
+        this.hooks.emit('close-pop')
         this.currentMenu.removeClass('.active')
         this.footer.removeClass('show-masker')
       },
@@ -141,6 +143,7 @@ module.exports = function mkDropdown(params) {
         if (!this.footer) {
           this.footer = this.getFooter()
         }
+        this.hooks.emit('open-pop')
         this.footer.addClass('show-masker')
       },
       updateContent(param){
@@ -171,6 +174,9 @@ module.exports = function mkDropdown(params) {
         this.contentRendered = []
         if (opts.id) {
           this.activePage[opts.id] = this
+        }
+        if (lib.isFunction(opts.__ready)) {
+          opts.__ready.call(this)
         }
       },
     }
