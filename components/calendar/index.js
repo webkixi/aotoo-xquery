@@ -180,11 +180,11 @@ function tintRange(fromInit) {
     this.hooks.emit('empty-month-checked')
   } else {
     if (startDate.month === endDate.month) {
-      startInst && startInst.tint(value[0], value[1], 'selected', 'end')
+      startInst && startInst.tint(value[0], value[1], 'selected', 'end', fromInit)
     } else {
       if (startInst) {
-        startInst && startInst.tint(value[0], null, 'selected', 'start')
-        endInst && endInst.tint(null, value[1], 'selected', 'end')
+        startInst && startInst.tint(value[0], null, 'selected', 'start', fromInit)
+        endInst && endInst.tint(null, value[1], 'selected', 'end', fromInit)
       }
     }
   }
@@ -204,6 +204,7 @@ function tintRange(fromInit) {
  *  type: 'single', // 'range' 连续范围选择, 'multiple'多项选择
  *  rangeCount: 28, // 当type === 'range'时，rangeCount为区间大小，意味着区间允许选择多少天
  *  rangeMode: 1,   // rangeMode=1 仿去哪儿不会隐藏区间外月份   rangeMode=2 仿携程，默认 隐藏可选区间外月份
+ *  rangeTip: [],  // 区选第一次点击，第二次点击附加的描述
  *  tap: callback,  //业务响应事件
  *  navTap: callback, // 横向滚动时，点击tab项的响应方法
  *  value: [], // 预设日期(一般从后台拿去，用于回显)，将value中的日期高亮显示
@@ -226,11 +227,13 @@ let defaultConfig = {
   rangeCount: 28,
   rangeMode: 2,
   rangeValue: [],
+  rangeTip: [],
   url: '',
   button: false,
   value: [],
   alignMonth: false,  // 平均每月日期数为42，swiper时对齐月容器高度
   festival: false,
+  lunar: false,  // 是否显示农历
   // festival: true,
   // festival: ['春节'],
   // festival: [{title: '春节', content: {dot: ['春节']}}],
@@ -251,6 +254,17 @@ function adapter(source={}) {
   coptions.mode = parseInt(coptions.mode)
   coptions.rangeCount = parseInt(coptions.rangeCount)
   coptions.rangeMode = parseInt(coptions.rangeMode)
+  if (coptions.rangeTip.length >=2) {
+    coptions.rangeTip = coptions.rangeTip.map(item=>{
+      if (lib.isString(item)) {
+        item = {title: item}
+      }
+      return item
+    })
+  } else {
+    coptions.rangeTip = []
+  }
+
   let {
     $$id,
     header,
@@ -279,11 +293,12 @@ function adapter(source={}) {
 
   this.allowBox = toolbox
   start = start && formatDate(start) || null
-  // this.allowBox = (()=>{
-  //   let tmp = {}
-  //   toolbox.forEach(key=>tmp[key]=true)
-  //   return tmp
-  // })()
+  this.fillData = this.fillData.map(item=>{
+    if (lib.isString(item)) {
+      return {date: item}
+    }
+    return item
+  })
 
   if (lib.isFunction(coptions.tap)) {
     let funcId = lib.suid('calendar_tap_fun_')
@@ -317,6 +332,7 @@ function adapter(source={}) {
         start = date
         total = getMonthCount(ymd.year, (ymd.month-1)).length
         total = total - ymd.day
+        if (total === 0) total = 99999
       } else {
         let fdate = start || fillData[0].date   // 在设置data的同时，如果设置了start，则起始日期以start标准
         let ldate = fillData[fillData.length-1].date
@@ -334,9 +350,9 @@ function adapter(source={}) {
     }
 
     if (mode === 4) total = 150
-    // if (!total) throw new Error('必须指定范围天数, total')
+    if (!total) throw new Error('必须指定范围天数, total')
     if (total) {
-      this.total = total
+      this.total = total === 99999 ? 0 : total
       dateList = []
 
       let modeConfig = {
@@ -749,6 +765,7 @@ Component({
         cb = param
         param = undefined
       }
+      this.currentMonth = this.getMonthInstance(date)
       let coptions = this.coptions
       let type = coptions.type
       let activePage = this.activePage
@@ -865,6 +882,7 @@ Component({
       let type = coptions.type
       let tapFun = coptions.tap
       let rangeCount = coptions.rangeCount
+      let rangeTip = coptions.rangeTip
 
       let activePage = this.activePage
       e.currentTarget.dataset.date = param.date
@@ -957,6 +975,28 @@ Component({
             }
           }
         }
+
+        if (type === 'range' && rangeTip) {
+          let startTip = rangeTip[0]
+          let endTip = rangeTip[1]
+          let $data = inst.getData()
+          let $dot = $data.dot || []
+
+          if (param.range === 'start') {
+            if (lib.isObject(startTip)) {
+              $dot.push(startTip)
+            }
+          }
+
+          if (param.range === 'end') {
+            if (lib.isObject(endTip)) {
+              $dot.push(endTip)
+            }
+          }
+          inst.update({ dot: $dot })
+        }
+
+
         // if (param.range === 'end') {
         //   this.rangeValue = []
         // }

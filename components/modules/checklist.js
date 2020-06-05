@@ -333,6 +333,9 @@ function mkCheckList(params, init) {
       if (config.data[0].content && !lib.isFunction(config.data[0].content)) {
         config.value = [].concat(config.data[0].value)
         config.valids = [0]
+        if (config.data[0].content.mode !== 3) {
+          setDefaultValue(config.data[0].content)
+        }
       }
     } else {
       let $value = config.value
@@ -353,7 +356,7 @@ function mkCheckList(params, init) {
     storeValids[cklistId] = config.valids
   }
 
-  if (opts.mode !== 3) {
+  if (opts.mode !== 3 && init) {
     setDefaultValue(opts, true)
   }
 

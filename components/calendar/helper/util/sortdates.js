@@ -5,12 +5,20 @@ const lib = Core.lib
 
 export function sortDates(params) {
   if (lib.isArray(params)) {
-    params = params.filter(item => {
+    let tmp = []
+    params.forEach(item => {
+      if (lib.isString(item)) {
+        item = {date: item}
+      }
+      
       if (item.date) {
         item.date = formatDate(item.date)
-        return item
       }
+
+      tmp.push(item)
     })
+
+    params = tmp
 
     return params.sort((a, b) => {
       let astamp = newDate(a.date)

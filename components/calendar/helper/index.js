@@ -2,12 +2,20 @@ const Core = require('../../aotoo/core/index')
 const $lunar = require('./lunar').calendar
 const lib = Core.lib
 
-const festival = $lunar.festival
-const lfestival = $lunar.lfestival
-const getFestival = $lunar.getFestival
-const setFestival = $lunar.setFestival
-const getLunarFestival = $lunar.getLunarFestival
-const setLunarFestival = $lunar.setLunarFestival
+export let festival = $lunar.festival
+export let lfestival = $lunar.lfestival
+export const getFestival = function() {
+  return festival
+}
+export function getLunarFestival() {
+  return lfestival
+}
+export function setFestival(param = {}) {
+  $lunar.festival = param
+}
+export function setLunarFestival(param = {}) {
+  $lunar.lfestival = param
+}
 
 import { 
   getYmd,
@@ -32,14 +40,7 @@ export {
   getWeekday,
   getMonthCount,
   getNextMonthCount,
-  getPreMonthCount,
-
-  festival,
-  lfestival,
-  getFestival,
-  setFestival,
-  getLunarFestival,
-  setLunarFestival
+  getPreMonthCount
 }
 
 function indexData(data=[]) {
@@ -64,12 +65,14 @@ export function completeMonth(timestart) {
   let fillupData = this.fillData
   let defaultDate = this.date // 默认日期显示，item类型
   let validFestival = this.coptions.festival
+  let validLunar = this.coptions.lunar
   let alignMonth = this.coptions.alignMonth
   let dataIndexs = indexData(fillupData)
   // 生成日历数据，上个月的 x 天 + 当月的 [28,29,30,31]天 + 下个月的 y 天 = 42
   let res = [];
   let today = getYmd() // 今天
-  let {year, month, day} = getYmd(timestart)
+  let ymd = getYmd(timestart)
+  let {year, month, day} = ymd
   let todayDate = `${today.year}-${today.month}-${today.day}`
   let todayStamp = newDate(todayDate).getTime()
   let currentMonth = getMonthCount(year, month-1);
@@ -90,8 +93,34 @@ export function completeMonth(timestart) {
   let sDate = getYmd(startDayStamp)
   let startDate = `${sDate.year}-${sDate.month}-${sDate.day}`
   
-  preArr = preArr.map(num=>({title: num, itemClass: 'invalid'}) )
-  nextArr = nextArr.map(num=>({title: num, itemClass: 'invalid'}))
+  let preYmd = rightYmd(ymd, -1)
+  let nextYmd = rightYmd(ymd)
+  preArr = preArr.map(num=>{
+    let lunarDate = $lunar.solar2lunar(preYmd.year, preYmd.month, num)
+    let date = {title: num, itemClass: 'invalid'}
+    if (validLunar) {
+      date.ltitle = lunarDate.lunarFestival || lunarDate.IDayCn
+      date.lunar = lunarDate
+    }
+    if (date.ltitle) {
+      date.dot = date.dot || []
+      date.dot.push({title: date.ltitle, itemClass: 'lunar-date'})
+    }
+    return date
+  })
+  nextArr = nextArr.map(num=>{
+    let lunarDate = $lunar.solar2lunar(nextYmd.year, nextYmd.month, num)
+    let date = {title: num, itemClass: 'invalid'}
+    if (validLunar) {
+      date.ltitle = lunarDate.lunarFestival || lunarDate.IDayCn
+      date.lunar = lunarDate
+    }
+    if (date.ltitle) {
+      date.dot = date.dot || []
+      date.dot.push({title: date.ltitle, itemClass: 'lunar-date'})
+    }
+    return date
+  })
   // preArr = preArr.map(num=>({title: {title: num, itemClass: 'date-item-day'}, itemClass: 'invalid'}) )
   // nextArr = nextArr.map(num=>({title: {title: num, itemClass: 'date-item-day'}, itemClass: 'invalid'}))
 
@@ -105,6 +134,11 @@ export function completeMonth(timestart) {
     let num = {title: _num, itemClass: 'date-item-day'}
     if (todayDate === theDate) num.title = '今天'
 
+    if (validLunar && theDate === lunarDate.date) {
+      validFestival = true
+      num.ltitle = lunarDate.lunarFestival || lunarDate.IDayCn
+      num.lunar = lunarDate
+    }
 
     // 是否显示节日
     if (validFestival) {
@@ -129,6 +163,11 @@ export function completeMonth(timestart) {
           }
         }
       }
+    }
+
+    if (num.ltitle) {
+      num.dot = num.dot || []
+      num.dot.push({title: num.ltitle, itemClass: 'lunar-date'})
     }
 
     // let ori = {title: num, timestamp: theStamp, date: theDate, year, month, day: _num, itemClass: 'valid'}
@@ -229,6 +268,7 @@ export function oneMonthListConfig(timestart) {
   let endPoint = getYmd(this.validEndDay)
   let monthDays = completeMonth.call(this, timestart)
   let originalMonthDays = lib.clone(monthDays)
+  let rangeTip = (coptions.rangeTip && lib.isArray(coptions.rangeTip) && coptions.rangeTip.length >= 2) ? coptions.rangeTip : null
 
 
   function getFollowMonths(first, over) {
@@ -286,6 +326,11 @@ export function oneMonthListConfig(timestart) {
     let others = follow.others
     let nexts = follow.nexts
     let preset = follow.preset
+    // preset.pop()
+    preset.forEach(monInstId=>{
+      let handle = that.activePage.getElementsById(monInstId)
+      handle&&handle.hooks.emit('restore-month-days')
+    })
 
     // that.calendar.children.forEach(child=>{
     //   child.visible(true)
@@ -299,12 +344,11 @@ export function oneMonthListConfig(timestart) {
     others.forEach(monInstId => {
       let handle = that.activePage.getElementsById(monInstId)
       if (handle) {
-        // handle.visible(false)
-        handle.hide()
-        // let parent = handle.parent()
-        // if (parent) {
-        //   parent.hide()
-        // }
+        if (rangeMode === 2) {
+          handle.hide()
+        } else {
+          handle.hooks.emit('disable-month-days')
+        }
       }
     })
 
@@ -355,6 +399,8 @@ export function oneMonthListConfig(timestart) {
             // handle.hooks.emit('emptyChecked', {itemClass: 'invalid'})
             handle.hooks.emit('restore-month-days')
             handle.tint(edgeDate, null, 'invalid')
+          } else {
+            handle.hooks.emit('restore-month-days')
           }
         }
       })
@@ -459,6 +505,25 @@ export function oneMonthListConfig(timestart) {
               theMon.fillMonth()
             }
           })
+
+          theMon.hooks.once('disable-month-days', function(params) {
+            monthDays = lib.clone(originalMonthDays)
+            monthDays = monthDays.map(item=>{
+              let clss = item.itemClass && item.itemClass.split(' ')
+              if (clss) {
+                if (clss.indexOf('invalid') === -1) {
+                  clss.push('invalid')
+                }
+                item.itemClass = clss.join(' ')
+              }
+              return item
+            })
+            theMon.fillMonth()
+          })
+
+          theMon.hooks.once('enable-month-days', function(params) {
+            theMon.forEach(item => item.removeClass('invalid'))
+          })
           
           // 重置showStat，使所有月份都能正常显示
           that.hooks.on('monthShowStat', function(param={}){
@@ -489,43 +554,52 @@ export function oneMonthListConfig(timestart) {
         // spd = startPoint date
         // epd = endPoint Date
         // cls = className  指定样式
-        tint(spd, epd, cls='selected', stat){
+        tint(spd, epd, cls='selected', stat, fromInit){
           let theMon = this
           if (!stat || stat === 'start') that.rangeValue = []
+
+          let stip = null
+          let etip = null
+          if (rangeTip && fromInit) {
+            stip = rangeTip[0]
+            etip = rangeTip[1]
+          }
 
           // 该月处于lazy隐藏状态时，
           if (!this.lazyDisplay) {
             this.hooks.one('lazy', function(){
-              theMon.tint(spd, epd, cls, stat)
+              theMon.tint(spd, epd, cls, stat, fromInit)
             })
             return
           }
 
-          // 全部渲染
-          if (!spd && !epd) {
-            theMon.forEach(item=>{
-              let data = item.data
-              let date = data.date
-              if (date) {
-                stat ? that.rangeValue.push(item) : ''
-                if (checkType==='range') {
-                  item.addClass(cls+' range')
+          // 添加比如 住店， 离店等tip信息
+          function appendTip(stip, etip, item) {
+            if (!stip && !etip) return
+            let data = item.data
+            let date = data.date
+            let dot = data.dot || []
+            dot.push((stip||etip))
+            item.update({dot})
+          }
 
+          theMon.forEach(item=>{
+            let data = item.data
+            let date = data.date
+            let spoint = spd && getYmd(spd)
+            let epoint = epd && getYmd(epd)
+            let point = spoint || epoint
+            if (date) {
+              if (!spd && !epd) {
+                stat ? that.rangeValue.push(item) : ''
+                if (checkType === 'range') {
+                  item.addClass(cls + ' range')
                 } else {
                   item.addClass(cls)
                 }
               }
-            })
-          }
-
-          // 区间渲染(当月)
-          if (spd && epd) {
-            let spoint = getYmd(spd)
-            let epoint = getYmd(epd)
-            theMon.forEach(item => {
-              let data = item.data
-              let date = data.date
-              if (date) {
+  
+              if (spd && epd) {
                 let day = data.day
                 if (day >= spoint.day && day<=epoint.day) {
                   stat ? that.rangeValue.push(item) : ''
@@ -533,39 +607,30 @@ export function oneMonthListConfig(timestart) {
                     item.addClass(cls+ ' range')
                   } else {
                     item.addClass(cls)
+                    if (day === spoint.day && stip) {
+                      appendTip(stip, null, item)
+                    }
+                    if (day === epoint.day && etip) {
+                      appendTip(null, etip, item)
+                    }
                   }
                 }
               }
-            })
-          }
-
-          // 渲染start后所有日期
-          if (spd && !epd){
-            let point = getYmd(spd)
-            theMon.forEach(item=>{
-              let data = item.data
-              let date = data.date
-              if (date) {
+  
+              if (spd && !epd) {
                 let day = data.day
                 if (day >= point.day) {
                   stat ? that.rangeValue.push(item) : ''
-                  if (day>point.day) {
-                    item.addClass(cls+' range')
+                  if (day > point.day) {
+                    item.addClass(cls + ' range')
                   } else {
                     item.addClass(cls)
+                    appendTip(stip, null, item)
                   }
                 }
               }
-            })
-          }
-
-          // 渲染终止日期前所有日期
-          if (!spd && epd) {
-            let point = getYmd(epd)
-            theMon.forEach(item => {
-              let data = item.data
-              let date = data.date
-              if (date) {
+  
+              if (!spd && epd) {
                 let day = data.day
                 if (day <= point.day) {
                   stat ? that.rangeValue.push(item) : ''
@@ -573,11 +638,12 @@ export function oneMonthListConfig(timestart) {
                     item.addClass(cls+' range')
                   } else {
                     item.addClass(cls)
+                    appendTip(null, etip, item)
                   }
                 }
               }
-            })
-          }
+            }
+          })
         },
 
         // 选中状态处理
@@ -592,13 +658,16 @@ export function oneMonthListConfig(timestart) {
               inst.removeClass('selected')
             } else {
               // 开始选择时间段，类似携程的入住，离店
-              if (rangeMode === 2) {
-                if (that.value.length === 1 && checkType === 'range') {
-                  // that.calendar.addClass('adjust-calendar-list-item')
-                  periodValidDays(param, rangeCount)
-                }
+              if (that.value.length === 1 && checkType === 'range') {
+                // that.calendar.addClass('adjust-calendar-list-item')
+                periodValidDays(param, rangeCount)
               }
-              // inst.addClass('selected')
+              // if (rangeMode === 2) {
+              //   if (that.value.length === 1 && checkType === 'range') {
+              //     // that.calendar.addClass('adjust-calendar-list-item')
+              //     periodValidDays(param, rangeCount)
+              //   }
+              // }
               theMon.setChecked(inst)
             }
             if (lib.isFunction(cb)) {
@@ -780,6 +849,7 @@ export function calendarMonths(timestart, end=5) {
  * 通过结算得到结束时间的年月日，用 calendarMonths 方法生成日历
  */
 export function calendarDays(timestart, total=30) {
+  if (total === 99999) total = 0
   let day = 24*60*60*1000
   let startPoint = getYmd(timestart)
   let sp = startPoint

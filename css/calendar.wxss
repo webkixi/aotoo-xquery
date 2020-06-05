@@ -132,6 +132,9 @@
   justify-content: flex-start;
   box-sizing: border-box;
   padding: 0 20rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
 }
 .date-list .date-item {
   width: calc(100% / 7);
@@ -140,12 +143,13 @@
   padding: 15rpx 0;
   box-sizing: border-box;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   font-weight: 400;
+  position: relative;
 }
-.date-list {
-  font-size: 30rpx;
-  font-weight: bold;
-  color: #333;
+
+.date-list .date-item .lunar-date{
+  font-size: 20rpx;
 }
