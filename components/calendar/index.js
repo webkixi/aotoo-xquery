@@ -622,7 +622,9 @@ Component({
 
       // this.activePage.doReady(true)
       that.hooks.once('done-display', function () {
-        that.hooks.emit('onReady')
+        setTimeout(() => {
+          that.hooks.emit('onReady')
+        }, 200);
       })
 
       setTimeout(() => {
@@ -1094,7 +1096,8 @@ Component({
 
     _mode4swiping(e){
       let dx = e.detail.dx
-      this.m4_dx = dx
+      this.m4_dx = (dx - (this.m4dx||dx))
+      this.m4dx = dx
     },
     _mode4swiper(e){
       if (e.type === 'change' && Math.abs(this.m4_dx)===1111) return
