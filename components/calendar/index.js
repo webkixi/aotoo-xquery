@@ -1226,10 +1226,22 @@ Component({
         let {top, left, right, bottom, width, height, showed} = item
         top = top - scrollTop
         bottom = bottom - scrollTop
-        if (!showed && (top < 2 * cbottom && top >= ctop)) {
-          item.showed = true
-          zoneItems.push(item)
+        if (!showed ) {
+          if (bottom < ctop && bottom > (ctop - cheight) ) {
+            item.showed = true
+            zoneItems.push(item)
+          } else {
+            if (top >= ctop && top < cbottom + cheight) {
+              item.showed = true
+              zoneItems.push(item)
+            }
+          }
+          // if ( top < 2 * cbottom && top >= ctop ) {
+          //   item.showed = true
+          //   zoneItems.push(item)
+          // }
         }
+        // || ((bottom < (ctop-cheight/2)) && bottom >= ctop))
         // if (!showed && (top < cbottom && top >= ctop || bottom < cbottom && bottom > ctop)) {
         //   item.showed = true
         //   zoneItems.push(item)
