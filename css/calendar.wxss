@@ -62,8 +62,8 @@
   background: #fff;
 }
 .calendar-list .calendar-list-item {
-  /* height: calc(114rpx * 5 + 92rpx); */
-  min-height: 300px;
+  min-height: calc(var(--date-item-height) * 5 + var(--calendar-nav-height) + var(--calendar-week-tils-height) + var(--append-date-item-height));
+  /* min-height: 300px; */
   position: relative;
 }
 .calendar-list .calendar-list-item .invalid {
