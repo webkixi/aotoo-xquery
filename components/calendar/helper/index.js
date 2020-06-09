@@ -772,6 +772,9 @@ export function oneMonthListConfig(timestart) {
             let date = year+'+'+month
             cb.call(this, date, monthDays)
           } else {
+            if (!param && this.data.$list.data.length) {
+              return
+            }
             let updata = monthDays
             if (lib.isArray(param)) {
               updata = param

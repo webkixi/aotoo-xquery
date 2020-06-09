@@ -10,6 +10,10 @@ export function newDate(timepoint) {
     }
 
     if (lib.isString(timepoint)) {
+      let ary = timepoint.split('-')
+      if (ary.length === 2) {
+        timepoint += '-1'
+      }
       timepoint = timepoint.replace(/\-/g, '/')
       timepoint = timepoint.replace(/\:/g, '/')
       return new Date(timepoint)

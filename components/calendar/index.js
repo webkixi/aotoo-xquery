@@ -580,17 +580,24 @@ Component({
 
         // 延时为了不去污染orienDataSource，保证原始数据不被污染
         let $dl = that.data.$dateList
-        if (mode === 1) {
-          if ($dl.type['scrollIntoView']) {
-            that.hooks.emit('scroll-into-view', {id: $dl.type['scrollIntoView']})
-          }
+        if ($dl.type['scrollIntoView']) {
+          that.hooks.one('scrollIntoView', function() {
+            let targetDate = $dl.type['scrollIntoView'].replace('id-', '')
+            that.goto(targetDate)
+          })
         }
 
-        if (mode === 2 || mode === 3) {
-          if ($dl.type['scrollIntoView']) {
-            that.hooks.emit('swiper-current', {id: $dl.type['scrollIntoView']})
-          }
-        }
+        // if (mode === 1) {
+        //   if ($dl.type['scrollIntoView']) {
+        //     that.hooks.emit('scroll-into-view', {id: $dl.type['scrollIntoView']})
+        //   }
+        // }
+
+        // if (mode === 2 || mode === 3) {
+        //   if ($dl.type['scrollIntoView']) {
+        //     that.hooks.emit('swiper-current', {id: $dl.type['scrollIntoView']})
+        //   }
+        // }
 
         if (mode === 4) {
           let ymd = that.m4_ymd
@@ -622,14 +629,13 @@ Component({
 
       // this.activePage.doReady(true)
       that.hooks.once('done-display', function () {
+        that.hooks.emit('scrollIntoView')
         setTimeout(() => {
           that.hooks.emit('onReady')
         }, 200);
       })
 
-      setTimeout(() => {
-        that.hooks.emit('render-calendar')
-      }, 100);
+      that.hooks.emit('render-calendar')
     },
     getFestival(){
       return getFestival()
