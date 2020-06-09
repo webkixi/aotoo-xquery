@@ -1336,9 +1336,13 @@ Component({
       const res = this.getAddressInfo(address)
       // console.log(res.address, res.inputData);
       if (res) {
+        let id = res.inputData.id||res.inputData.name
         res.inputData.type = res.inputData.type == 'password' ? 'text' : 'password'
         res.inputData.eye && (res.inputData.eye = typeof res.inputData.eye == 'boolean' ? 'form-eye' : true)
         this.setData({ [res.address]: res.inputData })
+        setTimeout(() => {
+          this.setValue(id, res.inputData.value)
+        }, 50);
       }
     },
 

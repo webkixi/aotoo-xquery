@@ -121,6 +121,7 @@
   <input 
     wx:else
     type="{{input.type||'text'}}" 
+    password="{{input.type === 'password' ? true : ''}}"
     id="{{input.id||''}}"
     data-address="{{input.uAddress}}"
     data-eye = "{{input.type === 'dropdown' ? true : ''}}"
