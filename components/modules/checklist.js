@@ -135,6 +135,9 @@ function getChilds(item, datas, opts, index, init) {
 
     if (opts.mode === 3) {
       let maxCount = opts.maxCount
+      let foldTips = opts.foldTips
+      let openTip = foldTips[0]
+      let closeTip = foldTips[1]
       item.itemClass = item.itemClass.replace('checklist-category', 'checklist-pad')
       item.content.type = {
         is: 'exposed'
@@ -151,14 +154,14 @@ function getChilds(item, datas, opts, index, init) {
           }
           return it
         })
-        item.title = [].concat(item.title).concat({title: '展开', targetId: item.content.checklistUniqId, containerClass: 'unfold', aim(e, param, inst){
+        item.title = [].concat(item.title).concat({title: openTip, targetId: item.content.checklistUniqId, containerClass: 'unfold', aim(e, param, inst){
 
           let $data = inst.getData()
           let targetId = $data.targetId
           this.children.forEach(ele=>{
             if (ele.$$is === 'list' && ele.checklistUniqId === targetId) {
               if (ele.__unfork) {
-                inst.update({title: '展开'})
+                inst.update({title: openTip})
                 inst.removeClass('fold')
                 ele.__unfork = false
                 ele.forEach((element, ii)=>{
@@ -167,7 +170,7 @@ function getChilds(item, datas, opts, index, init) {
                   }
                 })
               } else {
-                inst.update({title: '收起'})
+                inst.update({title: closeTip})
                 inst.addClass('fold')
                 ele.__unfork = true
                 ele.forEach((element, ii)=>{
@@ -243,6 +246,7 @@ function mkCheckList(params, init) {
     footer: null,  // 自动设置
 
     maxCount: 9,  // mode为3的时候有效，块状选择时有效
+    foldTips: ['展开', '收起'],
 
     checkedContainerClass: 'checklist-container',
     checkedBoxClass: 'checklist-box',
@@ -326,16 +330,57 @@ function mkCheckList(params, init) {
     }
   }
 
+  let allValue = []
+  let allTitle = []
+  let subValues = []
+  function initValidItem(item, val) {
+    if (item.content || item.body) {
+      let $content = item.content || item.body
+      let clid = $content.checklistUniqId
+      let $v = storeValue[clid] || []
+      // subValues = subValues.concat((item.content&&(item.content.value||[])) || (item.body&&(item.body[0].value||[])) || [])
+      subValues = subValues.concat($v)
+      if (val) {
+        subValues = subValues.map(v=>val+opts.separator+v)
+      }
+      // let $data = (item.content&&item.content.data) || (item.body&&item.body[0].data)
+      let $data = $content.data || $content[0].data
+      if ($data) {
+        $data.forEach(it => {
+          let theVal = val ? val + opts.separator + it.value : it.value
+          initValidItem(it, theVal)
+        })
+      }
+    }
+  }
+
+  function searchValidItem(item, val) {
+    if (item.content) {
+      let $content = item.content
+      let clid = $content.checklistUniqId
+      if ($content.mode === 2) {
+        let $data = $content.data
+        $data.forEach(it => {
+          let theVal = val ? val + opts.separator + it.value : it.value
+          searchValidItem(it, theVal)
+        })
+      } else {
+        let $v = storeValue[clid] || []
+        subValues = subValues.concat($v)
+        if (val) {
+          subValues = subValues.map(v => val + opts.separator + v)
+        }
+      }
+    }
+  }
+
   // 如果没有设置默认值时，则默认第一条数据的value为默认值
   function setDefaultValue(config, root) {
     let cklistId = config.checklistUniqId
     if (!config.value || !config.value.length) {
-      if (config.data[0].content && !lib.isFunction(config.data[0].content)) {
-        config.value = [].concat(config.data[0].value)
+      if (config.mode === 2) {
+        config.value = [config.data[0].value]
         config.valids = [0]
-        if (config.data[0].content.mode !== 3) {
-          setDefaultValue(config.data[0].content)
-        }
       }
     } else {
       let $value = config.value
@@ -345,19 +390,31 @@ function mkCheckList(params, init) {
         if ($value.indexOf(it.value) > -1) {
           $valid.push(ii)
         } else {
-          if (it.content && it.content.value && it.content.value.length) {
+          subValues = []
+          searchValidItem(it, it.value)
+          if (subValues.length) {
             $valid.push(ii)
           }
+          // if (it.content && it.content.value && it.content.value.length) {
+          //   $valid.push(ii)
+          // }
         }
       })
       config.valids = $valid
     }
-    storeValue[cklistId] = config.value
-    storeValids[cklistId] = config.valids
+    return config
   }
 
-  if (opts.mode !== 3 && init) {
-    setDefaultValue(opts, true)
+  // if (opts.mode !== 3 && init) {
+  if (opts.mode !== 3) {
+    opts = setDefaultValue(opts, init)
+    let cklistId = opts.checklistUniqId
+    storeValue[cklistId] = opts.value
+    storeValids[cklistId] = opts.valids
+    // if (init) {
+    //   console.log(opts);
+    //   debugger
+    // }
   }
 
   let checkedBoxItemClass = 'checklist-item' + (opts.checkedType === 2 ? ' multi-select' : '') // 单选还是多选类名
@@ -451,16 +508,19 @@ function mkCheckList(params, init) {
     let data = asset.data
     let $value = storeValue[ckId] || []
     storeValue[ckId] = $value
-    params.forEach(val => {
+    params.forEach((val, ii) => {
       let vals = val.split(opts.separator)
       let $v = vals.shift()
-      data.forEach(item=>{
+      data.forEach((item, jj)=>{
         let $data = item
         let $content = $data.content || $data.body
         // if (val.indexOf($data.value) === 0) {
         if ($v === $data.value) {
           if ($value.indexOf($v) === -1) {
             storeValue[ckId] = $value = $value.concat($v)
+            if (storeValids[ckId].indexOf(jj) === -1) {
+              storeValids[ckId] = (storeValids[ckId]||[]).concat(jj)
+            }
           }
           if ($content && vals.length) {
             let sonVal = vals.join(opts.separator)
@@ -497,6 +557,110 @@ function mkCheckList(params, init) {
     // })
   }
 
+  // 获取父级实例
+  function getRightParent(ctx) {
+    let inst = ctx.parent()
+    if (inst) {
+      if (inst.hasOwnProperty('value') && inst.hasOwnProperty('onBindSWchange')) {
+        return inst
+      } else {
+        return getRightParent(inst)
+      }
+    } 
+  }
+
+
+  // 设置父级状态
+  function setParentStat(curInst, theParent) {
+    let pValue = opts.parentValue
+    // let pIndex = opts.parentValueIndex
+    let pIndex = theParent.findIndex({value: pValue})
+    if (opts.fromBody) { // 事件是由body中的实例传递过来的
+      theParent.currentValue = pValue
+      theParent.currentValueIndex = pIndex
+    }
+    if (!curInst.value.length) {
+      theParent.validIt(false)
+    } else {
+      if (!curInst.valids.length) {
+        theParent.validIt(false)
+      } else {
+        theParent.validIt(true, curInst.currentValue)
+      }
+    }
+    theParent.hooks.emit('set-valid-stat', theParent)
+  }
+
+  /**
+   * 
+   * @param {*} ctx mkCheckList的实例
+   * @param {*} ckuniqId mkCheckList实例对象配置文件唯一id
+   * @param {*} val 用于拼接的value值
+   */
+  function getAllValue(ctx, ckuniqId, val) {
+    let $valids = storeValids[ckuniqId] || []
+    let $attrs = storeAttrs[ckuniqId] || {}
+
+    ctx.forEach((item, ii) => {
+      const $data = item.data
+      if ($valids.indexOf(ii)>-1) {
+        let value = $data.value
+        if (!value && lib.isString($data.title)) {
+          value = $data.title
+        }
+        let theValue = val ? val + opts.separator + value : value // separator: --
+
+        if (theValue && theValue.indexOf('9999') > -1) {
+          let sv = selectAllValue[ckuniqId] || []
+          let prefixValue = theValue.replace('9999', '')
+          sv.forEach(subvalue => {
+            let thev = prefixValue + subvalue
+            if (allValue.indexOf(thev)===-1) {
+              allValue.push(thev)
+            }
+          })
+        }else if ($data.content) {
+          let theContent = $data.content
+          if (lib.isFunction(theContent)) {
+            let functionid = theContent['functionid']
+            theContent = storeContent[functionid]
+          }
+          let $ckuniqId = theContent.checklistUniqId
+          let context = storeContex[$ckuniqId]
+          if (context) {
+            getAllValue(context, $ckuniqId, theValue)
+          } else {
+            subValues = []
+            initValidItem($data, theValue)
+            allValue = allValue.concat(subValues)
+          }
+        } else if ($data.body){
+          let $ckuniqId = $data.body[0].checklistUniqId
+          let context = storeContex[$ckuniqId]
+          getAllValue(context, $ckuniqId, theValue)
+        } else {
+          // 补上属性
+          let theAttrs = $data.attr || $attrs
+          if (theAttrs) {
+            let tmp = {}
+            Object.keys(theAttrs).forEach(key=>{
+              if (key!=='data-treeid') {
+                tmp[key] = theAttrs[key]
+              }
+            })
+            if (Object.keys(tmp).length) {
+              theValue = lib.formatToUrl(theValue, tmp)
+            }
+          }
+          if (allValue.indexOf(theValue)===-1) {
+            allValue.push(theValue)
+            allTitle.push($data.title)
+          }
+        }
+      }
+    })
+  }
+
   return {
     checklistUniqId: opts.checklistUniqId,
     containerClass: checkedContainerClass,
@@ -506,6 +670,7 @@ function mkCheckList(params, init) {
     data: opts.data,
     footer: footer,
     show: opts.show,
+    mode: opts.mode,
     itemMethod: {
       aim(e, param, inst) {
         if (opts.isSwitch && opts.checkedType === 2) return // 启用switch，则使tap无效
@@ -581,6 +746,7 @@ function mkCheckList(params, init) {
           if (!hasRadio) $footer.fillContent($content)
         } else {
           rootInst.fromLeaf = true
+          rootInst.fromTap = true
           rootInst.tapItem = {
             checked: hasChecked,
             checkedType: opts.checkedType,
@@ -695,6 +861,9 @@ function mkCheckList(params, init) {
         const currentValueIndex = this.currentValueIndex
         const currentContent = this.currentContent
         let $valids = this.valids
+        let rootInst = this.getRoot()
+        let fromLeaf = rootInst.fromLeaf
+        if (!fromLeaf) return
 
         if (this.value.indexOf(currentValue)===-1) {
           this.value.push(currentValue)
@@ -753,8 +922,7 @@ function mkCheckList(params, init) {
               $valids.push(ii)
               item.addClass('.valid')
             } else {
-              let rootInst = this.getRoot()
-              if (rootInst.fromLeaf) {
+              if (fromLeaf) {
                 if (opts.onlyValid) {   // 单value，单valid
                   item.removeClass('.valid')
                   clearRelationValids(item.data)
@@ -771,6 +939,7 @@ function mkCheckList(params, init) {
         const that = this
         const checkedClass = opts.checkedClass
         this.checklistUniqId = opts.checklistUniqId
+        this.mode = opts.mode
         storeContex[opts.checklistUniqId] = this
 
         // 防止无限次取实例(用于获取footerInst)
@@ -814,22 +983,23 @@ function mkCheckList(params, init) {
 
         if (opts.id) {
           this.activePage[opts.id] = this
+          this.activePage.elements[opts.id] = this
         }
 
         if (opts.$$id) {
           this.$$id = opts.$$id
           this.allValue = []
           this.activePage[opts.$$id] = this
-          if (opts.id) {
-            this.activePage[opts.id] = this
-          }
           if (lib.isFunction(opts.tap)){
             this.tap = opts.tap
           }
+          if (lib.isFunction(opts.__ready)) {
+            opts.__ready.call(this)
+          }
           this.getValue = () => {
-            if (!this._value) {
-              this.hooks.emit('set-valid-stat', this)
-            }
+            // if (!this._value) {
+            // }
+            this.hooks.emit('set-valid-stat', this)
             return this._value
           }
           
@@ -849,19 +1019,30 @@ function mkCheckList(params, init) {
                     storeValids[this.checklistUniqId] = this.valids
                     clearRelationValids(item.data)
                     this.allValue = this.allValue.filter(it => !re.test(it))
+                    if (!this._value) this._value = {}
                     this._value.allValue = this.allValue
                   }
                 }
               })
             } else {
               this.forEach(item => {
-                item.removeClass(checkedClass + ' valid')
+                if (opts.isSwitch && item.data['@switch']) {
+                  let switchCfg = item.data['@switch']
+                  switchCfg.checked = false
+                  item.update({ '@switch': switchCfg })
+                } else {
+                  item.removeClass(checkedClass + ' valid')
+                }
+                // item.removeClass(checkedClass + ' valid')
+
                 clearRelationValids(item.data, _clearStat)
               })
               let cklistId = this.checklistUniqId
               if (!_clearStat) {
                 storeValue[cklistId] = []
                 storeValids[cklistId] = []
+                this.value = []
+                this.valids = []
               }
               this.hooks.emit('set-valid-stat', this)
             }
@@ -879,6 +1060,7 @@ function mkCheckList(params, init) {
             if (param) {
               reviewAllValueAndValids(param, this.getData())
             }
+            this.value = storeValue[opts.checklistUniqId]
             this.hooks.emit('set-value-valid', {}, this)
           }
         }
@@ -887,132 +1069,6 @@ function mkCheckList(params, init) {
           if (opts.rootId||opts.$$id) {
             return that.activePage[(opts.rootId||opts.$$id)]
           }
-        }
-
-        // 获取父级实例
-        function getRightParent(ctx) {
-          let inst = ctx.parent()
-          if (inst) {
-            if (inst.hasOwnProperty('value') && inst.hasOwnProperty('onBindSWchange')) {
-              return inst
-            } else {
-              return getRightParent(inst)
-            }
-          } 
-        }
-
-
-        // 设置父级状态
-        function setParentStat(theParent) {
-          let pValue = opts.parentValue
-          // let pIndex = opts.parentValueIndex
-          let pIndex = theParent.findIndex({value: pValue})
-          if (opts.fromBody) { // 事件是由body中的实例传递过来的
-            theParent.currentValue = pValue
-            theParent.currentValueIndex = pIndex
-          }
-          if (!that.value.length) {
-            theParent.validIt(false)
-          } else {
-            if (!that.valids.length) {
-              theParent.validIt(false)
-            } else {
-              theParent.validIt(true, that.currentValue)
-            }
-          }
-          theParent.hooks.emit('set-valid-stat', theParent)
-        }
-
-        let allValue = []
-        let allTitle = []
-        let subValues = []
-        function initValidItem(item, val) {
-          if (item.content || item.body) {
-            let clid = (item.content||item.body).checklistUniqId
-            let $v = storeValue[clid] || []
-            // subValues = subValues.concat((item.content&&(item.content.value||[])) || (item.body&&(item.body[0].value||[])) || [])
-            subValues = subValues.concat($v)
-            if (val) {
-              subValues = subValues.map(v=>val+opts.separator+v)
-            }
-            let $data = (item.content&&item.content.data) || (item.body&&item.body[0].data)
-            if ($data) {
-              $data.forEach(it => {
-                let theVal = val ? val + opts.separator + it.value : it.value
-                initValidItem(it, theVal)
-              })
-            }
-          }
-        }
-
-        /**
-         * 
-         * @param {*} ctx mkCheckList的实例
-         * @param {*} ckuniqId mkCheckList实例对象配置文件唯一id
-         * @param {*} val 用于拼接的value值
-         */
-        function getAllValue(ctx, ckuniqId, val) {
-          let $valids = storeValids[ckuniqId] || []
-          let $attrs = storeAttrs[ckuniqId] || {}
-
-          ctx.forEach((item, ii) => {
-            const $data = item.data
-            if ($valids.indexOf(ii)>-1) {
-              let value = $data.value
-              if (!value && lib.isString($data.title)) {
-                value = $data.title
-              }
-              let theValue = val ? val + opts.separator + value : value // separator: --
-
-              if (theValue && theValue.indexOf('9999') > -1) {
-                let sv = selectAllValue[ckuniqId] || []
-                let prefixValue = theValue.replace('9999', '')
-                sv.forEach(subvalue => {
-                  let thev = prefixValue + subvalue
-                  if (allValue.indexOf(thev)===-1) {
-                    allValue.push(thev)
-                  }
-                })
-              }else if ($data.content) {
-                let theContent = $data.content
-                if (lib.isFunction(theContent)) {
-                  let functionid = theContent['functionid']
-                  theContent = storeContent[functionid]
-                }
-                let $ckuniqId = theContent.checklistUniqId
-                let context = storeContex[$ckuniqId]
-                if (context) {
-                  getAllValue(context, $ckuniqId, theValue)
-                } else {
-                  subValues = []
-                  initValidItem($data, theValue)
-                  allValue = allValue.concat(subValues)
-                }
-              } else if ($data.body){
-                let $ckuniqId = $data.body[0].checklistUniqId
-                let context = storeContex[$ckuniqId]
-                getAllValue(context, $ckuniqId, theValue)
-              } else {
-                // 补上属性
-                let theAttrs = $data.attr || $attrs
-                if (theAttrs) {
-                  let tmp = {}
-                  Object.keys(theAttrs).forEach(key=>{
-                    if (key!=='data-treeid') {
-                      tmp[key] = theAttrs[key]
-                    }
-                  })
-                  if (Object.keys(tmp).length) {
-                    theValue = lib.formatToUrl(theValue, tmp)
-                  }
-                }
-                if (allValue.indexOf(theValue)===-1) {
-                  allValue.push(theValue)
-                  allTitle.push($data.title)
-                }
-              }
-            }
-          })
         }
 
         this.hooks.once('set-valid-stat', function (ctx) {
@@ -1030,23 +1086,42 @@ function mkCheckList(params, init) {
               allTitle: allTitle
             }
             that._value = _value
-            if (that.fromLeaf) {
+            if (that.fromLeaf && that.fromTap) {
               that.fromLeaf = false
+              that.fromTap = false
               if (lib.isFunction(that.tap)) {
                 that.tap(_value)
               }
+              if (lib.isString(opts.tap)) {
+                if (lib.isFunction(that.activePage[opts.tap])) {
+                  that.activePage[opts.tap].call(that.activePage, _value)
+                }
+              }
             }
+            that.fromLeaf = false
           } else {
             if (that.parentInstance) {
-              setParentStat(that.parentInstance)
+              setParentStat(that, that.parentInstance)
             } else {
-              setTimeout(() => {
+              let myParent = () => {
                 let theParent = getRightParent(ctx)
                 if (theParent) {
                   that.parentInstance = theParent
-                  setParentStat(theParent)
+                  setParentStat(that, theParent)
+                } else {
+                  setTimeout(myParent, 50);
                 }
-              }, 34);
+              }
+              myParent()
+              
+
+              // setTimeout(() => {
+              //   let theParent = getRightParent(ctx)
+              //   if (theParent) {
+              //     that.parentInstance = theParent
+              //     setParentStat(that, theParent)
+              //   }
+              // }, 34);
             }
           }
         })
@@ -1150,10 +1225,10 @@ function mkCheckList(params, init) {
           }
         }
 
-        let $value = storeValue[opts.checklistUniqId] || this.value
         let renderContentStat = false
         let timmer = null
         this.hooks.once('set-value-valid', function(param) {
+          let $value = storeValue[opts.checklistUniqId] || this.value
           this.forEach((it, ii) => {
             it.removeClass(checkedClass)
             let item = it.data
@@ -1169,11 +1244,18 @@ function mkCheckList(params, init) {
                   this.footerInst.fillContent(item.content)
                 }, 17);
               } else {
-                it.addClass(checkedClass)
+                if (opts.isSwitch && it.data['@switch']) {
+                  let switchCfg = it.data['@switch']
+                  switchCfg.checked = true
+                  it.update({ '@switch': switchCfg })
+                } else {
+                  it.addClass(checkedClass)
+                }
+                // it.addClass(checkedClass)
               }
             } else {
               subValues = []
-              initValidItem(item, item.value)
+              searchValidItem(item, item.value)
               if (subValues.length) {
                 if (this.valids.indexOf(ii) === -1) {
                   this.valids.push(ii)
@@ -1184,12 +1266,14 @@ function mkCheckList(params, init) {
           storeValue[this.checklistUniqId] = this.value
           storeValids[this.checklistUniqId] = this.valids
           // storeValids[opts.checklistUniqId] = this.valids
+          
         })
         this.hooks.emit('set-value-valid', {}, this)
         
         if (!renderContentStat) {
           setTimeout(() => {
             let rootInst = this.getRoot()
+            rootInst.fromLeaf = true
             rootInst.tapItem = {
               checked: true,
               checkedType: opts.checkedType,
