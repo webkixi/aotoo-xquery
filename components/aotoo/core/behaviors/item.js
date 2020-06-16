@@ -166,7 +166,11 @@ export const itemBehavior = function(app, mytype) {
         }
       },
 
-      update: function (_param, callback) {
+      update(){
+        this._update.apply(this, arguments)
+      },
+
+      _update: function (_param, callback) {
         const that = this
         let param = lib.clone(_param)
         // const $tmp = lib.clone(this.data.$item)

@@ -2,7 +2,7 @@
 <import src="../parse_common/index.wxml" />
 <import src="../../templates/inner_templates.wxml" />
 
-<view class="ul {{item.liClass||''}}">
+<view class="ul {{item.liClass||''}}" style="{{item.liStyle||''}}">
   <block wx:for="{{item.li}}" wx:key="__key" wx:for-item="son">
     <block wx:if="{{util.isString(son)}}">
       <view class="li-item">

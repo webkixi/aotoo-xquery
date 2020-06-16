@@ -13,7 +13,7 @@
 </template>
 
 <!-- 这个key要小心 -->
-<view class="hfooter {{item.footerClass||''}}">
+<view class="hfooter {{item.footerClass||''}}" style="{{item.footerStyle||''}}">
   <block wx:for="{{item.footer}}" wx:key="__key" wx:for-item="son">
     <block wx:if="{{util.isString(son)}}">
       <view class="hf-item">

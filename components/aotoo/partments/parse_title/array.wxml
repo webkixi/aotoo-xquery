@@ -13,7 +13,7 @@
 </template> -->
 
 <!-- 这个key要小心 -->
-<view class="htitles {{item.titleClass||''}}">
+<view class="htitles {{item.titleClass||''}}" style="{{item.titleStyle||''}}">
   <block wx:for="{{item.title}}" wx:key="__key" wx:for-item="son">
     <block wx:if="{{util.isString(son)}}">
       <view class="t-item">

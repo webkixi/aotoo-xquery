@@ -2,7 +2,7 @@
 <import src="../parse_common/index.wxml" />
 <import src="../../templates/inner_templates.wxml" />
 
-<view class="hkv {{item.kvClass||''}}">
+<view class="hkv {{item.kvClass||''}}" style="{{item.kvStyle||''}}">
   <block wx:if="{{item.v}}">
     <text wx:if="{{util.isString(item.k)}}">{{item.k}}</text>
     <block wx:elif="{{util.isObject(item.k)}}">

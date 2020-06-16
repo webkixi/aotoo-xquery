@@ -263,7 +263,11 @@ export const listBehavior = function(app, mytype) {
 
       },
 
-      update: function (_param, callback) {
+      update(){
+        this._update.apply(this, arguments)
+      },
+
+      _update: function (_param, callback) {
         try {
           let param = lib.clone(_param)
           const that = this
