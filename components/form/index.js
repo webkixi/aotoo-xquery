@@ -1501,9 +1501,16 @@ function runFormBindFun(fn, res, e, from) {
         if (from === 'picker-view') {
           e.param.columnValue = e.detail.columnValue
           let {column, value} = e.detail.columnValue
-          context.updateNextColumn = function(param) {
+          context.updateNextColumn = function(col, param) {
+            if (lib.isArray(col)) {
+              param = col
+              col = undefined
+            }
+            let $column = column + 1
+            if (lib.isNumber(col)) {
+              $column = col
+            }
             if (column > -1 && lib.isArray(param)) {
-              let $column = column + 1
               if (res.inputData.values[$column]) {
                 res.inputData.values[$column] = param
                 that.setData({[res.address]: res.inputData})
@@ -1512,10 +1519,17 @@ function runFormBindFun(fn, res, e, from) {
           }
         }
       } else {
-        context.updateNextColumn = function(param) {
-          let column = e.detail.column
+        let column = e.detail.column
+        context.updateNextColumn = function(col, param) {
+          if (lib.isArray(col)) {
+            param = col
+            col = undefined
+          }
+          let $column = column + 1
+          if (lib.isNumber(col)) {
+            $column = col
+          }
           if (column > -1 && lib.isArray(param)) {
-            let $column = column + 1
             if (res.inputData.values[$column]) {
               res.inputData.values[$column] = param
               let resData = resetPickersValues(res.inputData, e)

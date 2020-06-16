@@ -240,9 +240,8 @@ class htmlparser {
       url: {}
     }
     let opts = {}
-    let options = param.options||{}
-    opts.img = Object.assign({}, dft.img, options.img)
-    opts.url = Object.assign({}, dft.url, options.url)
+    opts.img = Object.assign({}, dft.img, param.img)
+    opts.url = Object.assign({}, dft.url, param.url)
     this.options = Object.assign({}, dft, opts)
     this._codes = []
     this._html = []
