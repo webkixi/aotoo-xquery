@@ -481,15 +481,18 @@ export function oneMonthListConfig(timestart) {
 
           that.hooks.on('update-month-days', function(param){
             if (lib.isArray(param)) {
+              let hasChange = false
               monthDays = monthDays.map(day => {
                 param.forEach(item=>{
                   let date = formatDate(item.date)
                   if (date === day.date) {
+                    hasChange = true
                     day = Object.assign({}, day, (item.content||item))
                   }
                 })
                 return day
               })
+              hasChange && theMon.fillMonth(monthDays)
             }
           })
 
@@ -502,7 +505,7 @@ export function oneMonthListConfig(timestart) {
           theMon.hooks.once('restore-month-days', function(params) {
             monthDays = lib.clone(originalMonthDays)
             if (theMon.lazyDisplay) {
-              theMon.fillMonth()
+              theMon.fillMonth(monthDays)
             }
           })
 
@@ -518,7 +521,7 @@ export function oneMonthListConfig(timestart) {
               }
               return item
             })
-            theMon.fillMonth()
+            theMon.fillMonth(monthDays)
           })
 
           theMon.hooks.once('enable-month-days', function(params) {
@@ -537,6 +540,7 @@ export function oneMonthListConfig(timestart) {
         // 恢复初始月数据
         restore(){
           monthDays = lib.clone(originalMonthDays)
+          this.hooks.emit('restore-month-days')
         },
 
         // 当月是否可见

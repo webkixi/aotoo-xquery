@@ -584,6 +584,9 @@ Component({
             that.goto(targetDate, {index})
           }
           that.display()
+          if (lib.isFunction(coptions.__ready)) {
+            coptions.__ready.call(that)
+          }
         })
 
         if (mode === 4) {
@@ -695,11 +698,11 @@ Component({
     // 设置指定日期数据
     renderDate(param){
       this.hooks.emit('update-month-days', param)
-      this.calendar.children.forEach(month=>{
-        if (month.lazyDisplay) {
-          month.fillMonth()
-        }
-      })
+      // this.calendar.children.forEach(month=>{
+      //   if (month.lazyDisplay) {
+      //     month.fillMonth()
+      //   }
+      // })
     },
 
     // 恢复原始月数据
@@ -710,9 +713,9 @@ Component({
           let mon = month.getDate()
           if (mon.year === ymd.year && mon.month === ymd.month) {
             month.restore()
-            if (month.lazyDisplay) {
-              month.fillMonth()
-            }
+            // if (month.lazyDisplay) {
+            //   month.fillMonth()
+            // }
           }
         })
       } else {
