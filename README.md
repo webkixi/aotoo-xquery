@@ -19,6 +19,7 @@ demo图片均有效，github图片需要翻墙才能查看
 `queryUI`是一套我们内部项目孵化而出的小程序核心库(基于原生小程序)，糅合了一些jQuery特性及一些方便好用的特性，用于简化小程序开发成本及帮助后期能更好的维护项目  
 
 小程序社区： https://developers.weixin.qq.com/community/personal/oCJUsw9JDs23M0Y9XuAMiTuUX214  
+gitee(码云): https://gitee.com/webkixi/aotoo-xquery
 
 
 * 原生微信小程序  
