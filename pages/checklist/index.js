@@ -22,6 +22,23 @@ const splitConfig = {
   ]
 }
 
+// 二级分类
+// const splitConfig = {
+//   id: 'xxx',
+//   value: ['111'],
+//   data: [
+//     {title: '111', value: '111', idf: 'aaa', checkListOption: {checkedType: 2, value: ['222']}},
+//     {title: '222', value: '222', parent: 'aaa'},
+//     {title: '333', value: '333', parent: 'aaa'},
+//     {title: '444', value: '444', parent: 'aaa'},
+
+//     {title: '555', value: '555', idf: 'bbb', checkListOption: {checkedType: 2, value: ['666', '777']}},
+//     {title: '666', value: '666', parent: 'bbb'},
+//     {title: '777', value: '777', parent: 'bbb'},
+//     {title: '888', value: '888', parent: 'bbb'},
+//   ]
+// }
+
 Pager({
   data: {
     checkListConfig: mkCheckList(splitConfig)
