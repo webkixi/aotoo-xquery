@@ -18,43 +18,34 @@ demo图片均有效，github图片需要翻墙才能查看
 
 `queryUI`是一套我们内部项目孵化而出的小程序核心库(基于原生小程序)，糅合了一些jQuery特性及一些方便好用的特性，用于简化小程序开发成本及帮助后期能更好的维护项目  
 
-为保持本项目干净，项目不包含路由等配置，切换项目修改app.json。 
-
 小程序社区： https://developers.weixin.qq.com/community/personal/oCJUsw9JDs23M0Y9XuAMiTuUX214  
 
 
-`queryUI`包含以下这些特性  
-
 * 原生微信小程序  
 * 动态模板构建
-* 几乎无模板维护成本，方便集成
-* 事件函数封装
-* 钩子方法
-* lru缓存机制  
-* 支持内嵌语法/模板方式引入组件
+* 内置支持html、markdown
 
 完整DEMO列表
 
-* form表单
-* 下拉菜单
+* 多形态日历组件
 * 通用型筛选列表
+* form表单
+* markdown/html组件
+* 怎么弹都可以的弹窗组件
+* 支持震动的评分组件
+* 下拉菜单
+* 双向slider
 * 索引列表
-* markdown(包含表格)
-* html
 * 腾讯地址定位  
-* 评分组件
 * 水果老虎机
 * 折叠面板
 * 双栏分类导航(左右)
 * 双栏分类导航(上下)
 * 刮刮卡  
-* 弹窗
 * 导航球
 * 导航面板
-* 双向slider
 * 俄罗斯大转盘
 * 手势锁
-* 强大的日历
 
 
 ## 如何使用  
@@ -78,7 +69,7 @@ clone或下载本项目，`queryUI`基于微信小程序的原生库，不影响
         │
       app.json  注册全局组件
  
-### 引入核心目录/文件   
+### 核心目录/文件   
 融合项目中必须引入以下核心目录、文件  
 
     components 
@@ -88,19 +79,19 @@ clone或下载本项目，`queryUI`基于微信小程序的原生库，不影响
       ├─ modules ✔︎  # 该目录下的文件为组件合集，视需求选择
       ├─ templates 模板 ✔︎
 
-在app.json中定义全局组件  
+在app.json中定义核心全局组件  
 
- ```json
-  "usingComponents": {
-    "ui-item": "/components/aotoo/item/index",
-    "ui-list": "/components/aotoo/list/index",
-    "ui-tree": "/components/aotoo/tree/index",
-    "ui-form": "/components/form/index",
-    "ui-markit": "/components/markit/index"
-  }
- ```
+```json
+"usingComponents": {
+  "ui-item": "/components/aotoo/item/index",
+  "ui-list": "/components/aotoo/list/index",
+  "ui-tree": "/components/aotoo/tree/index",
+  "ui-form": "/components/form/index",
+  "ui-markit": "/components/markit/index"
+}
+```
 
- 核心文件内置支持  
+核心文件内置支持  
 1. markdown(全语法)
 2. html
 3. from表单 
