@@ -43,18 +43,10 @@ Component({
       if (lib.isObject(dataSource)) {
         let cnt = dataSource.content
         let type = dataSource.type || textType
-        let listClass = dataSource.listClass
-        let listStyle = dataSource.listStyle
         delete dataSource.content
         delete dataSource.type
-        delete dataSource.listClass
-        delete dataSource.listStyle
         // dataSource.type = dataSource.type || textType
         let props = dataSource
-        this.props = {
-          listClass,
-          listStyle
-        }
         if (type === 'html') {
           this.html(cnt, props)
         }
@@ -87,9 +79,6 @@ Component({
 
 function doneHtml(cnt, context) {
   let that = context
-  let {listClass, listStyle} = this.props
-  cnt.listClass = listClass ? cnt.listClass+=` ${listClass}` : cnt.listClass
-  cnt.listStyle = listStyle ? listStyle : ''
   cnt = lib.reSetList.call(this, cnt)
   that.setData({ $list: cnt })
 }

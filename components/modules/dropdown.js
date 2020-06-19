@@ -8,7 +8,7 @@ function adapter(params) {
     }
     if (lib.isObject(item)) {
       item._idx_ = ii
-      let content = {id: `pop-${ii}`, itemClass: 'dropdown-item-content', aim: function(params) {} }
+      let content = {id: `pop-${ii}`, itemClass: 'dropdown-item-content' }
       if (item.contentStyle) {
         content.itemStyle = item.contentStyle
         delete item.contentStyle
@@ -68,7 +68,8 @@ module.exports = function mkDropdown(params) {
         let contentInst = this.find(id)
         this.currentContent = contentInst
 
-        let $data = item.data
+        let $data = item.data || item
+        let $content = $data.content
 
         function filling(content, reset) {
           if (contentInst && content) {
@@ -92,14 +93,20 @@ module.exports = function mkDropdown(params) {
         }
 
 
-        if ($data.content && contentInst) {
+        if ($content && contentInst) {
           if (that.contentRendered.indexOf(id) === -1){
             that.contentRendered.push(id)
-            if (lib.isFunction($data.content)) {
-              let res = $data.content(item.data, idx)
-              filling(res)
+            if (lib.isFunction($content)) {
+              let res = $content(item.data, idx)
+              if (res.then) {
+                res.then(result=>{
+                  filling(result)
+                })
+              } else {
+                filling(res)
+              }
             } else {
-              filling($data.content)
+              filling($content)
             }
           }
         }
@@ -127,7 +134,8 @@ module.exports = function mkDropdown(params) {
                 return that.currentMenu.getData().title
               }
             }
-            opts.tap.call(context, item, idx)
+            // opts.tap.call(context, item, idx)
+            opts.tap.call(context, $data, idx)
           }
         }
       },
