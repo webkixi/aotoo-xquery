@@ -7,8 +7,10 @@
  * @FilePath: /xquery/README.md
  -->
 demo图片均有效，github图片需要翻墙才能查看  
+微信号: aotoodemo
 
 ![demo](http://www.agzgz.com/myimgs/demo.jpg)  
+
 
 
 # XQUERY
