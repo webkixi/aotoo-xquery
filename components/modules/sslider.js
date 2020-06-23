@@ -14,7 +14,7 @@ module.exports = function(params) {
     content: null,
     bindchange: null,
     bindchanging: null,
-    smooth: false, 
+    smooth: true, 
     tip: true,
     disable: false,
     frontColor: '#ccc',
@@ -46,7 +46,8 @@ module.exports = function(params) {
       }
     },
     catchtouchmove(e, param, inst) {
-      if (opts.disable) return
+      if (this.disabled) return
+      // if (opts.disable) return
       let sliderDetail = e.sliderDetail
       let value = sliderDetail.value
       
@@ -68,17 +69,34 @@ module.exports = function(params) {
         }
       }
 
+      if (lib.isString(opts.bindchanging)) {
+        let acp = this.activePage
+        let cb = acp[opts.bindchanging]
+        if (lib.isFunction(cb)) {
+          cb.call(acp, value, this)
+        }
+      }
+
       if (lib.isFunction(opts.bindchanging)) {
         opts.bindchanging.call(this, value)
       }
     },
     catchtouchend(e, param, inst){
-      if (opts.disable) return
+      if (this.disabled) return
+      // if (opts.disable) return
       this.oneDrawTime = null
       let sliderDetail = e.sliderDetail
       let value = sliderDetail.value
       this.value = value
       // console.log(this.value);
+      if (lib.isString(opts.bindchange)) {
+        let acp = this.activePage
+        let cb = acp[opts.bindchange]
+        if (lib.isFunction(cb)) {
+          cb.call(acp, value, this)
+        }
+      }
+
       if (lib.isFunction(opts.bindchange)) {
         opts.bindchange.call(this, value)
       }
@@ -99,13 +117,22 @@ module.exports = function(params) {
 
   return {
     title: content,
-    $$id: 'isItem',
+    // $$id: 'isItem',
     dot: [],
     itemClass: opts.disable ? 'mut-slider disable' : 'mut-slider', // 允许一个页面多个slider，需要设置指定类名
     touchoption: { ssliderAixs: true },
     touchstart(){},
     methods: {
+      disable(){
+        this.disabled = true
+        this.addClass('disable')
+      },
+      enable(){
+        this.disabled = false
+        this.removeClass('disable')
+      },
       __ready(){
+        this.disabled = opts.disable
         if (params && params.id) {
           this.activePage[params.id] = this
         }

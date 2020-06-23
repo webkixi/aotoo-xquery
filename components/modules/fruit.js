@@ -1,5 +1,25 @@
-function adapter(max=3, data={}) {
+function adapter(max=3, data={}, opts) {
   let count = max * max
+  let lineCount = opts.max  // 每行个数
+
+  /**
+   * 自定义实际的格子数
+   * 定义count数时，将不会输出水果盘
+   * lineCount决定每行显示格子数
+  */
+  if (opts.count > 0) {
+    count = opts.count
+    max = opts.count
+    if (max<lineCount) {
+      lineCount = max
+    }
+  }
+
+  if (count === 1) {
+    count = 2
+    max = 2
+  }
+
   let ary = Array.from(new Array(count), (item, jj) => jj + 1);
   let firstRow = Array.from(new Array(max), (item, jj) => jj);
   let lastRow = Array.from(firstRow, (item, jj) => ((ary.length - 1) - jj)).reverse();
@@ -31,7 +51,6 @@ function adapter(max=3, data={}) {
       }
     }
 
-    let rate = 100/max-1
     return {
       id,
       sortIndex,
@@ -47,22 +66,39 @@ function adapter(max=3, data={}) {
     jj++
   })
 
+  let heightRate = 0
   let rate = 100/max-1
+  if (count === max) {
+    rate = 100/lineCount-1
+    let line = parseInt(ary.length/lineCount)
+    heightRate = 100/line
+  }
   ary = ary.map((item, ii) => {
     let sortIndex = item.sortIndex
     let fruit = data[sortIndex]
+    let myStyle = `width: calc(${rate+1}%);height: calc(${rate+1}%);`
+    if (sortIndex) {
+      myStyle = `width: calc(${rate+1}%);height: calc(${rate+1}%);`
+      if (count === max) {
+        myStyle = `width: calc(${rate}%);height: calc(${heightRate}%);margin:0.5%;`
+      }
+    }
+
+    item.itemStyle = myStyle
     if (sortIndex) {
       item.value = sortIndex
-      item.itemStyle = `width: calc(${rate}%);height: calc(${rate}%);margin:0.5%`
-    } else {
-      item.itemStyle = `width: calc(${rate+1}%);height: calc(${rate+1}%);`
-    }
-    if (sortIndex && fruit) {
-      item = Object.assign({}, item, fruit)
-      if (fruit.img) {
-        if (!fruit.title) delete item.title
+      if (fruit) {
+        let itStyle = fruit.itemStyle
+        delete fruit.itemStyle
+        item = Object.assign({}, item, fruit)
+        if (itStyle) {
+          item.itemStyle += itStyle
+        }
+        if (fruit.img) {
+          if (!fruit.title) delete item.title
+        }
+        item.sortIndex = sortIndex
       }
-      item.sortIndex = sortIndex
     }
     return item
   })
@@ -76,7 +112,11 @@ module.exports = function(params, cb) {
     id: '',  // 实例id，page ready中可调用
     listClass: 'fruit-machine', // 容器类名
     fruitsData: {}, // 配置每一个有效奖品
-    max: 3 // 水果盘的基础数
+    max: 3, // 水果盘的基础数
+    count: 0, // 实体抽奖盘
+    confuse: false,   // 混淆数组排序
+    containerClass: '',
+    containerStyle: '',
   }
 
   if (typeof params === 'function') {
@@ -87,9 +127,11 @@ module.exports = function(params, cb) {
   let opts = Object.assign({}, dft, params)
 
   return {
+    containerClass: opts.containerClass,
+    containerStyle: opts.containerStyle,
     listClass: opts.listClass,
     itemClass: 'fruit-item',
-    data: adapter(opts.max, opts.fruitsData),
+    data: adapter(opts.max, opts.fruitsData, opts),
     methods: {
       flatGap(x, y){
         x = x - this.diffLeft
@@ -114,6 +156,7 @@ module.exports = function(params, cb) {
       },
       run(){
         if (this.isRunning) return
+        this.isRunning = true
         
         let num = Math.ceil(Math.random() * 10);
         let ring = num < 3 ? 3 : num > 6 ? 5 : 3 //跑圈数
@@ -177,6 +220,7 @@ module.exports = function(params, cb) {
                   cb.call(this, one)
                 }
               }
+              this.isRunning = false
             }
 
             appendStep.call(this, 1)
@@ -237,7 +281,17 @@ module.exports = function(params, cb) {
                   return item
                 })
 
-                this.sortPoints = this.sortPoints.sort((a, b)=>a.sortIndex-b.sortIndex)
+                if (!opts.count) {
+                  this.sortPoints = this.sortPoints.sort((a, b)=>a.sortIndex-b.sortIndex)
+                } else {
+                  if (opts.confuse) {
+                    this.sortPoints = this.sortPoints.sort((a, b)=>{
+                      let num1 = Math.floor(Math.random() * 10);
+                      let num2 = Math.floor(Math.random() * 10);
+                      return (a.sortIndex+num1) - (b.sortIndex+num2)
+                    })
+                  }
+                }
                 let point0 = this.sortPoints[0].position
                 this.rect(point0)
                 this.runningIndex = 1

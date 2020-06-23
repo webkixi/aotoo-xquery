@@ -89,90 +89,6 @@ Component({
   behaviors: [Core.itemBehavior(app, '_actionSide')],
   pageLifetimes: {
     show: function () {
-      this.toast.countdown = (p) => this.toast_countdown = lib.isNumber(p) ? p :3000
-      this.toast.mid = (p={}, c) => {
-        p.itemClass = 'toast-mid'
-        this.__opration(p, c, 'actionSide-toast')
-      }
-      this.toast_mid = (p={}, c) => {
-        p.itemClass = 'toast-mid'
-        this.__opration(p, c, 'actionSide-toast')
-      }
-      this.pop.bot = (p={}, c) => this.__opration(p, c, 'actionSide-pop-bottom')
-      this.pop_bot = (p={}, c) => this.__opration(p, c, 'actionSide-pop-bottom')
-      this.pop.top = (p={}, c) => this.__opration(p, c, 'actionSide-pop-top')
-      this.pop_top = (p={}, c) => this.__opration(p, c, 'actionSide-pop-top')
-
-      this.right.full = (p={}, c) => {
-        p.itemClass = 'full'
-        this.__opration(p, c, 'actionSide-right')
-      }
-      this.right_full = (p={}, c) => {
-        p.itemClass = 'full'
-        this.__opration(p, c, 'actionSide-right')
-      }
-      this.right.bar = (p={}, c) => {
-        p.itemClass = 'bar'
-        this.__opration(p, c, 'actionSide-right')
-      }
-      this.right_bar = (p={}, c) => {
-        p.itemClass = 'bar'
-        this.__opration(p, c, 'actionSide-right')
-      }
-
-      this.left.full = (p={}, c) => {
-        p.itemClass = 'full'
-        this.__opration(p, c, 'actionSide-left')
-      }
-      this.left_full = (p={}, c) => {
-        p.itemClass = 'full'
-        this.__opration(p, c, 'actionSide-left')
-      }
-      this.left.bar = (p={}, c) => {
-        p.itemClass = 'bar'
-        this.__opration(p, c, 'actionSide-left')
-      }
-      this.left_bar = (p={}, c) => {
-        p.itemClass = 'bar'
-        this.__opration(p, c, 'actionSide-left')
-      }
-
-      this.top.full = (p={}, c) => {
-        p.itemClass = 'full'
-        this.__opration(p, c, 'actionSide-top')
-      }
-      this.top_full = (p={}, c) => {
-        p.itemClass = 'full'
-        this.__opration(p, c, 'actionSide-top')
-      }
-      this.top.bar = (p={}, c) => {
-        p.itemClass = 'bar'
-        this.__opration(p, c, 'actionSide-top')
-      }
-      this.top_bar = (p={}, c) => {
-        p.itemClass = 'bar'
-        this.__opration(p, c, 'actionSide-top')
-      }
-      
-      this.bot.full = (p={}, c) => {
-        p.itemClass = 'full'
-        this.__opration(p, c, 'actionSide-bot')
-      }
-
-      this.bot_full = (p={}, c) => {
-        p.itemClass = 'full'
-        this.__opration(p, c, 'actionSide-bot')
-      }
-
-      this.bot.bar = (p={}, c) => {
-        p.itemClass = 'bar'
-        this.__opration(p, c, 'actionSide-bot')
-      }
-
-      this.bot_bar = (p={}, c) => {
-        p.itemClass = 'bar'
-        this.__opration(p, c, 'actionSide-bot')
-      }
     },
     hide: function () {
       // 页面被隐藏
@@ -289,6 +205,48 @@ Component({
       } catch (error) {
         console.error(error);
       }
+    },
+    bot_bar (p = {}, c) {
+      p.itemClass = 'bar'
+      this.__opration(p, c, 'actionSide-bot')
+    },
+    bot_full (p = {}, c) {
+      p.itemClass = 'full'
+      this.__opration(p, c, 'actionSide-bot')
+    },
+    top_bar (p = {}, c) {
+      p.itemClass = 'bar'
+      this.__opration(p, c, 'actionSide-top')
+    },
+    top_full (p = {}, c) {
+      p.itemClass = 'full'
+      this.__opration(p, c, 'actionSide-top')
+    },
+    left_bar (p = {}, c) {
+      p.itemClass = 'bar'
+      this.__opration(p, c, 'actionSide-left')
+    },
+    left_full (p = {}, c) {
+      p.itemClass = 'full'
+      this.__opration(p, c, 'actionSide-left')
+    },
+    right_bar (p = {}, c) {
+      p.itemClass = 'bar'
+      this.__opration(p, c, 'actionSide-right')
+    },
+    right_full (p = {}, c) {
+      p.itemClass = 'full'
+      this.__opration(p, c, 'actionSide-right')
+    },
+    pop_top(p = {}, c){
+      this.__opration(p, c, 'actionSide-pop-top')
+    },
+    pop_bot(p = {}, c) {
+      this.__opration(p, c, 'actionSide-pop-bottom')
+    },
+    toast_mid(p = {}, c){
+      p.itemClass = 'toast-mid'
+      this.__opration(p, c, 'actionSide-toast')
     },
     pop: function(p={}, c) {
       this.__opration(p, c, 'actionSide-pop')
