@@ -25,7 +25,8 @@
 			"outputPath": ""
 		},
 		"bundle": true,
-		"useCompilerModule": true,
+		"useIsolateContext": true,
+		"useCompilerModule": false,
 		"userConfirmedUseCompilerModuleSwitch": false
 	},
 	"compileType": "miniprogram",
