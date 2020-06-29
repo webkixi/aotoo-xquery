@@ -139,7 +139,7 @@ function tintRange(fromInit) {
   if (value[0] && !value[1] && fromInit) {
     setTimeout(() => {
       let target = startInst.setChecked(value[0])
-      startInst.checkedIndex = null
+      startInst.checkedIndex = []
       // this.rangeValue = [target]
     }, 100);
     return
@@ -512,6 +512,7 @@ Component({
   lifetimes: {
     created() {
       let that = this
+      this.m4_timmer = null
       this.query = wx.createSelectorQuery().in(this)
       this.elements = {} // 日历容器, 月容器存放地址
       this.zoneItems = [] // 在显示区的对象, 当月实例进入显示区调用fillMonth方法填充月数据
@@ -770,17 +771,22 @@ Component({
         cb = param
         param = undefined
       }
-      this.currentMonth = this.getMonthInstance(date)
+      // this.currentMonth = this.getMonthInstance(date)
       let coptions = this.coptions
       let type = coptions.type
+      let mode = coptions.mode
       let activePage = this.activePage
       if (date) {
         let value = this.value
         let len = value.length
         let curDate = getYmd(date)
         let curStamp = newDate(date).getTime()
-        let instId = `${this.calenderId}-${curDate.year}-${curDate.month}`
-        let monInst = this.currentMonth || activePage.getElementsById(instId)
+        // let instId = `${this.calenderId}-${curDate.year}-${curDate.month}`
+        // let monInst = this.currentMonth || activePage.getElementsById(instId)
+        let monInst = this.currentMonth 
+        if (mode === 1) {
+          monInst = this.getMonthInstance(date)
+        }
         
         // 单选
         if (type === 'single') {
@@ -1120,56 +1126,64 @@ Component({
       let detail = e.detail
       let current = detail.current
       current = current > 4 ? 0 : current < 0 ? 4 : current
-      let monInst = this.calendar.children[current]
-      let header = monInst.children[0]
-      let navHeader = this.activePage.getElementsById(this.headerId)
-      let navHeaderData = navHeader.getData()
-      let navHeaderTitle = navHeaderData.title
-      let myDate = ym.year + '年' + ym.month + '月'
-      navHeaderTitle[1] = myDate
-      navHeader.update({ title: navHeaderTitle }) 
-      this.currentMonth = monInst
 
-      
-      this.m4_current = current
-      this.m4_ymd = ym
-      
-      let site = 0
-      let ymd = Object.assign({}, ym)
-      if (this.m4_dx > 0) {
-        site = current -3 > -1 ? current - 3 : (current - 3) + 5
-        ymd = rightYmd(ymd, 2)
-      } else {
-        site = current + 3 < 5 ? current + 3 : (current + 3) - 5
-        ymd = rightYmd(ymd, -2)
-      }
-      start = `${ymd.year}-${ymd.month}-1`
-      let count = getMonthCount(ymd.year, (ymd.month - 1), true)
-      let calendarItems = calendarDays.call(this, start, count - 1)
-      let _data = calendarItems[0]['@list']._data
-      let preMonInst = this.calendar.children[site]
-      let preHeader = preMonInst.children[0]
-      preMonInst.year = ymd.year
-      preMonInst.month = ymd.month
-      preHeader.update({ title: ymd.month })
-      preMonInst.fillMonth(_data)
-
-      if (!this.coptions.alignMonth) {
-        if (monInst.days.length > 31) {
-          this.setData({ $style: `--append-date-item-height: var(--date-item-height)` })
-        }else {
-          this.setData({ $style: `--append-date-item-height: 0px;` })
-        }
-      }
-
-      let $ym = monInst.getDate()
-      if ($ym.year === ym.year && $ym.month === ym.month) {
-        if (Math.abs(this.m4_dx)>1000) {
-          this.calendar.update({ 'type.current': current })
+      function renderRight() {
+        let monInst = this.calendar.children[current]
+        let header = monInst.children[0]
+        let navHeader = this.activePage.getElementsById(this.headerId)
+        let navHeaderData = navHeader.getData()
+        let navHeaderTitle = navHeaderData.title
+        let myDate = ym.year + '年' + ym.month + '月'
+        navHeaderTitle[1] = myDate
+        navHeader.update({ title: navHeaderTitle }) 
+        this.currentMonth = monInst
+  
+        
+        this.m4_current = current
+        this.m4_ymd = ym
+        
+        let site = 0
+        let ymd = Object.assign({}, ym)
+        if (this.m4_dx > 0) {
+          site = current -3 > -1 ? current - 3 : (current - 3) + 5
+          ymd = rightYmd(ymd, 2)
         } else {
-          if (!monInst.lazyDisplay) monInst.fillMonth()
+          site = current + 3 < 5 ? current + 3 : (current + 3) - 5
+          ymd = rightYmd(ymd, -2)
+        }
+        start = `${ymd.year}-${ymd.month}-1`
+        let count = getMonthCount(ymd.year, (ymd.month - 1), true)
+        let calendarItems = calendarDays.call(this, start, count - 1)
+        let _data = calendarItems[0]['@list']._data
+        let preMonInst = this.calendar.children[site]
+        let preHeader = preMonInst.children[0]
+        preMonInst.year = ymd.year
+        preMonInst.month = ymd.month
+        preHeader.update({ title: ymd.month })
+        preMonInst.fillMonth(_data)
+  
+        if (!this.coptions.alignMonth) {
+          if (monInst.days.length > 31) {
+            this.setData({ $style: `--append-date-item-height: var(--date-item-height)` })
+          }else {
+            this.setData({ $style: `--append-date-item-height: 0px;` })
+          }
+        }
+  
+        let $ym = monInst.getDate()
+        if ($ym.year === ym.year && $ym.month === ym.month) {
+          if (Math.abs(this.m4_dx)>1000) {
+            this.calendar.update({ 'type.current': current })
+          } else {
+            if (!monInst.lazyDisplay) monInst.fillMonth()
+          }
         }
       }
+
+      clearTimeout(this.m4_timmer)
+      this.m4_timmer = setTimeout(() => {
+        renderRight.call(this)
+      }, 200);
     },
 
     _bindswiper(e){

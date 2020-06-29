@@ -436,7 +436,7 @@ export function oneMonthListConfig(timestart) {
           this.year = year
           this.month = month
 
-          this.checkedIndex = null // 当前月份选中的日期在数组中的index下标
+          this.checkedIndex = [] // 当前月份选中的日期在数组中的index下标
 
           /**
            * 显示状态
@@ -694,7 +694,8 @@ export function oneMonthListConfig(timestart) {
           if (targetDate) {
             if (targetDate.treeid) {
               let index = this.findIndex(targetDate.treeid)
-              this.checkedIndex = index
+              // this.checkedIndex = index
+              this.checkedIndex.push(index)
               target = targetDate
               targetDate.addClass('selected')
             } else {
@@ -705,7 +706,8 @@ export function oneMonthListConfig(timestart) {
                 if (date === targetDate || ts === targetDate) {
                   item.addClass('selected')
                   target = item
-                  this.checkedIndex = ii
+                  // this.checkedIndex = ii
+                  this.checkedIndex.push(ii)
                 }
               })
             }
@@ -733,13 +735,25 @@ export function oneMonthListConfig(timestart) {
             uinst.forEach(it=>it.exec())
             return 
           }
-          if (this.checkedIndex || this.checkedIndex === 0) {
-            let target = this.find(this.checkedIndex)
-            if (target) {
-              findIt = true
-              target.removeClass('selected range')
-            }
-          } 
+
+          if (this.checkedIndex.length) {
+            findIt = true
+            this.forEach((item, index)=>{
+              if (this.checkedIndex.indexOf(index)>-1) {
+                item.removeClass('selected range')
+              }
+            })
+            this.checkedIndex = []
+          }
+          
+          // if (this.checkedIndex || this.checkedIndex === 0) {
+          //   let target = this.find(this.checkedIndex)
+          //   if (target) {
+          //     findIt = true
+          //     target.removeClass('selected range')
+          //   }
+          // } 
+
           if (!findIt) {
             this.forEach(item=>{
               let data = item.data
