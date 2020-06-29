@@ -107,7 +107,8 @@
   z-index: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
+  margin-top: calc(var(--date-item-height) * 0.9 + var(--calendar-nav-height) + var(--calendar-week-tils-height) );
+  /* align-items: center; */
   font-size: 200pt;
   color: aliceblue;
 }
