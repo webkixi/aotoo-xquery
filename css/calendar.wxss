@@ -5,12 +5,17 @@
   --calendar-week-tils-height: 50rpx;
   --append-date-item-height: 0px;
   width: 100vw;
-  height: calc(var(--date-item-height) * 5 + var(--calendar-nav-height) + var(--calendar-week-tils-height) + var(--append-date-item-height));
+  height: calc(var(--date-item-height) * 6 + var(--calendar-nav-height) + var(--calendar-week-tils-height) + var(--append-date-item-height));
   /* height: calc(var(--date-item-height) * 5 + var(--calendar-nav-height) + var(--calendar-week-tils-height) ); */
   position: relative;
   /* padding: 0 20rpx; */
   box-sizing: border-box;
 }
+
+.calendar.mode-1{
+  height: 80vh;
+}
+
 .calendar-nav {
   background: #fff;
   width: 100%;

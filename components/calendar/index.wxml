@@ -3,7 +3,7 @@
 <!-- 小程序的模板真是又长又臭 -->
 <!-- <ui-item item="{{$item}}" class-name="{{myClass}}"/> -->
 <wxs src="../aotoo/util.wxs" module="util" />
-<view class="calendar" style="{{$style||''}}">
+<view class="calendar {{containerClass}}" style="{{$style||''}}">
   <ui-item wx:if="{{$header}}" item="{{$header}}" fromComponent="{{uniqId}}"/>
   <ui-list wx:if="{{$weekTils}}" list="{{$weekTils}}" />
   <ui-list wx:if="{{$dateList}}" list="{{$dateList}}" fromComponent="{{uniqId}}"/>

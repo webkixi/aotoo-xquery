@@ -459,7 +459,13 @@ function adapter(source={}) {
       if (footer) footer.$$id = this.footerId
     }
 
+    let containerClass = ''
+    if (mode === 1) {
+      containerClass = 'mode-1'
+    }
+
     initData.call(this, {
+      containerClass,
       $weekTils,
       $header: header,
       $footer: footer,
