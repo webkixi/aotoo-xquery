@@ -58,10 +58,13 @@
   height: 20px;
   line-height: 20px;
   text-align: center;
+  border-radius: 48%;
+  color: var(--t-bar-color);
+  background-color: var(--t-bar-bg)
 }
 
 .touchbar-cat .item.active {
   color: #fff;
-  background-color: rgb(86,191,106);
-  border-radius: 50%;
+  background-color: #56bf6a;
+  /* border-radius: 50%; */
 }

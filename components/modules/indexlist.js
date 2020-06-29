@@ -100,10 +100,12 @@ module.exports = function (id=lib.suid('step_'), data, options={}) {
   let result = adapter( (data||mockData) )
   let datas = result.options
   let sorts = result.sorts
-  let touchbarConfig = mkTouchbar({
+  let preTouchbarConfig = {
     data: sorts,
     ...options
-  })
+  }
+  preTouchbarConfig.tap = null
+  let touchbarConfig = mkTouchbar(preTouchbarConfig)
 
   return {
     $$id: id,
@@ -143,10 +145,10 @@ module.exports = function (id=lib.suid('step_'), data, options={}) {
       },
       touchmove(e, param, inst){
         inst = inst.data[0]
+        this.touchmove = true
         if (!attachButton) return
         if (inst.hasClass('itemroot')) return
         clearTimeout(this.touchtimmer)
-        this.touchmove = true
         let start = this.touchPoint.start
         let {pageX, pageY} = e.changedTouches[0]
         let diffx = (pageX-start.pageX)
@@ -211,6 +213,7 @@ module.exports = function (id=lib.suid('step_'), data, options={}) {
         let that = this
         let query = wx.createSelectorQuery().in(this)
         this.idfs = null
+        this.touchbarEvent = false  // 是否touchbar操作
         this.touchPoint = {
           start: null,
           preInst: null,
@@ -228,7 +231,12 @@ module.exports = function (id=lib.suid('step_'), data, options={}) {
         this.touchbar.hooks.on('scrollTotop', function(params) {
           that.update({ "type.scroll-top": 0 })
         })
+        this.touchbar.hooks.on('onTouchEnd', function (e) {
+          that.touchbarEvent = false
+        })
         this.touchbar.hooks.on('onTouchStart', function (param) {
+          if (!that.touchbarEvent) that.update({ "type.scroll-top": (that.scrollTop||0) })
+          that.touchbarEvent = true
           let target = param.data.target || param.data.to
           let ctx = {
             intoView(param){
@@ -258,16 +266,19 @@ module.exports = function (id=lib.suid('step_'), data, options={}) {
       },
 
       onScroll(e){
+        if (this.touchbarEvent) return
         if (this.idfs) {
           let tops = this.tops
           let detail = e.detail
           let scrollTop = detail.scrollTop
+          this.scrollTop = scrollTop
 
           let selects = tops.filter(top=>top<=scrollTop)
           let len = selects.length
           if (this.touchbar) {
             if (scrollTop<tops[0]){
               this.current = null
+              this.touchbar.value = null
               this.touchbar.removeActive()
               this.touchbar.selected(this.current)
             } else {
