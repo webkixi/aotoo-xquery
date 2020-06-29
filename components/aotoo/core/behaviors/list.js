@@ -152,7 +152,7 @@ export const listBehavior = function(app, mytype) {
       }
     },
     methods: {
-      reset: function(param, cb) {
+      _reset: function(param, cb) {
         // this.setData({$list: JSON.parse(this.originalDataSource)})
         if (lib.isFunction(param)) {
           cb = param
@@ -168,6 +168,9 @@ export const listBehavior = function(app, mytype) {
         }
         this.setData({$list: oriData}, cb)
         return this
+      },
+      reset(){
+        this._reset.apply(this, arguments)
       },
 
       forEach(cb, callback){

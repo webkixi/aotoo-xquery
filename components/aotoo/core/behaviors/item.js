@@ -98,7 +98,7 @@ export const itemBehavior = function(app, mytype) {
           }
         }
       },
-      reset: function(param, cb) {
+      _reset: function(param, cb) {
         // this.setData({$item: JSON.parse(this.originalDataSource)})
         if (lib.isFunction(param)) {
           cb = param
@@ -111,6 +111,9 @@ export const itemBehavior = function(app, mytype) {
           this.setData({$item: _resetItem(lib.clone(this.originalDataSource), this)}, cb)
         }
         return this
+      },
+      reset(){
+        this._reset.apply(this, arguments)
       },
       
       addClass: function(itCls) {

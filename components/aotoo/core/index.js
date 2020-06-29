@@ -76,7 +76,8 @@ function mkFind(context, app){
               if (lib.isArray(index)) {
                 let datas = {}
                 index.forEach(idx => {
-                  let item = listInst.data.$list.data[idx]
+                  // let item = listInst.data.$list.data[idx]
+                  let item = listInst.getData().data[idx]
                   let treeid = item.attr['treeid'] || item.attr['data-treeid']
                   item.__realIndex = idx
                   if (item.$$id) {
