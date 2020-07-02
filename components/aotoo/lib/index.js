@@ -95,7 +95,8 @@ export {
   findChilds,
   syncChildData,
   nav,  // wx路由的节流封装 1200毫秒,
-  countdown,  // 倒计时器
+  countdown,  // 倒计时器，手动运行倒计时(.run)
+  cd,  // 倒计时器，自动运行倒计时
   counter  // 计时器，秒表
 } from './util'
 

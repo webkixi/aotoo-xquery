@@ -443,6 +443,11 @@ class cdd {
   }
 }
 
+export function cd(opts = {}, callback, finaFun) {
+  let mycd = new cdd(opts, callback, finaFun)
+  mycd.run()
+}
+
 export function countdown(opts={}, callback, finaFun) {
   return new cdd(opts, callback, finaFun)
 }
