@@ -1,0 +1,53 @@
+.button {
+  width: 180px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  border: none;
+  outline: none;
+  color: white;
+  background-color: #1890ff;
+  font-size: 36rpx;
+  border-radius: 5px;
+  box-shadow: 4rpx 20rpx 20rpx rgba(148, 148, 148, 0.2);
+
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+
+.button.btn {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1), inset 0 -0.25em 0 rgba(0, 0, 0, 0.25), 0 0.25em 0.25em rgba(0, 0, 0, 0.05);
+}
+
+.button.btn:active {
+  outline: 0;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 2px 0 rgba(255, 255, 255, 0.1), inset 0 0.25em 0.5em rgba(0, 0, 0, 0.05);
+}
+
+.button.countdown{
+  font-size: 1.3em;
+}
+
+.button.disable{
+  opacity: 0.6;
+}
+
+.button.loading::before{
+  content: '';
+  width: 1em;
+  height: 1em;
+  margin-right: 0.5em;
+  color: red;
+  border: 2px solid red;
+  border-radius: 50%;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 30%, 0% 30%);
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  to {
+    transform: rotatez(360deg);
+  }
+}

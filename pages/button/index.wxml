@@ -1,0 +1,5 @@
+<view class="container">
+  <ui-item item="{{itemConfig}}" />
+</view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />

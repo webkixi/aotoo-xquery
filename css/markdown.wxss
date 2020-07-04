@@ -511,14 +511,22 @@
 }
 .markdown-body .li {
   word-wrap: break-all;
+  line-height: 150%;
 }
 .markdown-body .li::before {
   content: '•';
   font-size: 20px;
-  position: absolute;
+  /* position: absolute; */
   margin-right: 0.2em;
-  margin-left: -1em;
+  margin-left: -0.7em;
+  position: absolute;
 }
+/* .markdown-body .ul .li, 
+.markdown-body .ol .li {
+  position: relative;
+  display: flex;
+  align-items: center;
+} */
 .markdown-body .ol {
   counter-reset: section;
 }
@@ -526,15 +534,22 @@
   counter-increment: section;
   content: counter(section) ". ";
   margin-right: 0.2em;
-  margin-left: -1em;
+  margin-left: -1.2em;
   font-size: 14px;
+  position: absolute;
 }
 
 .markdown-body .li .p:first-child {
-  margin-top: 16px;
+  /* margin-top: 16px; */
+  margin: 0;
+  flex-direction: column;
 }
 .markdown-body .li {
-  margin-top: 0;
+  display: flex;
+  margin-top: 8rpx;
+  flex-direction: column;
+  position: relative;
+  /* align-items: center; */
 }
 .markdown-body .dl {
   padding: 0;
@@ -552,7 +567,7 @@
 }
 .markdown-body .table {
   display: block;
-  overflow: auto;
+  overflow: hidden;
   width: 100%;
   border-right: 1px solid #dfe2e5;
   border-bottom: 1px solid #dfe2e5;
@@ -565,6 +580,8 @@
   border-left: 1px solid #dfe2e5;
   display: flex;
   padding: 6px 13px;
+  height: 100%;
+  box-sizing: border-box;
 }
 .markdown-body .table .tr {
   display: flex;
