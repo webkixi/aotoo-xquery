@@ -170,7 +170,7 @@ export const listBehavior = function(app, mytype) {
         return this
       },
       reset(){
-        this._reset.apply(this, arguments)
+        return this._reset.apply(this, arguments)
       },
 
       forEach(cb, callback){

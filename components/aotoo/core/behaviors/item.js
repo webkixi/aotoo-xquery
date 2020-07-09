@@ -113,7 +113,7 @@ export const itemBehavior = function(app, mytype) {
         return this
       },
       reset(){
-        this._reset.apply(this, arguments)
+        return this._reset.apply(this, arguments)
       },
       
       addClass: function(itCls) {
