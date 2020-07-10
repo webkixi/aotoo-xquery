@@ -599,16 +599,28 @@ export const listBehavior = function(app, mytype) {
       },
 
       findAndUpdate: function (params, cb) {
+        const that = this
         const res = this.find(params)
-        if (res) {
-          const index = res.__realIndex
-          const isFun = lib.isFunction(cb)
-          let result
-          if (!isFun) return res
-          result = cb(res)
-          if (result) {
-            this.update({ [`data[${index}]`]: result })
+        const isFun = lib.isFunction(cb)
+        const index = res.__realIndex
+        let context = {
+          update(param){
+            if (lib.isObject(param)){
+              that.update({ [`data[${index}]`]: param })    
+            }
           }
+        }
+        if (res) {
+          if (isFun) {
+            cb.call(context, res)
+          } else {
+            if (lib.isObject(cb)) {
+              let param = cb
+              that.update({ [`data[${index}]`]: param })    
+            }
+          }
+        } else {
+          if (isFun) cb.call(this)
         }
       },
 
@@ -684,13 +696,20 @@ export const listBehavior = function(app, mytype) {
         const that = this
         let $list = this.data.$list
         let $data = $list.data
-        if (lib.isString(params)) {
+        if (lib.isString(params) || lib.isObject(params)) {
           let $selectIndex = this.findIndex(params)
           let insertFun = (payload) => {
             if (payload) {
               payload = that.__newItem(payload, 'insert')
               if ($selectIndex || $selectIndex == 0) {
-                $data.splice($selectIndex, 0, payload)
+                if (lib.isArray(payload)) {
+                  payload.forEach((it, ii)=>{
+                    let targetIndex = $selectIndex + ii
+                    $data.splice(targetIndex, 0, it)
+                  })
+                } else {
+                  $data.splice($selectIndex, 0, payload)
+                }
                 that.setData({ $list }, cb)
               }
             }
