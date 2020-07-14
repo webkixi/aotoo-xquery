@@ -1,0 +1,4 @@
+<view class="container">
+  <ui-item wx:if="{{demosConfig}}" item="{{demosConfig}}" />
+  <ui-item wx:if="{{pagesConfig}}" item="{{pagesConfig}}" />
+</view>
