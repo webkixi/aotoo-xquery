@@ -1,0 +1,24 @@
+@import "../common/common.wxss";
+
+.button-flash{
+  color: white;
+  background-color: #262626;
+  overflow: hidden;
+}
+
+.button-flash::before {
+  content: "";
+  z-index: -1;
+  position: absolute;
+  background: #595959;
+  top: -50%;
+  left: 0%;
+  bottom: -50%;
+  width: 1.5em;
+  transition: transform 0.5s ease-in-out;
+  transform: translate3d(-200%, 0, 0) rotate(35deg);
+}
+
+.button-flash:active::before {
+  transform: translate3d(1000%, 0, 0) rotate(35deg);
+}

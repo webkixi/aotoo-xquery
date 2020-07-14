@@ -1,0 +1,2 @@
+@import "../../css/icono.wxss";
+@import "../../components/modules/button.wxss";

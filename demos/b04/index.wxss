@@ -1,0 +1,27 @@
+@import "../common/common.wxss";
+
+.button-pop{
+  overflow: hidden;
+  color: white;
+  background-color: #40a9ff;
+}
+
+.button-pop::before {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  background-color: #9254de;
+  /* 变化位置的代码 */
+  top: 0;
+  left: 0;
+  transform-origin: center;
+  transform: scale3d(0, 0, 0);
+  transition: transform 0.45s ease-in-out;
+}
+
+.button-pop:active::before {
+  transform: scale3d(30, 30, 30);
+}

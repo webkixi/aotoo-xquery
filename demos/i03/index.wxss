@@ -1,0 +1,39 @@
+@import "../common/common.wxss";
+
+.sitem{
+  width: 65vw;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sitem.cat{
+  border: 1px solid #e2e2e2;
+  border-radius: 3px;
+}
+
+.sitem.cat > .htitle{
+  display: flex;
+  box-sizing: border-box;
+  padding: 5px;
+  padding-left: 10px;
+  width: 100%;
+  height: 40px;
+  align-items: center;
+  border-top: 1px solid #e2e2e2;
+  flex: 0 0 auto;
+}
+
+
+.sitem.cat>.ul, .sitem.cat>image {
+  flex: 2;
+}
+
+.sitem.cat>.ul{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+

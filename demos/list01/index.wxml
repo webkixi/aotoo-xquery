@@ -1,0 +1,7 @@
+<view class="container">
+  <ui-list wx:if="{{targetConfig0}}" list="{{targetConfig0}}" />
+  <ui-list wx:if="{{targetConfig}}" list="{{targetConfig}}" />
+  <ui-list wx:if="{{targetConfig1}}" list="{{targetConfig1}}" />
+  <ui-list wx:if="{{targetConfig2}}" list="{{targetConfig2}}" />
+  <ui-list wx:if="{{targetConfig3}}" list="{{targetConfig3}}" />
+</view>

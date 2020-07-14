@@ -1,0 +1,69 @@
+@import "../common/common.wxss";
+
+.sitem{
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #eee;
+  border-radius: 5px;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.sitem .badge{
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  border-radius: 18rpx;
+  background-color: red;
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */
+  color: #fff;
+  overflow: hidden;
+  min-width: 30rpx;
+  min-height: 30rpx;
+  top: -15rpx;
+  right: -15rpx;
+  font-size: 20rpx;
+}
+
+.sitem .badge.none{
+  display: none;
+}
+.sitem .badge.len1{
+  padding: 5rpx;
+  top: -17rpx;
+  right: -17rpx;
+  width: 35rpx;
+  height: 35rpx;
+  border-radius: 50%;
+  font-size: 12px;
+}
+.sitem .badge.len2{
+  padding: 0 10rpx;
+  top: -15rpx;
+  right: -20rpx;
+  width: 35rpx;
+  height: 35rpx;
+  font-size: 12px;
+}
+.sitem .badge.len3{
+  padding: 0 10rpx;
+  top: -15rpx;
+  right: -22rpx;
+  width: 35rpx;
+  height: 35rpx;
+  font-size: 12px;
+}
+.sitem .badge.len4{
+  padding: 0 10rpx;
+  top: -15rpx;
+  right: -22rpx;
+  width: 35rpx;
+  height: 35rpx;
+  font-size: 12px;
+}
+

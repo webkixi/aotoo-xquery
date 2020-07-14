@@ -1,0 +1,26 @@
+@import "../common/common.wxss";
+
+.button-pop{
+  overflow: hidden;
+  color: white;
+  background-color: #40a9ff;
+}
+
+.button-pop::before {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  background-color: #9254de;
+  transform-origin: center;
+  transform: translate3d(-50%, -50%, 0) scale(0, 0);
+  transition: transform 0.45s ease-in-out;
+}
+
+.button-pop:active::before {
+  transform: translate3d(-50%, -50%, 0) scale(15, 15);
+}
