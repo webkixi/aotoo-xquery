@@ -91,7 +91,7 @@ module.exports = function(params={}) {
         cdtime, 
         function(count, ms) { // per callback
           let cdCount = ms/1000
-          cdCount = `${cdPreTitle}(${cdCount})${cdAftTitle}`
+          if (cdPreTitle || cdAftTitle) cdCount = `${cdPreTitle}(${cdCount})${cdAftTitle}`
           if (lib.isFunction(per)) {
             per.call(that, ms, cdCount)
           } else {
