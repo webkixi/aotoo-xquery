@@ -30,7 +30,7 @@
 		"userConfirmedUseCompilerModuleSwitch": false
 	},
 	"compileType": "miniprogram",
-	"libVersion": "2.10.4",
+	"libVersion": "2.11.2",
 	"appid": "wxf3ea6bf81c6ef85a",
 	"projectname": "xquery%E6%B5%8B%E8%AF%95",
 	"debugOptions": {

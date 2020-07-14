@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/index/index",
     "pages/markdown/index",
     "pages/button/index",
     "pages/calendar/index",
@@ -29,6 +30,25 @@
     "pages/steper/index",
     "pages/item/index"
   ],
+  "subpackages": [{
+    "root": "demos/",
+    "name": "demos",
+    "pages": [
+      "list01/index",
+      "i06/index",
+      "i01/index",
+      "i02/index",
+      "i03/index",
+      "i04/index",
+      "i05/index",
+      "b01/index",
+      "b02/index",
+      "b03/index",
+      "b04/index",
+      "b05/index",
+      "b06/index"
+    ]
+  }],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
