@@ -29,9 +29,6 @@ Pager({
           let defaultTitle = '选项三'
           this.update({ 'title[0]': defaultTitle })
         },
-        onTap(){
-          this.toggleClass('active')
-        },
         onOption(e, param, inst){
           inst.siblings().removeClass('active')
           inst.addClass('active')
@@ -40,5 +37,16 @@ Pager({
         }
       }
     },
+  },
+  onLoad(param) {
+    let pageTitle = param.pageTitle
+    if (pageTitle) {
+      wx.setNavigationBarTitle({
+        title: pageTitle
+      })
+    }
+  },
+  onTap(e, param, inst) {
+    inst.toggleClass('active')
   }
 })

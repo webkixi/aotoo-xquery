@@ -17,5 +17,13 @@ Pager({
         {src: 'http://www.agzgz.com/imgs/Result.svg', itemStyle: 'width: 80px' },
       ],
     },
+  },
+  onLoad(param) {
+    let pageTitle = param.pageTitle
+    if (pageTitle) {
+      wx.setNavigationBarTitle({
+        title: pageTitle
+      })
+    }
   }
 })

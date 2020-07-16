@@ -21,7 +21,7 @@
   width: 100%;
   height: 40px;
   align-items: center;
-  border-bottom: 1px solid #e2e2e2;
+  border-top: 1px solid #e2e2e2;
   flex: 0 0 auto;
 }
 

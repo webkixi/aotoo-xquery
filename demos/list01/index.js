@@ -108,6 +108,15 @@ Pager({
     },
   },
   
+  onLoad(param) {
+    let pageTitle = param.pageTitle
+    if (pageTitle) {
+      wx.setNavigationBarTitle({
+        title: pageTitle
+      })
+    }
+  },
+  
   // 更新监听对象并修改title
   onAim(e, param, inst){
     let id = param.id

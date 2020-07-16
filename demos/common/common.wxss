@@ -1,2 +1,8 @@
 @import "../../css/icono.wxss";
 @import "../../components/modules/button.wxss";
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
+}

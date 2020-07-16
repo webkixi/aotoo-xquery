@@ -9,5 +9,13 @@ Pager({
       title: 'Button',
       itemClass: 'button button-flash',
     },
+  },
+  onLoad(param) {
+    let pageTitle = param.pageTitle
+    if (pageTitle) {
+      wx.setNavigationBarTitle({
+        title: pageTitle
+      })
+    }
   }
 })

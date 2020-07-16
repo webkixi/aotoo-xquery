@@ -35,5 +35,13 @@ Pager({
         {title: '∙∙∙', itemClass: 'badge len4'}
       ]
     },
+  },
+  onLoad(param) {
+    let pageTitle = param.pageTitle
+    if (pageTitle) {
+      wx.setNavigationBarTitle({
+        title: pageTitle
+      })
+    }
   }
 })
