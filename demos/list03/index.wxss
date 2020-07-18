@@ -1,0 +1,67 @@
+@import "../common/common.wxss";
+@import "./widgets/search.wxss";
+@import "./widgets/badge.wxss";
+
+page{
+  background-color: #fff;
+}
+
+.container{
+  padding: 0;
+}
+
+.demo-slip-list{
+  width: 100vw;
+  background: linear-gradient(to right, #fff 22%, #eee 22%);
+}
+
+.demo-slip-list-item{
+  width: 100%;
+  height: 60px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  padding-left: 4%;
+  background-color: #fff;
+  /* border-bottom: 1px solid red; */
+  display: flex;
+  align-items: center;
+  margin-bottom: 1px;
+  position: relative;
+}
+
+.demo-slip-list-item image{
+  flex: 0 0 auto;
+}
+
+.demo-slip-list-item .body{
+  flex: 2;
+  box-sizing: border-box;
+  margin-left: 16px;
+}
+
+.demo-slip-list-item .body .htitles{
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-slip-list-item .body .htitles .t-item:first-child{
+  font-size: 36rpx;
+  margin-bottom: 6px;
+}
+
+.demo-slip-list-item .body .htitles .t-item:last-child{
+  font-size: 26rpx;
+  color: #999
+}
+
+
+.demo-slip-list-item>.hdot-item:last-child{
+  position: absolute;
+  top: 12rpx;
+  right: 30rpx;
+  font-size: 12px;
+  color: #ccc;
+}
+
+
+

@@ -1,0 +1,6 @@
+<view class="container">
+  <view class="search-zone">
+    <view class="input-search">搜索</view>
+  </view>
+  <ui-list wx:if="{{targetConfig}}" list="{{targetConfig}}" class="menus"/>
+</view>

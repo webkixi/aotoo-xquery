@@ -1,0 +1,52 @@
+.demo-slip-list-item .badge{
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  border-radius: 18rpx;
+  background-color: red;
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */
+  color: #fff;
+  overflow: hidden;
+  min-width: 25rpx;
+  min-height: 25rpx;
+  top: 4rpx;
+  left: calc(4% + 40px);
+  font-size: 20rpx;
+  box-sizing: border-box;
+}
+
+.demo-slip-list-item .badge.none{
+  display: none;
+}
+.demo-slip-list-item .badge.len1{
+  /* padding: 5rpx; */
+  top: 0;
+  left: calc(4% + 38px);
+  width: 35rpx;
+  height: 35rpx;
+  border-radius: 50%;
+  font-size: 12px;
+}
+.demo-slip-list-item .badge.len2{
+  top: 0;
+  left: calc(4% + 35px);
+  width: 45rpx;
+  height: 35rpx;
+  font-size: 12px;
+}
+.demo-slip-list-item .badge.len3{
+  top: 0;
+  left: calc(4% + 32px);
+  width: 55rpx;
+  height: 35rpx;
+  font-size: 11px;
+}
+.demo-slip-list-item .badge.len4{
+  top: 0;
+  left: calc(4% + 34px);
+  width: 45rpx;
+  height: 35rpx;
+  font-size: 12px;
+}

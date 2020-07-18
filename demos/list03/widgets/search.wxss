@@ -1,0 +1,24 @@
+.search-zone {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  background-color: #eee;
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+.input-search {
+  width: 100%;
+  background-color: #fff;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  border-radius: 5px;
+}
+
+.input-search::before{
+  content: '';
+}

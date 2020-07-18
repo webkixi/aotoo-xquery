@@ -1,7 +1,7 @@
 //index.js
 //获取应用实例
 const app = getApp()
-const Pager = require('../../components/aotoo/core/index')
+const Pager = require('../common/extpager')
 const lib = Pager.lib
 
 Pager({
