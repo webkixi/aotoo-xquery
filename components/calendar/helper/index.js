@@ -396,7 +396,6 @@ export function oneMonthListConfig(timestart) {
             handle.fillMonth()
           }
           if (edgeId === monInstId) {
-            // handle.hooks.emit('emptyChecked', {itemClass: 'invalid'})
             handle.hooks.emit('restore-month-days')
             handle.tint(edgeDate, null, 'invalid')
           } else {
@@ -797,9 +796,24 @@ export function oneMonthListConfig(timestart) {
             if (lib.isArray(param)) {
               updata = param
             }
-            this.update(updata, function() {
-              that.hooks.emit('lazy')
-            })
+
+            let $data = this.data.$list.data
+            if ($data.length) {
+              let tmpData = {}
+              updata.forEach((it, ii)=>{
+                if (it.itemClass!==$data[ii].itemClass){
+                  let key = `data[${ii}]`
+                  tmpData[key] = it
+                }
+              })
+              if (Object.keys(tmpData).length) {
+                this.update(tmpData)
+              }
+            } else {
+              this.update(updata, function() {
+                that.hooks.emit('lazy')
+              })
+            }
           }
         }
       }

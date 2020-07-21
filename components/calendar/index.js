@@ -817,7 +817,8 @@ Component({
         // 选择范围
         if (type === 'range') {
           if (len === 0 || len === 2) {
-            this.rangeStartMonth = this.currentMonth
+            // this.rangeStartMonth = this.currentMonth
+            this.rangeStartMonth = this.getMonthInstance(date)
             this.value = value = [date]
             len = 1
             this.hooks.emit('empty-month-checked') // 清空所有选择日期
@@ -832,9 +833,9 @@ Component({
               } else {
                 if (curStamp < zeroStamp) {
                   let theMon = monInst || this.$month(zeroStamp)
-                  if (theMon) {
-                    theMon.emptyChecked()
-                  }
+                  // if (theMon) {  // theMon.checked中已经重置过
+                  //   theMon.emptyChecked()
+                  // }
                   value[0] = date
                 }
               }
@@ -948,15 +949,8 @@ Component({
             let dayTime = 24*60*60*1000
             let gap = 0
             if (diffStamp > 0) {
-              this.rangeEndMonth = this.currentMonth
+              // this.rangeEndMonth = this.currentMonth
               gap = parseInt(diffStamp/dayTime)
-              // if (diffStamp%dayTime) gap++
-              // if (gap < rangeCount) {
-              //   gap++
-              //   this.tintRange()
-              // } else {
-              //   this.removeValue(value[1], inst)
-              // }
               this.tintRange()
             } else {
               this.rangeEndMonth = null
