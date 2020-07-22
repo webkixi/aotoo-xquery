@@ -94,8 +94,13 @@ const attrKey = [
   'data', 'mode'
 ]
 
+// const accessKey = [
+//   'title', 'img', 'icon', 'list', 'tree', 'item', 
+//   'header', 'body', 'footer', 'dot', 'li', 'k', 'v', 'url'
+// ]
+
 const accessKey = [
-  'title', 'img', 'icon', 'list', 'tree', 'item', 
+  'title', 'img',  
   'header', 'body', 'footer', 'dot', 'li', 'k', 'v', 'url'
 ]
 

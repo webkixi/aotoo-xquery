@@ -81,3 +81,7 @@
   </block>
 </block>
 
+<block wx:else>
+  <template is="catchtouch" data="{{item}}"></template>
+</block>
+

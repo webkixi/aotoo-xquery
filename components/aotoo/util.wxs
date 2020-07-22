@@ -429,6 +429,9 @@ function optionObserver(newValue, oldValue, ownerInstance, instance) {
   if (newValue.navpad) {
     globleVar.navpad = globleVar.navpad || {}
   }
+  if (newValue.slip) {
+    globleVar.listSlip = globleVar.listSlip || {}
+  }
   if (isObject(newValue.navball)) {
     tpos.current.navballStartX = newValue.navball.start.x
     tpos.current.navballStartY = newValue.navball.start.y
@@ -499,13 +502,7 @@ function chooseTouchFun(e, ins, stopPropagation) {
   var currentTarget = e.currentTarget
   var dataset = currentTarget.dataset
   var dsetEvt = e.type + '@@' + dataset['evt']
-  var slipObj = {
-    direction: 'a',
-    min: 20,
-    width: 60,
-    height: 0,
-    find: '.move-it'
-  }
+  var slipObj = {}
 
   tpos.events = {}
 
@@ -513,82 +510,6 @@ function chooseTouchFun(e, ins, stopPropagation) {
   var allParam = tmp.allParam
   
   if (allParam) {
-    if (allParam.__slip) {
-      var slip = allParam.__slip.fun ? allParam.__slip.fun.split(';;') : allParam.__slip.split(';;')
-      var slip2 = slip[2] && slip[2].split(':')
-      var wid = slip2[0]
-      var hgt = slip2[1]
-      slipObj = {
-
-        // 定义移动方向, 有 
-        // a => 允许左移  d => 允许右移  ad => 允许左右移动  
-        // w => 允许上移 s => 允许下移 ws =>允许上下移
-        // wsad/adws/asdw => 允许上下左右移动，
-        // -- 根据手指滑动的位移距离，判断移动方向，
-        // -- 当垂直移动距离 > 水平移动距离时，限定移动为上下
-        // -- 当水平移动距离 > 垂直移动距离时，限定移动为左右
-        direction: slip[0] || slipObj.direction,
-
-        // 设置最小位移值，用于触发子元素的移动
-        min: slip[1] || slipObj.min,
-
-        // 子菜单的最小宽度
-        width: wid || slipObj.width,
-
-        // 子元素的类名
-        find: slip[3] || slipObj.find,
-
-        // 上下移动时一定需要高度值
-        height: hgt || slipObj.height,  
-
-        // 子菜单的个数，如：删除，关注等
-        length: 0,  
-
-        // 存放treeid的数组
-        siblingIds: [],  
-
-        siblings: {},
-      }
-
-      if (touchMethods.indexOf(evtType) > -1) {
-        var allInst = ins.selectAllComponents(slipObj.find)
-
-        // 将每一个子实例及其treeid存放于数组
-        // treeid数组，子实例数组
-        // 可以通过当前操作实例的treeid判定哪些是兄弟节点实例
-        
-        var tmpCount = -1
-        for (var ii = 0; ii < allInst.length; ii++) {
-          var oneInst = allInst[ii]
-          var treeid = oneInst.getDataset().treeid
-          slipObj.siblingIds[ii] = treeid // 将所有子元素的treeid存储于数组，并与实例数组的下标对应
-          slipObj.siblings[treeid] = oneInst // 实例数组，当上下移动时，控制相邻实例的运动
-          if (!tpos._siblingIds[ii]) {
-            tpos._siblingIds[ii] = treeid // 将所有子元素的treeid存储于数组，并与实例数组的下标对应
-          }
-
-          if (tpos._siblingIds.indexOf(treeid) == -1) {
-            tmpCount ++
-          }
-        }
-
-        if (tmpCount > -1) {
-          tpos._siblingIds = slipObj.siblingIds
-        }
-
-        // 批量设置子菜单的宽度
-        var myfind = slipObj.find + '>>> .li-item'
-        var sonsInst = ins.selectAllComponents(myfind)
-        var liItems = e.instance.selectAllComponents('.li-item')
-        slipObj.length = liItems.length
-        for (var ii = 0; ii < sonsInst.length; ii++) {
-          var myInst = sonsInst[ii]
-          myInst.setStyle('width: ' + slipObj.width + 'px')
-        }
-        slipObj.max = slipObj.width * slipObj.length
-      }
-    }
-    
      e.__query = tmp.param
      tpos.__allParam = tpos.__allParam || allParam
      tpos._allParam = tpos._allParam || sClone(tpos.__allParam)
@@ -635,73 +556,20 @@ function tStart(e, slip, ins, stopPropagation) {
   tpos.moving = false
 
   var cb = param.cb
-  var h = parseInt(slip.height)
-  var ddd = slip.direction
-  var min = slip.min
-  var width = slip.width
-  var max = slip.max
-  var find = slip.find
-  var inst = e.instance
-  var tmpTarget = tpos.instance
 
   tpos.start.x = parseInt(pageX)
   tpos.start.y = parseInt(pageY)
   tpos.start.timeStamp = e.timeStamp
 
-  if (allParam.__slip) {
-    if (tmpTarget) {
-      var tmpSlip = tmpTarget.slip
-      var tmpInst = tmpTarget.inst
-      var tmpTreeid = tmpTarget.treeid
-      // 确定是同一组操作对象，所有slip属性一致
-      if (tmpSlip.direction == ddd && tmpSlip.min == min && tmpSlip.width == width && tmpSlip.find == slip.find) {
-        if (treeid && tmpTreeid !== treeid) {
-          if (ddd.indexOf('a')>-1 || ddd.indexOf('d')>-1) {
-            if (tmpTarget.moving) {
-              var siblingIds = slip.siblingIds
-              var _siblingIds = tpos._siblingIds
-              var oIdx = siblingIds.indexOf(tmpTreeid)
-              var cIdx = _siblingIds.indexOf(tmpTreeid)
-              var cpos = (cIdx-oIdx)*h
-              setStyle(tmpInst, 0, cpos)
-            }
-          } else {
-            // if (ddd.indexOf('w')>-1||ddd.indexOf('s') > -1) { }
-          }
-        }
-      } else {
-        // 当选择的slip对象不相同时，清空栈数据
-        tpos._siblingIds = slip.siblingIds
-      }
-    }
-    tpos.instance = {
-      slip: slip,
-      inst: inst,
-      treeid: treeid,
-      direction: ddd,
-      prev: tmpTarget
-    }
-  
-    tpos.start = {
-      x: pageX,
-      y: pageY
-    }
-  
-    if (cb) {
-      ins.callMethod(cb, e)
-    }
-  } else {
-    /** */
-  }
-
-  if (allParam.__drop){
-    dropStart(e, ins)
-  }
+  // if (allParam.__drop){
+  //   dropStart(e, ins)
+  // }
 
   if (globleVar.touchoption) {
     if (globleVar.touchoption.navball) navballStart(e, ins)
     if (globleVar.touchoption.sslider) ssliderStart(e, ins)
     if (globleVar.touchoption.navpad) navpadStart(e, ins)
+    if (globleVar.touchoption.slip) slipStart(e, ins)
   }
 
   // 响应js的touchstart方法
@@ -741,12 +609,6 @@ function tMove(e, slip, ins, stopPropagation) {
   var param = e.__query
   var allParam = tpos.__allParam
   var cb = param.cb
-  var ddd = slip.direction || 'a'
-  var min = slip.min || 30
-  var max = slip.max || 120
-  var find = slip.find || '.move-it'
-  var absMax = Math.abs(max)
-  var absMin = Math.abs(min)
 
   // var allInst = ins.selectAllComponents(find)
   var inst = e.instance
@@ -764,143 +626,11 @@ function tMove(e, slip, ins, stopPropagation) {
   tpos.current.x = parseInt(pageX)
   tpos.current.y = parseInt(pageY)
 
-  // tpos.moving = false
-  // tpos.instance && (tpos.instance.moving = false)
-  // if (absDiffx > 10 || absDiffy > 10) {
-  //   tpos.moving = true
-  //   // if (allParam.__slip) tpos.instance && (tpos.instance.moving = true)
-  // }
-  
-  var h = parseInt(slip.height)
-  if (allParam.__slip) {
-    if (absDiffx > 10 || absDiffy > 10) {
-      tpos.instance && (tpos.instance.moving = true)
-    }
-
-    var oriIndex = slip.siblingIds.indexOf(treeid)
-    var curIndex = tpos._siblingIds.indexOf(treeid)
-    var curPos  = curIndex*h
-
-    var startTime = tpos.timeStamp.start
-    var nowTime = e.timeStamp
-    var gapTime = nowTime - startTime
-
-    // 纵向移动  
-    if (absDiffy > absDiffx && gapTime > 1000) {
-      if ((ddd.indexOf('w')>-1||ddd.indexOf('s') > -1) && slip.height > 0 && absDiffy > min) {
-        var diffPos = (curIndex - oriIndex) * h
-        var moveY = diffPos + diffY
-        
-        var offY  = curPos + diffY
-        var computIndex = parseInt(offY/h)
-        var threshold = computIndex*h + parseInt(h/2)
-        
-        var nxIndex
-        var nxTreeid
-        var oriNxIndex
-        var diffNx
-        var nxSibling
-        var cPos
-
-        // 向下
-        if (offY > curPos) {
-          inst.setStyle('transform: translateY(' + moveY + 'px)')
-          if (offY >= threshold) {
-            nxIndex = computIndex+1
-            // nxIndex = curIndex + 1
-            nxTreeid = tpos._siblingIds[nxIndex]
-            oriNxIndex = slip.siblingIds.indexOf(nxTreeid)
-            diffNx = (nxIndex - oriNxIndex)*h - h
-            nxSibling = slip.siblings[nxTreeid]
-            cPos = nxIndex*h
-          } else {
-            nxIndex = computIndex + 1
-            nxTreeid = tpos._siblingIds[nxIndex]
-            oriNxIndex = slip.siblingIds.indexOf(nxTreeid)
-            diffNx = (nxIndex - oriNxIndex) * h
-            nxSibling = slip.siblings[nxTreeid]
-            cPos = (nxIndex-1) * h
-          }
-        }
-        
-        // 向上
-        else if (offY < curPos) {
-          if (computIndex != curIndex) {
-            inst.setStyle('transform: translateY(' + moveY + 'px)')
-            if (offY < threshold) {
-              nxIndex = computIndex
-              // nxIndex = curIndex - 1
-              nxTreeid = tpos._siblingIds[nxIndex]
-              oriNxIndex = slip.siblingIds.indexOf(nxTreeid)
-              diffNx = (nxIndex - oriNxIndex) * h + h
-              nxSibling = slip.siblings[nxTreeid]
-              cPos = nxIndex * h
-            } else {
-              nxIndex = computIndex
-              nxTreeid = tpos._siblingIds[nxIndex]
-              oriNxIndex = slip.siblingIds.indexOf(nxTreeid)
-              diffNx = (nxIndex - oriNxIndex) * h
-              nxSibling = slip.siblings[nxTreeid]
-              cPos = (nxIndex+1) * h
-            }
-          }
-        }
-
-        if (nxSibling) {
-          nxSibling.setStyle('transform: translateY(' + diffNx + 'px)')
-          tpos.current.pos = cPos
-        }
-      }
-
-    } 
-    // 横向移动
-    else {
-      var runtimePos = (curIndex-oriIndex)*h
-      if (ddd.indexOf('a') > -1) {
-        if (diffX < 0) {
-          if (absDiffx < absMax) {
-            setStyle(inst, diffX, runtimePos)
-          } else {
-            setStyle(inst, -(absMax), runtimePos)
-          }
-        } else {
-          if (absDiffx > absMin) {
-            setStyle(inst, 0, runtimePos)
-          }
-        }
-      }
-    
-      if (ddd.indexOf('d')>-1) {
-        if (diffX > 0) {
-          if (absDiffx < absMax) {
-            setStyle(inst, diffX, runtimePos)
-          } else {
-            setStyle(inst, absMax, runtimePos)
-          }
-        } else {
-          if (absDiffx > absMin) {
-            setStyle(inst, 0, runtimePos)
-          }
-        }
-      }
-    }
-
-    if (cb) {
-      ins.callMethod(cb, e)  // 不要执行本对象setData方法，会中断move方法，但可以执行其他对象的渲染方法
-    }
-  } else {
-    /** */
-  }
-
-  // 允许拖动
-  if (allParam.__drop) {
-    dropMove(e, ins)
-  }
-
   if (globleVar.touchoption) {
     if (globleVar.touchoption.navball) navballMove(e, ins)
     if (globleVar.touchoption.sslider) ssliderMove(e, ins)
     if (globleVar.touchoption.navpad) navpadMove(e, ins)
+    if (globleVar.touchoption.slip) slipMove(e, ins)
   }
   
   tpos.current.timeStamp = e.timeStamp
@@ -908,6 +638,165 @@ function tMove(e, slip, ins, stopPropagation) {
   if (tevent && (tevent !== 'true' || tevent.fun !== 'true')) {
     stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
   }
+}
+
+function slipStart(e, ins) {
+  var id = e.currentTarget.id
+  var currentTarget = e.currentTarget
+  var inst = e.instance
+  var offsetLeft = currentTarget.offsetLeft
+  var offsetTop = currentTarget.offsetTop
+  var changedTouches = e.changedTouches[0]
+  var pageX = changedTouches.pageX
+  var pageY = changedTouches.pageY
+  var listSlip = globleVar.listSlip
+  var slipEnv = globleVar.touchoption.slip
+  var wth = parseInt(slipEnv.menuWidth.replace('px', ''))
+  var count = slipEnv.menuCount
+  var maxDistance = wth*count  // 左移最大距离
+
+  listSlip.start = listSlip.start || {}
+  listSlip.finish = listSlip.finish || {}
+
+  var start = listSlip.start[id] || {}
+  var finish = listSlip.finish[id] || {}
+  var current = listSlip.current || {}
+
+  if (current && current.inst) {
+    if (id !== current.id) {
+      var _id = current.id
+      listSlip.finish[_id] = {
+        diffX: 0,
+        slipOpened: false
+      }
+      current.inst.setStyle('transition: all ease-in-out .3s;transform: translate3d(0, 0, 0)')
+    }
+  }
+
+  start = {
+    x: pageX,
+    y: pageY,
+    pageX: pageX,
+    pageY: pageY,
+    timeStamp: e.timeStamp,
+    offsetLeft: offsetLeft,
+    offsetTop: offsetTop,
+    maxDistance: maxDistance
+  }
+
+  listSlip.start[id] = start
+  e.slipOpened = finish.slipOpened ? true : false
+}
+
+function slipMove(e, ins) {
+  var listSlip = globleVar.listSlip
+  var inst = e.instance
+  var slipEnv = globleVar.touchoption.slip
+  var slipLeft = slipEnv.slipLeft
+
+  var changedTouches = e.changedTouches[0]
+  var currentTarget = e.currentTarget
+  var id = currentTarget.id
+  var start = listSlip.start[id]
+  var finish = listSlip.finish[id] || {}
+  var maxDistance = start.maxDistance
+
+  var pageX = changedTouches.pageX
+  var pageY = changedTouches.pageY
+
+  var diffX = pageX - start.x
+  var diffY = pageY - start.y
+  var absX = Math.abs(diffX)
+  var absY = Math.abs(diffY)
+  
+  var targetX = diffX + (finish.diffX||0)
+
+  if (targetX < -(maxDistance)) {
+    targetX = -(maxDistance)
+  }
+
+  if (slipLeft && absX > absY) {
+    e.slip = true
+    if (targetX<=0) {
+      inst.setStyle('transform: translate3d(' + targetX + 'px, 0, 0)')
+    }
+  }
+
+  listSlip.current = {
+    id: id,
+    inst: inst,
+    x: pageX,
+    y: pageY,
+    diffX: diffX,
+    diffY: diffY
+  }
+}
+function slipEnd(e, ins) {
+  var inst = e.instance
+  var id = e.currentTarget.id
+  var listSlip = globleVar.listSlip
+  var slipEnv = globleVar.touchoption.slip
+  var slipLeft = slipEnv.slipLeft
+
+  var changedTouches = e.changedTouches[0]
+  var currentTarget = e.currentTarget
+
+  var pageX = changedTouches.pageX
+  var pageY = changedTouches.pageY
+
+  var start = listSlip.start[id]
+  var finish = listSlip.finish[id] || {}
+  var maxDistance = start.maxDistance
+
+  var diffX = pageX - listSlip.start[id].x
+  var diffY = pageY - listSlip.start[id].y
+
+  var targetX = diffX + (finish.diffX || 0)
+  var targetY = diffY + (finish.diffY || 0)
+
+  var slipOpened = finish.slipOpened
+
+  if (diffX < 0) {
+    if (targetX < -(maxDistance)) {
+      targetX = -(maxDistance)
+      slipOpened = true
+    } else {
+      var absX = Math.abs(diffX)
+      if (absX < (maxDistance/2)) {
+        targetX = 0
+        slipOpened = false
+      } else {
+        targetX = -(maxDistance)
+        slipOpened = true
+      }
+    }
+  } else {
+    targetX = 0
+    slipOpened = false
+  }
+  diffX = targetX
+
+  inst.closeIt = function() {
+    if (slipOpened) {
+      slipOpened = false
+      listSlip.finish[id] = {
+        diffX: 0,
+        slipOpened: false
+      }
+      targetX = 0
+      inst.setStyle('transition: all ease-in-out .3s;transform: translate3d(' + targetX + 'px, 0, 0)')
+    }
+  }
+  
+  listSlip.finish[id] = {
+    x: pageX,
+    y: pageY,
+    diffX: diffX,
+    diffY: diffY,
+    slipOpened: slipOpened
+  }
+  e.slip = false
+  inst.setStyle('transition: all ease-in-out .3s;transform: translate3d(' + targetX + 'px, 0, 0)')
 }
 
 // 导航球
@@ -920,7 +809,6 @@ function navballStart(e, ins) {
   tpos.current.navballStartX = tpos.current.navballStartX || tpos.start.x
   tpos.current.navballStartY = tpos.current.navballStartY || tpos.start.y
 }
-
 function navballMove(e, ins) {
   var inst = e.instance
   var id = e.currentTarget.id
@@ -962,7 +850,11 @@ function navballMove(e, ins) {
     inst.setStyle('transform: translate3d(' + navballOffsetX + 'px, ' + navballOffsetY + 'px, 0)')
   }
 }
+function navballEnd(e, ins) {
+  e.currentPosition = tpos.current
+}
 
+// 导航面板
 function navpadStart(e, ins) {
   var id = e.currentTarget.id
   if (id.indexOf('$$navpad') === -1) return
@@ -1076,10 +968,8 @@ function navpadEnd(e, ins) {
   }
 }
 
-function navballEnd(e, ins) {
-  e.currentPosition = tpos.current
-}
 
+// 双向选择条
 function ssliderStart(e, ins) {
   var inst = e.instance
   var id = e.currentTarget.id
@@ -1101,7 +991,6 @@ function ssliderStart(e, ins) {
   globleVar.sslider.halfBlockSize = parseInt(ssliderConfig.blockSize/2)
   globleVar.sslider.oneStepDraw = false
 }
-
 function ssliderMove(e, ins) {
   var inst = e.instance
   var id = e.currentTarget.id
@@ -1310,18 +1199,6 @@ function ssliderEnd(e, ins) {
   globleVar.ssliderAixs.setStyle(aixsStyle)
 }
 
-function dropStart(e, ins) {
-  
-}
-
-function dropMove(e, ins) {
-  
-}
-
-function dropEnd(e, ins) {
-  
-}
-
 function tEnd(e, slip, ins, stopPropagation) {
   var currentTarget = e.currentTarget
   var dataset = currentTarget.dataset
@@ -1330,13 +1207,6 @@ function tEnd(e, slip, ins, stopPropagation) {
   var param = e.__query
   var allParam = tpos.__allParam
   var cb = param.cb
-  var ddd = slip.direction || 'a'
-  var width = slip.width
-  var min = slip.min || 30
-  var max = slip.max || 120
-  var find = slip.find || '.move-it'
-  var absMin = Math.abs(min)
-  var absMax = Math.abs(max)
   tpos.timeStamp.end = e.timeStamp
   var gapTime = tpos.timeStamp.end - tpos.timeStamp.start
 
@@ -1355,78 +1225,11 @@ function tEnd(e, slip, ins, stopPropagation) {
   var diffY = pageY - startY
   var absDiffx = Math.abs(diffX)
   var absDiffy = Math.abs(diffY)
-  
-  if (allParam.__slip && tpos.moving) {
-    var h = slip.height  // height
-    var oriIndex = slip.siblingIds.indexOf(treeid)
-    var curIndex = tpos._siblingIds.indexOf(treeid)
-    
-    if (absDiffy > absDiffx) {
-      var _offset = curPos && parseInt(curPos/h)
-      var offset = _offset - curIndex
-      var slipDone = {
-        index: curIndex,
-        offset: _offset || 0
-      }
-      e.currentTarget.dataset.slipDone = slipDone
-      if ((ddd.indexOf('w')>-1 || ddd.indexOf('s')>-1) && slip.height > 0) {
-        if (typeof curPos == 'number') {
-          var rightPos = curPos - oriIndex*h
-          inst.setStyle('transform: translateY(' + rightPos + 'px)')
-          var _s = tpos._siblingIds
-          var __siblingIds = JSON.parse(JSON.stringify(tpos._siblingIds))
-
-          if (offset) {
-            if (offset > 0) {
-              __siblingIds.splice((_offset+1), 0, _s[curIndex])
-              __siblingIds.splice(curIndex, 1)
-            } else {
-              if (offset < 0) {
-                __siblingIds.splice((curIndex + offset), 0, _s[curIndex])
-                __siblingIds.splice((curIndex + 1), 1)
-              }
-            }
-          }
-          
-          tpos._siblingIds = __siblingIds
-        }
-      }
-    } else {
-      var runtimePos = (curIndex - oriIndex)*h
-      if (ddd.indexOf('a') > -1) {
-        if (diffX < 0) {
-          if (absDiffx < absMin) {
-            setStyle(inst, 0, runtimePos)
-          } else {
-            setStyle(inst, -(absMax), runtimePos)
-          }
-        }
-      }
-  
-      if (ddd.indexOf('d') > -1) {
-        if (diffX > 0) {
-          if (absDiffx < absMin) {
-            setStyle(inst, 0, runtimePos)
-          } else {
-            setStyle(inst, absMax, runtimePos)
-          }
-        }
-      }
-    }
-    
-    if (cb) {
-      ins.callMethod(cb, e)
-    }
-  } 
-
-  // 允许拖动
-  if (allParam.__drop) {
-    dropEnd(e, ins)
-  }
 
   if (globleVar.touchoption) {
     if (globleVar.touchoption.sslider) ssliderEnd(e, ins)
     if (globleVar.touchoption.navpad) navpadEnd(e, ins)
+    if (globleVar.touchoption.slip) slipEnd(e, ins)
     if (globleVar.touchoption.navball) {
       navballEnd(e, ins)
       if (absDiffx < 5 && absDiffy < 5) {

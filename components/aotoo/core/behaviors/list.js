@@ -25,6 +25,21 @@ const {
 function updateSelf(params) {
   if (params && isObject(params)) {
     params = setPropsHooks.call(this, params)
+
+    let $props = this.data.props||{}
+    let $itemMethod = $props.itemMethod || params.itemMethod || {}
+    let hasTouchoption = false
+    let touchoption = $itemMethod.touchoption || params.touchoption
+    if (params.touchoption){
+      delete params.touchoption
+    }
+    if (touchoption) {
+      hasTouchoption = true
+      params.itemMethod = params.itemMethod || $itemMethod
+      params.itemMethod.touchoption = touchoption
+      params.hasTouchoption = true
+    }
+
     let list = params
     let listProps = (() => {
       let props = {}

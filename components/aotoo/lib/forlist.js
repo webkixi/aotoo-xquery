@@ -118,8 +118,77 @@ export function reSetArray(data, list) {
       list.itemMethod = tmp
     }
 
+    
     if (isArray(data)) {
-      list.data = data.map(item => reSetItemAttr.call(this, item, list))
+      if (list.hasTouchoption) {
+        this._onSlipMenus = (e, param, inst) => {
+          let acp = this.activePage
+          if (acp && isFunction(acp['onSlipMenus'])) {
+            let id = param.id
+            let tmp = this.find({id})
+            let target = null
+            if (tmp) {
+              target = tmp.data[0]
+            }
+            acp['onSlipMenus'].call(acp, e, param, target)
+          } else {
+            console.warn('在Page环境中定义onSlipMenus方法');
+          }
+        }
+      }
+
+      list.data = data.map(item => {
+        if (list.hasTouchoption) {
+          item.id = item.id || suid('item_')
+          let touchoption =  list.itemMethod.touchoption
+          
+          let slip = touchoption.slip || {}
+          let slipLeft = slip.slipLeft
+          let deletePart = {title: '删除', _aim: '_onSlipMenus?id='+item.id+'&action=delete'}
+          
+          if (slipLeft) {
+            if (slipLeft === true) slipLeft = []
+            slip.menuWidth = slip.menuWidth || '80px'
+            slipLeft = [].concat(slipLeft, deletePart)
+          }
+
+          let itemSlipLeft = []
+          let itemTouchoption = item.touchoption
+          if (itemTouchoption) {
+            let itemSlip = itemTouchoption.slip || {}
+            itemSlipLeft = itemSlip.slipLeft
+            if (itemSlipLeft) {
+              if (itemSlipLeft === true) itemSlipLeft = []
+              if (isString(itemSlipLeft)) {
+                itemSlipLeft = [itemSlipLeft]
+              }
+            }
+          }
+
+          if (itemSlipLeft.length) {
+            slipLeft = itemSlipLeft
+          }
+          
+          if (slipLeft && slipLeft.length) {
+            slipLeft = slipLeft.map(it=>{
+              if (isString(it)) {
+                it = {title: it, _aim: '_onSlipMenus?id='+item.id+'&action='+it}
+              }
+              if (isObject(it)) {
+                let styleWidth = 'width:' + (slip.menuWidth) + ';'
+                it.containerStyle = styleWidth + (it.itemStyle||'') 
+              }
+              return it
+            })
+
+            item.li = [].concat((item.li||[]), slipLeft)
+            item.liClass = (item.liClass||'') + ' slip-menus'
+
+            slip.menuCount = (slipLeft.length || 0)
+          }
+        }
+        return reSetItemAttr.call(this, item, list)
+      })
     }
     delete list.itemMethod
     return list

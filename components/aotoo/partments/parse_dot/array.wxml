@@ -23,7 +23,8 @@
     <template is="@list"  data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'hdot-item'} }}" />
   </block>
   <block wx:else>
-    <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), itemClass: son.itemClass ?  'hdot-item ' + son.itemClass : 'hdot-item'} }}" />
+    <!-- <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), itemClass: son.itemClass ?  'hdot-item ' + son.itemClass : 'hdot-item'} }}" /> -->
+    <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'hdot-item'} }}" />
   </block>
 </block>
 <!-- <block wx:for="{{item.dot}}" wx:key="__key">

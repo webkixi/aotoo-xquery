@@ -24,7 +24,8 @@
       <template is="@list"  data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'hb-item'} }}" />
     </block>
     <block wx:else>
-      <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), itemClass: son.itemClass ?  'hb-item ' + son.itemClass : 'hb-item'} }}" />
+      <!-- <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), itemClass: son.itemClass ?  'hb-item ' + son.itemClass : 'hb-item'} }}" /> -->
+      <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'hb-item'} }}" />
     </block>
   </block>
 </view>
