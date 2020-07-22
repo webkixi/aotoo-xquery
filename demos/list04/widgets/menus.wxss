@@ -1,0 +1,25 @@
+.demo-slip-list-item>.slip-menus {
+  position: absolute;
+  height: 100%;
+  left: 100%;
+  top: 0;
+  display: flex;
+  align-items: center;
+}
+
+.demo-slip-list-item>.slip-menus .li-item {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: var(--slip-list-item-height);
+  height: var(--slip-list-item-height);
+  background-color: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+
+
+.demo-slip-list-item>.slip-menus .li-item:nth-of-type(odd) {
+  background-color: blue;
+}

@@ -36,6 +36,7 @@ function itemInfo(params) {
 
 function mkBody(title, info) {
   return {
+    tap: 'onTap',
     title,
     dot: itemInfo([info, '下午4:30'])
   }
@@ -52,6 +53,11 @@ const menusData = [
     id: 'nav-2', 
     img: src(), 
     ...mkBody(['订阅号消息', '难怪你的牙黄，原来是你刷牙时忘了这件事!'], '78'),
+    touchoption: {
+      slip: {
+        slipLeft: ['自定义', '菜单'],
+      }
+    },
   },
 
   {
@@ -106,7 +112,25 @@ Pager({
       listClass: 'demo-slip-list',
       itemClass: 'demo-slip-list-item',
       data: menusData,
+      itemMethod: {
+        touchoption: {
+          slip: {
+            slipLeft: ['详情', '喜欢'],
+          }
+        },
+        touchstart(e){},
+      }
     },
+  },
+
+  onTap(){
+    console.log('======== 响应tap事件');
+    Pager.alert('子项点击响应')
+  },
+  
+  onSlipMenus(e, param, inst){
+    console.log('==== 响应侧滑菜单点击事件');
+    Pager.alert('侧滑菜单项点击响应: '+param.action)
   },
   
   onLoad(param) {
