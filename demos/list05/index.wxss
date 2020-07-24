@@ -1,0 +1,193 @@
+@import "../common/common.wxss";
+
+page{
+  background-color: #efefef;
+}
+
+.container{
+  padding: 0;
+  padding-top: 0;
+}
+
+.today{
+  font-size: 35px;
+  font-weight: 700;
+  background-color: #fff;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  box-sizing: border-box;
+  padding: 10px;
+  background-color: #f9f9f9;
+  padding-left: 20px;
+  padding-bottom: 0;
+  margin-bottom: -5px;
+}
+
+.demo-list {
+  width: 100vw;
+  min-height: 100%;
+  padding: 30rpx;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+  position: relative;
+}
+
+.demo-list-item {
+  width: 100%;
+  min-height: 300px;
+  box-sizing: border-box;
+  transition: all ease 0.2s;
+}
+
+.demo-list-item:first-child {
+  margin-top: 0;
+}
+
+.demo-list-item:active{
+  transform: scale(0.97);
+}
+
+.appstore-item{
+  width: 100%;
+  min-height: 300px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+}
+
+.appstore-item image{
+  flex: 0 0 auto;
+  min-height: 200px;
+  border-top-left-radius: 10rpx;
+  border-top-right-radius: 10rpx;
+}
+
+.appstore-item .htitles{
+  width: 100%;
+  min-height: 100px;
+  box-sizing: border-box;
+  padding: 30rpx;
+}
+
+.appstore-item .htitles .t-item{
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 110%;
+}
+
+.appstore-item .htitles .t-item:nth-child(1),
+.appstore-item .htitles .t-item:nth-child(3) {
+  font-size: 13px;
+  font-weight: 300;
+  color: #666;
+  line-height: 180%;
+}
+
+.appstore-item .htitles .t-item:nth-child(2) {
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 110%;
+  color: #000;
+}
+
+
+.appstore-item.reverse image {
+  flex: 0 0 auto;
+  min-height: 200px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 10rpx;
+  border-bottom-right-radius: 10rpx;
+}
+
+.appstore-item.reverse .htitles {
+  min-height: 85px;
+}
+
+.appstore-item.reverse .htitles .t-item:nth-child(2) {
+  font-size: 26px;
+}
+
+
+/* cover */
+.appstore-item.cover{
+  min-height: 400px;
+}
+
+.appstore-item.cover image {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 100%;
+  border-top-left-radius: 10rpx;
+  border-top-right-radius: 10rpx;
+  border-bottom-left-radius: 10rpx;
+  border-bottom-right-radius: 10rpx;
+}
+
+.appstore-item.cover .htitles {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.appstore-item.cover .htitles .t-item{
+  color: #fff;
+}
+
+.appstore-item.cover.dark .htitles .t-item{
+  color: #666;
+}
+
+.appstore-item.cover.dark .htitles .t-item:nth-child(2) {
+  color: #000;
+}
+
+.appstore-item.cover .htitles .t-item:nth-child(2) {
+  font-size: 26px;
+}
+
+.appstore-item.cover .htitles .t-item:nth-child(3) {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+}
+
+.appstore-item.cover.bar .htitles .t-item:nth-child(3) {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background-color: rgba(0, 17, 255, 0.1);
+}
+
+.appstore-item.cover.bar .htitles .t-item:nth-child(3) .banner{
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.appstore-item.cover.bar .htitles .t-item:nth-child(3) .banner > .hdot-item{
+  width: 50px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #eee;
+  border-radius: 5px;
+}

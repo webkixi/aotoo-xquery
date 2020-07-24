@@ -19,7 +19,8 @@ const srcs = [
 
 const src = () => {
   let index = Math.floor(Math.random() * 10);
-  return srcs[index]
+  // return srcs[index]
+  return srcs[0]
 }
 
 
@@ -45,31 +46,31 @@ const menusData = [
   {
     id: 'nav-1',
     img: src(),
-    ...mkBody( [ '中国电信广东公司', '转发这张高考好运卡，助力高考门门赢!' ], '8' )
+    ...mkBody(['queryui', '这个UI框架很简单!'], '8')
   },
 
   {
     id: 'nav-2', 
     img: src(), 
-    ...mkBody(['订阅号消息', '难怪你的牙黄，原来是你刷牙时忘了这件事!'], '78'),
+    ...mkBody(['queryui', '这个UI框架很简单!'], '78'),
   },
 
   {
     id: 'nav-3',
     img: src(),
-    ...mkBody(['queryui', '另一种思路开发小程序!'], '00'),
+    ...mkBody(['queryui', '这个UI框架很简单!'], '00'),
   },
 
   {
     id: 'nav-4',
     img: src(),
-    ...mkBody(['queryui', '另一种思路开发小程序!'], '9999'),
+    ...mkBody(['queryui', '这个UI框架很简单!'], '9999'),
   },
 
   {
     id: 'nav-5', 
     img: src(),
-    ...mkBody(['queryui', '另一种思路开发小程序!'], '22'),
+    ...mkBody(['queryui', '这个UI框架很简单!'], '22'),
   },
   
   {id: 'nav-6', img: src()},

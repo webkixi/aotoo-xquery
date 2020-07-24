@@ -1,5 +1,6 @@
 @import "../../css/icono.wxss";
 @import "../../components/modules/button.wxss";
+@import "../../css/shadow.wxss";
 
 ::-webkit-scrollbar {
   width: 0;
