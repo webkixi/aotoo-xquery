@@ -1,2 +1,3 @@
-<image class="himg" mode="scaleToFill" lazy-load="{{true}}" src="{{item.img}}" />
+<import src="../parse_common/index.wxml" />
+<template is="target-object-img" data="{{item: {src: item.img}, source: item }}" />
 <!-- 其他的组件 -->

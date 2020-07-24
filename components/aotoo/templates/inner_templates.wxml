@@ -380,6 +380,7 @@
         <cover-image 
           src="{{props.src}}"
           id="{{props.id||''}}"
+          data-treeid="{{(source.attr&&source.attr['data-treeid']) || ''}}"
           class="{{props.itemClass||props.class||''}}"
 
           catch:touchstart= "{{(props.touchstart || props.catchtouchstart) ? 'itemMethod' : ''}}"
@@ -399,6 +400,7 @@
       <image 
         wx:else
         id="{{props.id||''}}"
+        data-treeid="{{(source.attr&&source.attr['data-treeid']) || ''}}"
         class="{{props.itemClass||props.class||''}}"
         style="{{props.style||props.itemStyle||''}}" 
         lazy-load="{{true}}" 

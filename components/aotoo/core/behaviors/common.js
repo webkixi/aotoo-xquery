@@ -1301,8 +1301,15 @@ export const commonMethodBehavior = (app, mytype) => {
         let currentTarget = e.currentTarget
         let dataset = currentTarget.dataset
         let src = dataset.src
+        let treeid = dataset.treeid
 
         let $item = this.data.$item
+        if (treeid) {
+          let index = this.findIndex(treeid)
+          if (index === undefined) return
+          $item = this.data.$list.data[index]
+        }
+
         let $img = $item.img
         let findIt = null
         if (lib.isArray($img)) {

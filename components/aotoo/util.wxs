@@ -652,7 +652,7 @@ function slipStart(e, ins) {
   var listSlip = globleVar.listSlip
   var slipEnv = globleVar.touchoption.slip
   var wth = parseInt(slipEnv.menuWidth.replace('px', ''))
-  var count = slipEnv.menuCount
+  var count = inst.selectAllComponents('.li-item').length || slipEnv.menuCount
   var maxDistance = wth*count  // 左移最大距离
 
   listSlip.start = listSlip.start || {}

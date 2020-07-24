@@ -230,7 +230,7 @@
   </block>
   <block wx:else>
     <block wx:if="{{util.isString(item.src)}}">
-      <template is="@image" data="{{ props: item }}"></template>
+      <template is="@image" data="{{ props: item, source }}"></template>
     </block>
     <!-- <block wx:if="{{util.isString(item.src)}}">
       <block wx:if="{{item.type&&item.type.is === 'cover'}}">

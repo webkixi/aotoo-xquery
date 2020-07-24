@@ -2,16 +2,17 @@
 <import src="../parse_common/index.wxml" />
 
 <template name="img-content">
-  <block wx:if="{{util.isString(item)}}">
-    <image class="himg" mode="scaleToFill" lazy-load="{{true}}" src="{{item}}" />
+  <block wx:if="{{util.isString(pic)}}">
+    <image class="himg" mode="scaleToFill" lazy-load="{{true}}" src="{{pic}}" />
+    <template is="target-object-img" data="{{item: {src: pic}, source }}" />
   </block>
-  <block wx:elif="{{util.isObject(item)}}">
-    <template is="target-object-img" data="{{item}}"/>
+  <block wx:elif="{{util.isObject(pic)}}">
+    <template is="target-object-img" data="{{item: pic, source}}"/>
   </block>
 </template>
 <!-- 这个key要小心 -->
 <view class="ul {{item.imgClass||''}}" >
-  <block wx:for="{{item.img}}" wx:key="__key">
-    <template is="img-content" data="{{item}}" />
+  <block wx:for="{{item.img}}" wx:key="__key" wx:for-item="pic">
+    <template is="img-content" data="{{pic, source: item }}" />
   </block>
 </view>
