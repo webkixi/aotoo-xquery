@@ -17,15 +17,53 @@ const eventName = ['tap', 'catchtap', 'aim', '_tap', '_aim',
 'touchoption'
 ]
 
+function parseImg(src) {
+  if (isString(src)) {
+    let ary = src.split('#')
+    if (ary.length > 1) {
+      src = src.replace('#', '?')
+      let obj = formatQuery(src)
+      return obj
+    } else {
+      return {url: src, query: {}}
+    }
+  }
+}
+
 function formatImg(props) {
   let img = props.img
   if (isString(img)) {
-    let ary = img.split('#')
-    if (ary.length > 1) {
-      img = img.replace('#', '?')
-      let obj = formatQuery(img)
-      props.img = { src: obj.url, ...obj.query }
-    } 
+    let obj = parseImg(img)
+    props.img = { src: obj.url, ...obj.query }
+    // let ary = img.split('#')
+    // if (ary.length > 1) {
+    //   img = img.replace('#', '?')
+    //   let obj = formatQuery(img)
+    //   props.img = { src: obj.url, ...obj.query }
+    // } 
+  }
+  if (isObject(img)) {
+    let obj = parseImg(img.src)
+    if (obj) {
+      let tmp = { src: obj.url, ...obj.query }
+      props.img = Object.assign({}, props.img, tmp)
+    }
+  }
+  if (isArray(img)) {
+    props.img = img.map(pic => {
+      if (isString(pic)) {
+        let obj = parseImg(pic)
+        return { src: obj.url, ...obj.query }
+      }
+      if (isObject(pic)) {
+        let obj = parseImg(img.src)
+        if (obj) {
+          let tmp = { src: obj.url, ...obj.query }
+          pic = Object.assign({}, props.img, tmp)
+        }
+        return pic
+      }
+    })
   }
   return props
 }

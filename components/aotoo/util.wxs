@@ -1245,6 +1245,11 @@ function tEnd(e, slip, ins, stopPropagation) {
     stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
   }
 
+  // 兼容android
+  if (absDiffx < 2 && absDiffy < 2) {
+    tpos.moving = false
+  }
+
   // 模拟的longtap tap
   if (!tpos.moving) {
     if (gapTime > tpos.timeStamp.gap) {

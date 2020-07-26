@@ -144,7 +144,7 @@ export function reSetArray(data, list) {
           
           let slip = touchoption.slip || {}
           let slipLeft = slip.slipLeft
-          let deletePart = {title: '删除', _aim: '_onSlipMenus?id='+item.id+'&action=delete'}
+          let deletePart = {title: '删除', itemClass: 'slip-menu', _aim: '_onSlipMenus?id='+item.id+'&action=delete'}
           
           if (slipLeft) {
             if (slipLeft === true) slipLeft = []
@@ -172,10 +172,11 @@ export function reSetArray(data, list) {
           if (slipLeft && slipLeft.length) {
             slipLeft = slipLeft.map(it=>{
               if (isString(it)) {
-                it = {title: it, _aim: '_onSlipMenus?id='+item.id+'&action='+it}
+                it = {title: it, itemClass: 'slip-menu', _aim: '_onSlipMenus?id='+item.id+'&action='+it}
               }
               if (isObject(it)) {
-                let styleWidth = 'width:' + (slip.menuWidth) + ';'
+                // let styleWidth = 'width:' + (slip.menuWidth) + ';'
+                let styleWidth = ''
                 it.containerStyle = styleWidth + (it.itemStyle||'') 
               }
               return it
