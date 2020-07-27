@@ -66,7 +66,7 @@ function subTree(item, dataAry, deep, index){
 		item['@list'] = {
       // $$id: $id,
       data: nsons,
-      type: item.type,
+      type: item.type||{is: 'exposed'},
       listClass: item.liClass || 'ul',
       itemClass: treeProps.itemClass||'',
       itemStyle: treeProps.itemStyle||'',
