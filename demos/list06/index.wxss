@@ -1,0 +1,183 @@
+@import "../common/common.wxss";
+
+page{
+  background-color: #efefef;
+}
+
+.container{
+  padding: 0;
+  flex-direction: row;
+}
+
+.menus{
+  flex: 0 0 auto;
+  width: 90px;
+  height: 100vh;
+  /* border-right: 1px solid #f6f6f6; */
+}
+
+.content{
+  flex: 2;
+  height: 100vh;
+}
+
+.menus .demo-scroll-list {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+}
+
+.menus .demo-scroll-list-item {
+  flex: 0 0 auto;
+  width: auto;
+  box-sizing: border-box;
+  padding: 3px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* background-color: #fff; */
+  position: relative;
+}
+
+.menus .demo-scroll-list-item.active {
+  color: #ff3c00;
+  /* background-color: transparent; */
+  background-color: #fff;
+}
+
+.menus .demo-scroll-list-item.active::before {
+  content: '';
+  padding: 1px;
+  background-color: #ff0800;
+  /* box-shadow: 0 0 5px #ff0800; */
+  position: absolute;
+  left: 0;
+  height: 20px;
+}
+
+
+.board-list{
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+}
+
+.board-list .board-item-sub{
+  width: 100%;
+  min-height: 70vh;
+  flex: 0 0 auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.board-list .board-item-sub > .htitle{
+  display: flex;
+  height: 30px;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 500;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+}
+
+
+/* 内容列表  list*/
+/* .board-item-sub .list-header {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.board-item-sub .block-list {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.board-item-sub .block-list .block-item {  
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 33%;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.board-item-sub .block-list .block-item image{
+  width: 64px;
+}
+
+.board-item-sub .block-list .block-item .htitle{
+  color: #999;
+  font-size: 11px;
+  text-align: center;
+} */
+
+/* 内容列表  tree*/
+.board-item-sub .block-list {
+  width: 100%;
+}
+
+.board-item-sub .block-list .hlist{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.board-item-sub .block-list .hlist > .item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.board-item-sub .block-list .hlist > .itemroot > .htitle {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.board-item-sub .block-list .hlist > .itemroot > .ui-list {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.board-item-sub .block-list .hlist > .itemroot > .ui-list > .block-item {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 33%;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.board-item-sub .block-list .hlist>.itemroot>.ui-list>.block-item .htitle {
+  color: #999;
+  font-size: 11px;
+  text-align: center;
+}
+
+.board-item-sub .block-list .block-item image {
+  height: 64px;
+}

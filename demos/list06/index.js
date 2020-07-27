@@ -4,6 +4,13 @@ const app = getApp()
 const Pager = require('../common/extpager')
 const lib = Pager.lib
 
+import {
+  item1 // 第一栏的数据
+} from "./contents/item1";
+
+import {
+  item2  // 第二栏的数据
+} from "./contents/item2";
 const adjustment = 4 // 调整菜单滚动时的居中位置
 
 const menusData = [
@@ -37,22 +44,18 @@ const menusData = [
 ]
 
 const contentData = [
+  item1,
+  item2,
+
   {
-    title: '要闻' , id: 'board-1',
-    dot: [
-      {img: {src: '/images/mk1.jpeg', itemStyle:'width: 100%; margin-top: 10px;'}},
-    ]
-  },
-  {
-    title: '视频' , 
-    id: 'board-2',
+    title: '推荐',
+    id: 'board-3',
     dot: [
       {img: {src: '/images/banner.jpg', itemStyle:'width: 100%; margin-top: 10px;'}},
       {img: {src: '/images/banner.jpg', itemStyle:'width: 100%; margin-top: 10px;'}},
       {img: {src: '/images/banner.jpg', itemStyle:'width: 100%; margin-top: 10px;'}},
     ]
   },
-  {title: '推荐' , id: 'board-3'},
   {title: '抗疫' , id: 'board-4'},
   {title: '科技' , id: 'board-5'},
   {title: '军事' , id: 'board-6'},
@@ -83,6 +86,7 @@ Pager({
   data: {
 
     // menus，由list组件构建
+    // 可以不用修改，直接使用targetConfig的配置
     targetConfig: {
       $$id: 'menus-scroll-view',
       listClass: 'demo-scroll-list',
@@ -153,13 +157,13 @@ Pager({
     },
 
     // content，由list组件构建
+    // 可以不用修改，直接使用targetBoard的配置
     targetBoard: {  
       $$id: 'content-scroll-view',
       type: {
         'is': 'scroll',
         'scroll-y': true,
         'enable-flex': true,
-        // 'scroll-with-animation': true,
         'bindscroll': 'onBindscroll'
       },
       listClass: 'board-list',
@@ -184,7 +188,7 @@ Pager({
                 })
               }
             }).exec()
-          }, 200);
+          }, 300);
         },
         scrollIntoView(id){
           let that = this

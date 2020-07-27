@@ -78,7 +78,7 @@ page{
 
 .board-list .board-item-sub{
   width: 100%;
-  height: 70vh;
+  min-height: 70vh;
   flex: 0 0 auto;
   padding: 10px;
   box-sizing: border-box;

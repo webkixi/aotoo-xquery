@@ -13,13 +13,18 @@
   width: var(--slip-list-item-height);
   height: var(--slip-list-item-height);
   background-color: red;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   color: #fff;
 }
 
 
 .demo-slip-list-item>.slip-menus .li-item:nth-of-type(odd) {
   background-color: blue;
+}
+
+.demo-slip-list-item>.slip-menus .li-item .slip-menu {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
