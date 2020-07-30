@@ -1,0 +1,185 @@
+.tag{
+  font-size: 12px;
+  text-align: center;
+}
+
+.tag-01,
+.tag01>.htitle,
+.tag01>.htitles{
+  border: 1px solid red;
+  color: red;
+  padding: 2px;
+  display: inline-block;
+  border-radius: 3px;
+  position: relative;
+}
+
+.tag-02,
+.tag02>.htitle,
+.tag02>.htitles {
+  box-sizing: border-box;
+  border: 1px solid red;
+  color: #fff;
+  background-color: red;
+  padding: 2px;
+  display: inline-block;
+  border-radius: 3px;
+  position: relative;
+}
+
+.tag-03,
+.tag03>.htitles {
+  box-sizing: border-box;
+  color: #fff;
+  background-image: linear-gradient(to left, blue 32px, red 32px);
+  padding: 2px 3px;
+  display: inline-block;
+  border-radius: 3px;
+  position: relative;
+}
+
+.tag-04,
+.tag04>.htitles {
+  box-sizing: border-box;
+  color: #fff;
+  background-image: linear-gradient(to left, blue 32px, red 32px);
+  padding: 2px 3px;
+  display: inline-block;
+  border-radius: 3px;
+  position: relative;
+}
+
+.tag4::before,
+.tag04>.htitles::before {
+  position: absolute;
+  top: 2px;
+  right: 25px;
+  color: #fff;
+  transform: skewX(-22deg) scale(0.41);
+  content: "";
+  width: 0;
+  height: 0;
+  border-radius: 0 0 0 0;
+  border-left: none;
+  border-left: 1px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 26px solid #fff;
+  box-shadow: -10px -18px 0 -1px;
+}
+
+.tag-05,
+.tag05>.htitle,
+.tag05>.htitles {
+  border: 1px solid red;
+  color: red;
+  padding: 2px;
+  display: inline-block;
+  border-radius: 3px;
+  position: relative;
+}
+
+.tag-05::after,
+.tag05>.htitle::after,
+.tag05>.htitles::after {
+  content: "";
+  width: 0.4em;
+  height: 0.4em;
+  display: inline-block;
+  border: 1px solid red;
+  border-left: none;
+  border-bottom: none;
+  transform: rotate(45deg);
+  margin-bottom: 1px;
+  margin-right: 0.2em;
+}
+
+.tag-06,
+.tag06>.htitle,
+.tag06>.htitles {
+  border: 1px solid red;
+  color: red;
+  padding: 2px 5px;
+  display: inline-block;
+  border-radius: 20px;
+  position: relative;
+}
+
+.tag-07,
+.tag07>.htitle,
+.tag07>.htitles {
+  box-sizing: border-box;
+  border: 1px solid red;
+  color: #fff;
+  background-color: red;
+  padding: 2px 5px;
+  display: inline-block;
+  border-radius: 20px;
+  position: relative;
+}
+
+.tag-08,
+.tag08>.htitle,
+.tag08>.htitles {
+  border: 1px solid red;
+  color: red;
+  padding: 2px 5px;
+  display: inline-block;
+  border-radius: 20px;
+  position: relative;
+}
+
+.tag-08::after,
+.tag08>.htitle::after,
+.tag08>.htitles::after {
+  content: "";
+  width: 0.4em;
+  height: 0.4em;
+  display: inline-block;
+  border: 1px solid red;
+  border-left: none;
+  border-bottom: none;
+  transform: rotate(45deg);
+  margin-bottom: 1px;
+  margin-right: 0.2em;
+}
+
+[class*=tag]>.htitles>.t-item{
+  display: inline-block;
+}
+
+.tag-01 .tag-split,
+.tag-03 .tag-split,
+.tag-06 .tag-split,
+.tag-04 .tag-split {
+  box-sizing: border-box;
+  display: inline-block;
+  padding-left: 8px;
+}
+
+.tag-01 .tag-split,
+.tag-06 .tag-split {
+  padding: 0 2px 0 4px;
+  border-left: 1px dotted currentColor;
+}
+
+.tag01 .htitles .t-item:nth-child(n+2),
+.tag03 .htitles .t-item:nth-child(n+2),
+.tag06 .htitles .t-item:nth-child(n+2),
+.tag04 .htitles .t-item:nth-child(n+2){
+  box-sizing: border-box;
+  padding-left: 6px;
+}
+
+
+.tag01 .htitles .t-item:nth-child(1),
+.tag03 .htitles .t-item:nth-child(1),
+.tag04 .htitles .t-item:nth-child(1),
+.tag06 .htitles .t-item:nth-child(1){
+  padding: 0 4px 0 0;
+}
+
+.tag01 .htitles .t-item:nth-child(n+2),
+.tag06 .htitles .t-item:nth-child(n+2) {
+  padding: 0 3px 0 3px;
+  border-left: 1px dotted currentColor;
+}

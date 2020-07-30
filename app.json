@@ -34,6 +34,11 @@
     "root": "demos/",
     "name": "demos",
     "pages": [
+      "tag01/index",
+      "load01/index",
+      "list06/index",
+      "list05/index",
+      "list04/index",
       "list03/index",
       "list02/index",
       "list01/index",

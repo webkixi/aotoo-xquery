@@ -1,0 +1,171 @@
+/* 下列loading效果无需独立结构 */
+
+/* loading的背景色 */
+page{
+  /* --loading-attach-color: rgba(211, 211, 211, 0.5); */
+  --loading-attach-color: inherit;
+  --loading-attach-width: 1em;
+  --loading-attach-height: 1em;
+}
+
+.loading01::before{
+  content: '';
+  width: var(--loading-attach-width);
+  height: var(--loading-attach-height);
+  margin-right: 0.5em;
+  color: var(--loading-attach-color);
+
+  border: 0.2em dotted currentcolor;
+  border-radius: 50%;
+  animation: 1s loader-01 linear infinite;
+}
+
+.loading02::before{
+  content: '';
+  width: var(--loading-attach-width);
+  height: var(--loading-attach-height);
+  margin-right: 0.5em;
+  color: var(--loading-attach-color);
+
+  border: .2em solid transparent;
+  border-left-color: currentcolor;
+  border-right-color: currentcolor;
+  border-radius: 50%;
+  animation: 1s loader-02 linear infinite;
+}
+
+.loading03::before{
+  content: '';
+  width: var(--loading-attach-width);
+  height: var(--loading-attach-height);
+  margin-right: 0.5em;
+  color: var(--loading-attach-color);
+
+  border: .2em solid currentcolor;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: 1s loader-03 linear infinite;
+  position: relative;
+}
+
+.loading04::before{
+  content: '';
+  width: var(--loading-attach-width);
+  height: var(--loading-attach-height);
+  margin-right: 0.5em;
+  color: var(--loading-attach-color);
+
+  border: .2em solid currentColor;
+  border-top-color: rgba(233, 233, 233, 0.7);
+  border-radius: 50%;
+  animation: 1s loader-04 linear infinite;
+  position: relative;
+}
+
+.loading05::before{
+  content: '';
+  width: var(--loading-attach-width);
+  height: var(--loading-attach-height);
+  margin-right: 0.5em;
+  color: var(--loading-attach-color);
+
+  border: .2em solid currentcolor;
+  border-radius: 50%;
+  animation: loader-05 1s ease-out infinite;
+}
+
+.loading06::before{
+  content: '';
+  width: var(--loading-attach-width);
+  height: var(--loading-attach-height);
+  margin-right: 0.5em;
+  color: var(--loading-attach-color);
+
+  background-color: currentcolor;
+  border-radius: 50%;
+  animation: loader-06 1.0s infinite ease-in-out;
+}
+
+.loading07::before{
+  content: '';
+  width: var(--loading-attach-width);
+  height: var(--loading-attach-height);
+  margin-right: 0.5em;
+  color: var(--loading-attach-color);
+
+  border-top: .2em solid currentcolor;
+  border-right: .2em solid transparent;
+  animation: loader-07 1s linear infinite;
+  border-radius: 100%;
+  position: relative;
+}
+
+@keyframes loader-01 {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader-02 {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader-03 {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader-04 {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader-05 {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes loader-06 {
+  0% {
+    transform: scale(0);
+  }
+
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+@keyframes loader-07 {
+  to {
+    transform: rotate(360deg);
+  }
+}
