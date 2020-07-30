@@ -98,10 +98,12 @@ export function subcontent(content, len, ellipse) {
 export function formatQuery(url) {
   let aim = url
   let query={};
+  let hasQuery = false
   if (url) {
     let urls = url.split('?')
     aim = urls[0]
     if (urls[1]) {
+      hasQuery = true
       let params = urls[1].split('&')
       params.forEach(param => {
         let attrs = param.split('=')
@@ -112,7 +114,7 @@ export function formatQuery(url) {
       })
     }
   }
-  return {url: aim, query}
+  return {url: aim, query, hasQuery}
 }
 
 export function formatToUrl(url, param={}) {

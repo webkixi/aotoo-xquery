@@ -646,7 +646,10 @@ export const listBehavior = function(app, mytype) {
         }
       },
 
-      append: function(params, cb) {
+      append(){
+        this._append.apply(this, arguments)
+      },
+      _append: function(params, cb) {
         const that = this
         if (params) {
           let $list = this.data.$list
@@ -671,7 +674,10 @@ export const listBehavior = function(app, mytype) {
         return this
       },
 
-      prepend: function(params, cb) {
+      prepend(){
+        this._prepend.apply(this, arguments)
+      },
+      _prepend: function(params, cb) {
         const that = this
         if (params) {
           let $list = this.data.$list
@@ -696,7 +702,10 @@ export const listBehavior = function(app, mytype) {
         return this
       },
 
-      delete: function (params, cb) {
+      delete(){
+        this._delete.apply(this, arguments)
+      },
+      _delete: function (params, cb) {
         let $list = this.data.$list
         let $data = $list.data
         let $selectIndex = this.findIndex(params)
@@ -707,7 +716,10 @@ export const listBehavior = function(app, mytype) {
         return this
       },
 
-      insert: function (params, pay, cb) {
+      insert(){
+        this._insert.apply(this, arguments)
+      },
+      _insert: function (params, pay, cb) {
         const that = this
         let $list = this.data.$list
         let $data = $list.data

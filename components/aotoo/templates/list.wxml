@@ -49,6 +49,7 @@
 </template>
 
 <template name="listWrap">
+  <slot name="list-top" />
   <block wx:if="{{ list.type && list.type.is === 'exposed'}}">
     <block wx:if="{{util.isArray(list.data)}}">
       <block wx:for="{{list.data}}" wx:key="__key">
@@ -86,6 +87,7 @@
     </block> -->
 
   </block>
+  <slot name="list-bottom" />
 </template>
 
 <template name="swiperWrap">
@@ -171,6 +173,7 @@
       </block>
     </block>
     <slot name="bottom"></slot>
+    <slot name="scroll-bottom"></slot>
   </scroll-view>
   <!-- <block wx:if="{{list.type['scroll-top'] && list.type['scroll-left']}}">
     <scroll-view 
