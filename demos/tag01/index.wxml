@@ -1,0 +1,56 @@
+<view class="container">
+
+  <ui-item item="{{tag01}}" />
+  <ui-item item="{{tag011}}" />
+  <ui-item item="{{tag012}}" />
+  <ui-item item="{{tag02}}" />
+  <ui-item item="{{tag03}}" />
+  <ui-item item="{{tag04}}" />
+  <ui-item item="{{tag05}}" />
+  <ui-item item="{{tag06}}" />
+  <ui-item item="{{tag061}}" />
+  <ui-item item="{{tag062}}" />
+  <ui-item item="{{tag07}}" />
+  <ui-item item="{{tag08}}" />
+  
+
+  <!-- 原生view组件构建 -->
+  <!-- <view class="tag tag-01 buttonx">tag01的标签演示</view>
+
+  <view class="tag tag-01 buttonx">
+    tag01的标签演示
+    <text class="tag-split">效果</text>
+  </view>
+
+  <view class="tag tag-01 buttonx">
+    tag01的标签演示
+    <text class="tag-split">效果</text>
+    <text class="tag-split">效果</text>
+    <text class="tag-split">效果</text>
+  </view>
+
+  <view class="tag tag-02 buttonx">tag02的标签演示</view>
+
+  <view class="tag tag-03 buttonx">
+    tag03的标签演示
+    <text class="tag-split">效果</text>
+  </view>
+
+  <view class="tag tag-04 buttonx">
+    tag04的标签演示
+    <text class="tag-split">效果</text>
+  </view>
+
+  <view class="tag tag-05 buttonx">tag05的标签演示</view>
+
+  <view class="tag tag-06 buttonx">
+    tag06的标签演示
+    <text class="tag-split">效果</text>
+    <text class="tag-split">效果</text>
+    <text class="tag-split">效果</text>
+  </view>
+
+  <view class="tag tag-07 buttonx">tag07的标签演示</view>
+
+  <view class="tag tag-08 buttonx">tag08的标签演示</view> -->
+</view>

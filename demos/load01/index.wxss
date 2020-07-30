@@ -1,0 +1,50 @@
+@import "../common/common.wxss";
+
+.container{
+  padding-top: 30px;
+}
+
+.buttonx{
+  width: 80vw;
+  height: 50px;
+  border-radius: 5px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background-color: #387ef5;
+  margin-top: 10px;
+  position: relative;
+}
+
+.boxer{
+  width: 80vw;
+  height: 70vh;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  grid-auto-flow: row dense;
+  grid-gap: 3px 3px;
+  background-color: #387ef5;
+  margin-top: 10px;
+}
+
+.item{
+  width: 100%;
+  height: 100%;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.item:nth-child(2n+1){
+  background-color: burlywood;
+}
+
+.desc{
+  font-size: 14px;
+  margin-top:3px;
+}

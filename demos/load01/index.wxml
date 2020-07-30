@@ -1,0 +1,26 @@
+<view class="container">
+  <view style="width: 80vw; padding: 5px;box-sizing: border-box">
+    不需要额外结构，直接挂在类名即可实现loading效果，注意设置color和font-size属性
+  </view>
+
+  <!-- list组件构建 -->
+  <ui-list wx:if="{{targetConfig}}" list="{{targetConfig}}" />
+
+  <!-- item组件构建 -->
+  <ui-item item="{{loading01}}" />
+  <ui-item item="{{loading02}}" />
+  <ui-item item="{{loading03}}" />
+  <ui-item item="{{loading04}}" />
+  <ui-item item="{{loading05}}" />
+  <ui-item item="{{loading06}}" />
+  <ui-item item="{{loading07}}" />
+
+  <!-- 原生view组件构建 -->
+  <!-- <view class="loading01 buttonx">loading01</view>
+  <view class="loading02 buttonx">loading02</view>
+  <view class="loading03 buttonx">loading03</view>
+  <view class="loading04 buttonx">loading04</view>
+  <view class="loading05 buttonx">loading05</view>
+  <view class="loading06 buttonx">loading06</view>
+  <view class="loading07 buttonx">loading07</view> -->
+</view>

@@ -1,0 +1,20 @@
+@import "../common/common.wxss";
+
+.container{
+  padding-top: 30px;
+}
+
+.buttonx{
+  margin-bottom: 20px;
+}
+
+.boxer{
+  width: 80vw;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.tag{
+  margin-bottom: 20px;
+}
