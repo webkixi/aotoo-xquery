@@ -10,11 +10,11 @@
       </view>
     </block>
     <block wx:elif="{{son.data && util.isArray(son.data)}}">
-      <template is="@list" data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'li-item'} }}" />
+      <template is="@list" data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'li-item '+(son.containerClass||'')} }}" />
     </block>
     <block wx:else>
       <!-- <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), itemClass: son.itemClass ?  'li-item ' + son.itemClass : 'li-item'} }}" /> -->
-      <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'li-item'} }}" />
+      <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'li-item '+(son.containerClass||'')} }}" />
     </block>
   </block>
 </view>

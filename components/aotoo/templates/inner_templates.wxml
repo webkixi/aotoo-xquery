@@ -139,6 +139,17 @@
 </template>
 
 <template name="@button">
+  <block wx:if="{{props && util.isArray(props.data)}}">
+    <block wx:for="{{props.data}}" wx:key="index">
+      <template is="@btn" data="{{props: item}}"></template>
+    </block>
+  </block>
+  <block wx:else>
+    <template is="@btn" data="{{props}}"></template>
+  </block>
+</template>
+
+<template name="@btn">
   <button 
     type="{{props.typeset||'default'}}" 
     size="{{props.size||''}}"

@@ -21,11 +21,11 @@
       </view>
     </block>
     <block wx:elif="{{son.data && util.isArray(son.data)}}">
-      <template is="@list"  data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'hf-item'} }}" />
+      <template is="@list"  data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'hf-item '+(son.containerClass||'')} }}" />
     </block>
     <block wx:else>
       <!-- <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), itemClass: son.itemClass ?  'hf-item ' + son.itemClass : 'hf-item'} }}" /> -->
-      <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'hf-item'} }}" />
+      <template is="@item" data="{{ props: {...son, treeid: util.treeid(item), containerClass: 'hf-item '+(son.containerClass||'')} }}" />
     </block>
   </block>
   <!-- <block wx:for="{{item.footer}}" wx:key="__key">
