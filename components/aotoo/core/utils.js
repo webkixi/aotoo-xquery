@@ -154,6 +154,42 @@ export function usualKit(ctx, options) {
   return new UsualKit(ctx, options)
 }
 
+export function _cloud (url, param, ctx) {
+  if (lib.isString(url)) {
+    if (/^[\\\/]/.test(url)) url = url.substr(1)
+    let urls = url.split('/')
+    let api = urls[0]
+    let $url = urls.slice(1)
+    if ($url.length) {
+      $url = $url.join('/')
+    } else {
+      $url = 'index'
+    }
+    param.$url = $url
+
+    const re = /(add|update|set|delete|remove)/
+    if (api) {
+      return new Promise((resolve, reject) => {
+        wx.cloud.callFunction({
+          name: api,
+          data: param || {},
+          success: res => {
+            // if (re.test(param.$url)) {
+            //   that.cloud('one/site/upVersion')
+            // }
+            if (ctx) that.hooks.emit('response', param)
+            resolve(res)
+          },
+          fail: err => {
+            if (ctx) that.hooks.emit('cloud_fail')
+            reject(err)
+          }
+        })
+      })
+    }
+  }
+} 
+
 class UsualKit {
   constructor(ctx, options) {
     this.ctx = ctx
@@ -223,20 +259,21 @@ class UsualKit {
    * inst.cloud('one/user/get', {...})  // 获取用户信息  one 云端接口名
    */
   cloud(url, param={}) {
-    if (lib.isString(url)) {
-      if (/^[\\\/]/.test(url)) url = url.substr(1)
-      let urls = url.split('/')
-      let api = urls[0]
-      let $url = urls.slice(1)
-      if ($url.length) {
-        $url = $url.join('/')
-      } else {
-        $url = 'index'
-      }
-      param.$url = $url
+    return _cloud(url, param, this)
+    // if (lib.isString(url)) {
+    //   if (/^[\\\/]/.test(url)) url = url.substr(1)
+    //   let urls = url.split('/')
+    //   let api = urls[0]
+    //   let $url = urls.slice(1)
+    //   if ($url.length) {
+    //     $url = $url.join('/')
+    //   } else {
+    //     $url = 'index'
+    //   }
+    //   param.$url = $url
 
-      return this.c_fun(api, param)
-    }
+    //   return this.c_fun(api, param)
+    // }
   }
 
   // 调用云方法

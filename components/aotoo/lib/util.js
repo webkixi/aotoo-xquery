@@ -56,12 +56,23 @@ export function isEmpty(params) {
     if (Array.isArray(params)) {
       return params.length ? false : true
     } else {
-      for (var key in params) {
-        return false
-      };
+      let objKeys = Object.keys(params)
+      return objKeys.length ? false : true
     }
   }
   return true
+
+  // const $obj = typeof params == 'object' ? true : false
+  // if ($obj) {
+  //   if (Array.isArray(params)) {
+  //     return params.length ? false : true
+  //   } else {
+  //     for (var key in params) {
+  //       return false
+  //     };
+  //   }
+  // }
+  // return true
 }
 
 //计算字符变量的长度，包含处理中文

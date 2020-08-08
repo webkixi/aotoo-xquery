@@ -561,16 +561,24 @@ function tStart(e, slip, ins, stopPropagation) {
   tpos.start.y = parseInt(pageY)
   tpos.start.timeStamp = e.timeStamp
 
-  // if (allParam.__drop){
-  //   dropStart(e, ins)
-  // }
-
   if (globleVar.touchoption) {
     if (globleVar.touchoption.navball) navballStart(e, ins)
     if (globleVar.touchoption.sslider) ssliderStart(e, ins)
     if (globleVar.touchoption.navpad) navpadStart(e, ins)
     if (globleVar.touchoption.slip) slipStart(e, ins)
+    if (globleVar.touchoption.followTouch) {  // 任何item有此属性都设置其跟随手指
+      if (!globleVar.followTouch) {
+        globleVar.followTouch = {
+          start: { x: tpos.start.x, y: tpos.start.y, timeStamp: e.timeStamp },
+          end: { }, 
+          current: { }
+        }
+      } else {
+        globleVar.followTouch.start = {x: tpos.start.x, y: tpos.start.y, timeStamp: e.timeStamp}
+      }
+    }
   }
+  
 
   // 响应js的touchstart方法
   var tevent = tpos.events.touchstart
@@ -631,6 +639,16 @@ function tMove(e, slip, ins, stopPropagation) {
     if (globleVar.touchoption.sslider) ssliderMove(e, ins)
     if (globleVar.touchoption.navpad) navpadMove(e, ins)
     if (globleVar.touchoption.slip) slipMove(e, ins)
+
+    if (globleVar.touchoption.followTouch) {
+      let startX = globleVar.followTouch.start.x
+      let startY = globleVar.followTouch.start.y
+      let endX = globleVar.followTouch.end.x
+      let endY = globleVar.followTouch.end.y
+      let _diffX = diffX + (globleVar.followTouch.end.diffX || 0)
+      let _diffY = diffY + (globleVar.followTouch.end.diffY || 0)
+      inst.setStyle('transform: translate3d(' + _diffX + 'px, ' + _diffY + 'px, 0)')
+    }
   }
   
   tpos.current.timeStamp = e.timeStamp
@@ -1226,6 +1244,11 @@ function tEnd(e, slip, ins, stopPropagation) {
   var absDiffx = Math.abs(diffX)
   var absDiffy = Math.abs(diffY)
 
+  // 兼容android
+  if (absDiffx < 2 && absDiffy < 2) {
+    tpos.moving = false
+  }
+
   if (globleVar.touchoption) {
     if (globleVar.touchoption.sslider) ssliderEnd(e, ins)
     if (globleVar.touchoption.navpad) navpadEnd(e, ins)
@@ -1236,6 +1259,15 @@ function tEnd(e, slip, ins, stopPropagation) {
         tpos.moving = false
       }
     }
+    if (globleVar.touchoption.followTouch) {  // 任何item有此属性都设置其跟随手指
+      globleVar.followTouch.end = {
+        x: pageX,
+        y: pageY,
+        diffX: diffX,
+        diffY: diffY,
+        timeStamp: e.timeStamp
+      }
+    }
   }
 
   var isFake = isFakeEvent(allParam)
@@ -1243,11 +1275,6 @@ function tEnd(e, slip, ins, stopPropagation) {
   var tevent = tpos.events.touchend
   if (tevent && (tevent !== 'true' || tevent.fun !== 'true')) {
     stopPropagation ? ins.callMethod('catchItemMethod', e) : ins.callMethod('itemMethod', e)
-  }
-
-  // 兼容android
-  if (absDiffx < 2 && absDiffy < 2) {
-    tpos.moving = false
   }
 
   // 模拟的longtap tap
