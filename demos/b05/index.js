@@ -13,14 +13,6 @@ Pager({
   data: {
     targetConfig: buttonConfig
   },
-  onLoad(param) {
-    let pageTitle = param.pageTitle
-    if (pageTitle) {
-      wx.setNavigationBarTitle({
-        title: pageTitle
-      })
-    }
-  },
   onReady(){
     let $button = this['button']
     setTimeout(() => {

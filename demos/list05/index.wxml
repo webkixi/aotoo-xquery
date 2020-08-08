@@ -2,3 +2,4 @@
   <view class="today">Today</view>
   <ui-list wx:if="{{targetConfig}}" list="{{targetConfig}}" class="menus"/>
 </view>
+<include src="../common/common.wxml" />

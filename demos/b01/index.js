@@ -7,15 +7,7 @@ Pager({
   data: {
     targetConfig: {
       title: 'Button',
-      itemClass: 'button button-pulse',
+      itemClass: 'button button01',
     },
   },
-  onLoad(param) {
-    let pageTitle = param.pageTitle
-    if (pageTitle) {
-      wx.setNavigationBarTitle({
-        title: pageTitle
-      })
-    }
-  }
 })

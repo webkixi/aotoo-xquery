@@ -7,7 +7,7 @@ Pager({
   data: {
     targetConfig: {
       title: 'Button',
-      itemClass: 'button button02',
+      itemClass: 'button button03',
     },
   },
 })

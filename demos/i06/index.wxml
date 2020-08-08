@@ -5,3 +5,4 @@
   <ui-item wx:if="{{targetConfig3}}" item="{{targetConfig3}}" />
   <ui-item wx:if="{{targetConfig4}}" item="{{targetConfig4}}" />
 </view>
+<include src="../common/common.wxml" />

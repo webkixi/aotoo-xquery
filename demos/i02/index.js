@@ -11,12 +11,4 @@ Pager({
       title: '标题',
     },
   },
-  onLoad(param) {
-    let pageTitle = param.pageTitle
-    if (pageTitle) {
-      wx.setNavigationBarTitle({
-        title: pageTitle
-      })
-    }
-  }
 })

@@ -1,0 +1,144 @@
+/* 公共 */
+.button {
+  width: 150px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  border: none;
+  outline: none;
+  color: white;
+  background-color: #1890ff;
+  font-size: 36rpx;
+  border-radius: 5px;
+  box-shadow: 4rpx 20rpx 20rpx rgba(148, 148, 148, 0.2);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+
+/* button-01 */
+.button01 {
+  color: white;
+  background-color: #1890ff;
+  font-size: 22px;
+}
+
+.button01::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  border: 4px solid #1890ff;
+  animation: 1s animat01 linear infinite;
+}
+
+.button01:active::before {
+  border: 1px solid#e6f7ff;
+  color: #fff;
+  animation: none;
+  border-radius: 5px;
+}
+
+@keyframes animat01 {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    transform-origin: center;
+    border: 4px solid #1890ff;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+    transform-origin: center;
+    border: 1px solid#e6f7ff;
+  }
+}
+
+
+
+/* button-02 */
+.button02{
+  color: white;
+  background-color: #262626;
+  overflow: hidden;
+}
+
+.button02::before {
+  content: "";
+  z-index: -1;
+  position: absolute;
+  background: #595959;
+  top: -100%;
+  left: 0%;
+  bottom: -50%;
+  width: 1.5em;
+  animation: 1s animat02 ease-in-out infinite;
+}
+
+.button02:active{
+  transform: scale(0.95);
+}
+
+.button02:active::before {
+  transform: translate3d(-200%, 0, 0) rotate(35deg);
+  animation: none;
+}
+
+
+@keyframes animat02 {
+  /* 0% { -webkit-transform: scale(0) rotate(45deg); opacity: 0; }
+  80% { -webkit-transform: scale(0) rotate(45deg); opacity: 0.5; }
+  81% { -webkit-transform: scale(4) rotate(45deg); opacity: 1; }
+  100% { -webkit-transform: scale(50) rotate(45deg); opacity: 0; } */
+
+  0% { transform: translate3d(-200%, 0, 0) rotate(35deg); }
+  100% { transform: translate3d(1000%, 0, 0) rotate(35deg); }
+}
+
+
+/* button-03 */
+.button03 {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  color: white;
+  background-color: #1890ff;
+}
+
+.button03::before {
+  border-radius: 50%;
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  border: 4px solid #1890ff;
+  animation: 1s animat03 linear infinite;
+}
+
+.button03:active::before {
+  border: 1px solid#e6f7ff;
+  color: #fff;
+  animation: none;
+}
+
+@keyframes animat03 {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    transform-origin: center;
+    border: 4px solid #1890ff;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+    transform-origin: center;
+    border: 1px solid#e6f7ff;
+  }
+}

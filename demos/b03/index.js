@@ -10,12 +10,4 @@ Pager({
       itemClass: 'button button-pop',
     },
   },
-  onLoad(param) {
-    let pageTitle = param.pageTitle
-    if (pageTitle) {
-      wx.setNavigationBarTitle({
-        title: pageTitle
-      })
-    }
-  }
 })

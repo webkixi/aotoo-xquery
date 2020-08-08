@@ -133,13 +133,4 @@ Pager({
     console.log('==== 响应侧滑菜单点击事件');
     Pager.alert('侧滑菜单项点击响应: '+param.action)
   },
-  
-  onLoad(param) {
-    let pageTitle = param.pageTitle
-    if (pageTitle) {
-      wx.setNavigationBarTitle({
-        title: pageTitle
-      })
-    }
-  }
 })

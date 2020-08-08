@@ -1,0 +1,2 @@
+<ui-pop wx:if="{{popConfig}}" item="{{popConfig}}" />
+<ui-item wx:if="{{stickyBar}}" item="{{stickyBar}}" />

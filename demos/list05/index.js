@@ -141,14 +141,4 @@ Pager({
       data: menusData,
     },
   },
-  
-  onLoad(param) {
-    let pageTitle = param.pageTitle
-    if (pageTitle) {
-      wx.setNavigationBarTitle({
-        title: pageTitle
-      })
-    }
-  },
-  
 })

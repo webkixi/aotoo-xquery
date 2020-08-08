@@ -6,13 +6,14 @@ page{
   --loading-attach-color: inherit;
   --loading-attach-width: 1em;
   --loading-attach-height: 1em;
+  --loading-attach-margin-right: 0.5em
 }
 
 .loading01::before{
   content: '';
   width: var(--loading-attach-width);
   height: var(--loading-attach-height);
-  margin-right: 0.5em;
+  margin-right: var(--loading-attach-margin-right);
   color: var(--loading-attach-color);
 
   border: 0.2em dotted currentcolor;
@@ -24,7 +25,7 @@ page{
   content: '';
   width: var(--loading-attach-width);
   height: var(--loading-attach-height);
-  margin-right: 0.5em;
+  margin-right: var(--loading-attach-margin-right);
   color: var(--loading-attach-color);
 
   border: .2em solid transparent;
@@ -38,7 +39,7 @@ page{
   content: '';
   width: var(--loading-attach-width);
   height: var(--loading-attach-height);
-  margin-right: 0.5em;
+  margin-right: var(--loading-attach-margin-right);
   color: var(--loading-attach-color);
 
   border: .2em solid currentcolor;
@@ -52,7 +53,7 @@ page{
   content: '';
   width: var(--loading-attach-width);
   height: var(--loading-attach-height);
-  margin-right: 0.5em;
+  margin-right: var(--loading-attach-margin-right);
   color: var(--loading-attach-color);
 
   border: .2em solid currentColor;
@@ -66,7 +67,7 @@ page{
   content: '';
   width: var(--loading-attach-width);
   height: var(--loading-attach-height);
-  margin-right: 0.5em;
+  margin-right: var(--loading-attach-margin-right);
   color: var(--loading-attach-color);
 
   border: .2em solid currentcolor;
@@ -78,7 +79,7 @@ page{
   content: '';
   width: var(--loading-attach-width);
   height: var(--loading-attach-height);
-  margin-right: 0.5em;
+  margin-right: var(--loading-attach-margin-right);
   color: var(--loading-attach-color);
 
   background-color: currentcolor;
@@ -90,7 +91,7 @@ page{
   content: '';
   width: var(--loading-attach-width);
   height: var(--loading-attach-height);
-  margin-right: 0.5em;
+  margin-right: var(--loading-attach-margin-right);
   color: var(--loading-attach-color);
 
   border-top: .2em solid currentcolor;

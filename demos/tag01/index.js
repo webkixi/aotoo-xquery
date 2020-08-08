@@ -18,12 +18,4 @@ Pager({
     tag07: {title: 'tag07的标签演示', itemClass: 'tag tag07'},
     tag08: {title: 'tag08的标签演示', itemClass: 'tag tag08'},
   },
-  onLoad(param) {
-    let pageTitle = param.pageTitle
-    if (pageTitle) {
-      wx.setNavigationBarTitle({
-        title: pageTitle
-      })
-    }
-  }
 })

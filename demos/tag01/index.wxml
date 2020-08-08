@@ -54,3 +54,4 @@
 
   <view class="tag tag-08 buttonx">tag08的标签演示</view> -->
 </view>
+<include src="../common/common.wxml" />

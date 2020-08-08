@@ -2,3 +2,4 @@
   <ui-list wx:if="{{targetConfig}}" list="{{targetConfig}}" class="menus"/>
   <ui-list wx:if="{{targetBoard}}" list="{{targetBoard}}" class="content"/>
 </view>
+<include src="../common/common.wxml" />

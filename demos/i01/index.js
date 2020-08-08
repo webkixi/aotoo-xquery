@@ -11,12 +11,4 @@ Pager({
       img: {src: 'http://www.agzgz.com/imgs/Result.svg', itemStyle: 'width: 100px'}
     },
   },
-  onLoad(param) {
-    let pageTitle = param.pageTitle
-    if (pageTitle) {
-      wx.setNavigationBarTitle({
-        title: pageTitle
-      })
-    }
-  }
 })

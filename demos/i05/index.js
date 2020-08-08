@@ -38,14 +38,6 @@ Pager({
       }
     },
   },
-  onLoad(param) {
-    let pageTitle = param.pageTitle
-    if (pageTitle) {
-      wx.setNavigationBarTitle({
-        title: pageTitle
-      })
-    }
-  },
   onTap(e, param, inst) {
     inst.toggleClass('active')
   }

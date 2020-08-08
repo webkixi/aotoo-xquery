@@ -24,3 +24,4 @@
   <view class="loading06 buttonx">loading06</view>
   <view class="loading07 buttonx">loading07</view> -->
 </view>
+<include src="../common/common.wxml" />
