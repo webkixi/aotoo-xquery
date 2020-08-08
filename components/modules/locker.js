@@ -235,18 +235,7 @@ module.exports = function(params, cb) {
         this.cavs.closePath()
       },
 
-      __ready() {
-        let that = this
-        this.value = []
-        this.prev = 0
-        this.container = null
-
-        wx.showLoading({})
-
-        if (opts.id) {
-          this.activePage[opts.id] = this
-        }
-
+      calcPoints(){
         let query = wx.createSelectorQuery().in(this)
         query.selectAll(`.${opts.listClass}`).boundingClientRect(ret=>{
           this.container = ret && ret[0]
@@ -307,6 +296,22 @@ module.exports = function(params, cb) {
             })
           }
         })
+      },
+
+      __ready() {
+        let that = this
+        this.value = []
+        this.prev = 0
+        this.container = null
+
+        wx.showLoading({})
+
+        if (opts.id) {
+          this.mount(opts.id)
+          // this.activePage[opts.id] = this
+        }
+
+        this.calcPoints()
       }
     }
   }
