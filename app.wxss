@@ -1,4 +1,5 @@
 @import './css/markdown.wxss';
+@import './css/popup.wxss';
 /**app.wxss**/
 .container {
   height: 100%;
