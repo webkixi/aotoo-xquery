@@ -36,7 +36,10 @@ export function post(url, data={}, param={}, method='POST') {
         reject(e)
       }
     }
+    let header = param.header || {}
+    delete param.header
     postParam = Object.assign(postParam, param)
+    postParam.header = Object.assign(postParam.header, header)
     postParam.fail = postParam.error
     if (postParam.url) wx.request(postParam)
   })
@@ -211,7 +214,11 @@ class UsualKit {
 
   // 获取用户是否获得某权限
   auth(scopeType) {
-    const scopes = ['userInfo', 'userLocation', 'address', 'invoiceTitle', 'invoice', 'werun', 'record', 'writePhotosAlbum', 'camera']
+    // const scopes = ['userInfo', 'userLocation', 'address', 'invoiceTitle', 'invoice', 'werun', 'record', 'writePhotosAlbum', 'camera']
+    if(!scopeType) {
+      console.warn('必须指定需要设置的状态');
+      return
+    }
     return new Promise((resolve, rej) =>{
       function erro(err) {
         console.error(err);
@@ -222,8 +229,7 @@ class UsualKit {
           let stat = res.authSetting[`scope.${scopeType}`]
           if (!stat) {
             if (scopeType === 'userInfo') {
-              // return resolve(stat)
-              return erro(stat)
+              return erro(false)
             }
           }
           wx.authorize({

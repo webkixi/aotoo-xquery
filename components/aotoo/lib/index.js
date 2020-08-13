@@ -35,7 +35,7 @@ Date.prototype.ttf = function (fmt) {
 }
 
 // 时间戳转格式化
-// time为毫秒
+// time为毫秒，为时间戳差值
 export function secondFormat(time, fmt) {
   try {
     fmt = fmt || "hh:mm:ss"
@@ -49,14 +49,14 @@ export function secondFormat(time, fmt) {
     hour = parseInt(time / _hour) - day * 24
     min = parseInt(time / _min) - 60 * (hour + day * 24)
     sec = parseInt(time/1000) - 60*(min + hour*60 + day*24*60)
-    msec = parseInt((time - (sec*1000))/10)
+    msec = sec === 0 ? 0 : parseInt((time - (sec*1000))/10)
 
     var o = {
       "d+": day, //日
       "h+": hour, //小时
       "m+": min, //分
       "s+": sec, //秒
-      "S+": msec // 毫秒
+      "S": msec // 毫秒
     }
     
     for (var k in o)

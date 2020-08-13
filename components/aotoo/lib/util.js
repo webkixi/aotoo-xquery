@@ -23,6 +23,14 @@ export function objTypeof(obj, type) {
   }
 }
 
+export function isBoolean(obj) {
+  return typeof obj === 'boolean'
+}
+
+export function isSymbol(obj) {
+  return typeof obj === 'symbol'
+}
+
 export function isObject(obj) {
   return obj && objTypeof(obj) == 'object' && !isArray(obj)
 }
@@ -39,6 +47,10 @@ export function isNumber(obj) {
 
 export function isFunction(obj) {
   return objTypeof(obj) == 'function'
+}
+
+export function isRegExp(obj) {
+  return obj && Object.prototype.toString.call(obj) === '[object RegExp]';
 }
 
 export function clone(params={}) {
