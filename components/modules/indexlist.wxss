@@ -16,7 +16,7 @@
   padding: 3px 3px 3px 10px;
 }
 
-.ul .sortlist-item{
+.sortlist-container .itemroot > .ui-list .sortlist-item{
   height: 70px;
   display: flex;
   justify-content: flex-start;
@@ -27,18 +27,18 @@
   transition: margin-left .2s ease;
 }
 
-.ul .sortlist-item.float-left {
+.sortlist-container .itemroot > .ui-list .sortlist-item.float-left {
   margin-left: -100px;
 }
-.ul .sortlist-item.float-left.two {
+.sortlist-container .itemroot > .ui-list .sortlist-item.float-left.two {
   margin-left: -200px;
 }
 
-.ul .sortlist-item:active{
+.sortlist-container .itemroot > .ui-list .sortlist-item:active{
   background-color: #e9e9e9;
 }
 
-.ul .sortlist-item image{
+.sortlist-container .itemroot > .ui-list .sortlist-item image{
   flex: 0 0 auto;
   border: 1px solid #eee;
   border-radius: 5px;
@@ -49,7 +49,7 @@
   margin-right: 15px
 }
 
-.ul .sortlist-item > text, .ul .sortlist-item > view{
+.sortlist-container .itemroot > .ui-list .sortlist-item > text, .sortlist-container .itemroot > .ui-list .sortlist-item > view{
   flex: 0 0 auto;
   width: calc(100vw - 72px);
   display: flex;
@@ -58,11 +58,11 @@
   border-bottom: 1px solid #f5f5f5;
 }
 
-.ul .sortlist-item ui-item { 
+.sortlist-container .itemroot > .ui-list .sortlist-item ui-item { 
   height: 100%;
 }
 
-.ul .sortlist-item ui-item .hdot-item {
+.sortlist-container .itemroot > .ui-list .sortlist-item ui-item .hdot-item {
   width: 100px;
   height: 100%;
   display: flex;
@@ -73,6 +73,6 @@
   color: #fff;
 }
 
-.ul .sortlist-item:last-child {
+.sortlist-container .itemroot > .ui-list .sortlist-item:last-child {
   margin-bottom: 10px;
 }
