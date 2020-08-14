@@ -86,7 +86,7 @@ function indexs(params) {
           if (cb) {
             cb.call(this, {data: $data})
           }
-        }, 50);
+        }, 100);
       }
     }
   }
@@ -259,21 +259,23 @@ module.exports = function(param={}, forConfig) {
         let changedToucheTarget = e.changedTouches[0]
         // let len = selects.length
         let len = selects.__index
-        this.touchbar.selected(len, 'touch', function(item) {
+        let $data = Object.assign({}, this.touchbar.data.$list.data[len])
+        $data._point = changedToucheTarget
+        $data._event = e
+        that.hooks.emit('onTouchStart', {data: $data})
 
+        this.touchbar.selected(len, 'touch', function(item) {
           let _param = {
             target: item.data.target || item.data.to
           }
-
           let tmp = that.touchbar.find(item.data.attr['data-treeid'])
           let _inst = tmp&&tmp.getData()[0]
 
           param = Object.assign({}, param, _param)
           eventCallback.call(this, tap, e, param, _inst)
-
           item._point = changedToucheTarget
           item._event = e
-          that.hooks.emit('onTouchStart', item)
+          // that.hooks.emit('onTouchStart', item)
         })
       },
       onMove(e, param, inst){
