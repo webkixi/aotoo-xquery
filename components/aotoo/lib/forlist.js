@@ -143,12 +143,14 @@ export function reSetArray(data, list) {
           let touchoption =  list.itemMethod.touchoption
           
           let slip = touchoption.slip || {}
+          let autoDelete = slip.autoDelete === false ? false : true
           let slipLeft = slip.slipLeft
           let deletePart = {title: '删除', itemClass: 'slip-menu', _aim: '_onSlipMenus?id='+item.id+'&action=delete'}
           
           if (slipLeft) {
             if (slipLeft === true) slipLeft = []
             slip.menuWidth = slip.menuWidth || '80px'
+            if (!autoDelete) deletePart = []
             slipLeft = [].concat(slipLeft, deletePart)
           }
 
@@ -182,10 +184,17 @@ export function reSetArray(data, list) {
               return it
             })
 
-            item.li = [].concat((item.li||[]), slipLeft)
-            item.liClass = (item.liClass||'') + ' slip-menus'
+            if (!item.idf || (item.idf && item.slip===true)) {
+              item.li = [].concat((item.li||[]), slipLeft)
+              item.liClass = (item.liClass||'') + ' slip-menus'
+              slip.menuCount = (slipLeft.length || 0)
+            }
 
-            slip.menuCount = (slipLeft.length || 0)
+            if (item.slip === false) {
+              item.li = null
+              item.liClass = null
+              slip.menuCount = 0
+            }
           }
         }
         return reSetItemAttr.call(this, item, list)

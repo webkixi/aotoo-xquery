@@ -91,6 +91,7 @@
 </template>
 
 <template name="swiperWrap">
+  <slot name="swiper-top"></slot>
   <swiper 
     id="{{list.id||list.type.id||''}}"  
     class="hlist {{list.listClass||list.class||''}}" 
@@ -124,6 +125,7 @@
       </block>
     </block>
   </swiper>
+  <slot name="swiper-bottom"></slot>
 </template>
 
     <!-- class="hlist {{list.listClass||list.class||''}}"  -->
