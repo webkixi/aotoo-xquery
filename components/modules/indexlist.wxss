@@ -14,6 +14,7 @@
   height: 22px;
   background-color: #efefef; 
   padding: 3px 3px 3px 10px;
+  z-index: 1;
 }
 
 .sortlist-container .itemroot > .ui-list .sortlist-item{
