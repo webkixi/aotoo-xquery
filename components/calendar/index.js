@@ -223,6 +223,7 @@ let defaultConfig = {
   end: '',
   total: 0,
   mode: 2, // 1
+  modeOption: {},  // mode的附加配置
   type: 'range',
   rangeCount: 28,
   rangeMode: 2,
@@ -273,6 +274,7 @@ function adapter(source={}) {
     end,
     total,
     mode,
+    modeOption,
     type,
     value,
     data,
@@ -393,6 +395,7 @@ function adapter(source={}) {
       }
   
       let calendarItems = calendarDays.call(this, start, total)
+      modeConfig = Object.assign({}, modeConfig, modeOption)
   
       dateList = {
         $$id: this.calenderId,
@@ -600,7 +603,7 @@ Component({
           let ymd = that.m4_ymd
           let currentDate = `${ymd.year}-${ymd.month}-${ymd.day}`
           let monInst = that.getMonthInstance(currentDate)
-          if (monInst && monInst.days.length > 31) {
+          if (monInst && monInst.days && monInst.days.length > 31) {
             that.setData({ $style: `--append-date-item-height: var(--date-item-height)` })
           }
         }
@@ -1098,7 +1101,8 @@ Component({
     },
 
     _mode4swiping(e){
-      let dx = e.detail.dx
+      let v = this.coptions.modeOption.vertical
+      let dx = v ? e.detail.dy : e.detail.dx
       this.m4_dx = (dx - (this.m4dx||dx))
       this.m4dx = dx
     },
