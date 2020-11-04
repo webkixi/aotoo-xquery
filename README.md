@@ -11,18 +11,16 @@ demo图片均有效，github图片需要翻墙才能查看
 
 ![demo](http://www.agzgz.com/myimgs/demo.jpg)  
 
-
-
 # XQUERY
+
 小程序端更名为`queryUI`，在微信中搜索`queryUI`可以查看更多的DEMO  
 
-本项目是一个精简小程序项目，包含丰富的小程序组件及其演示demo，不定期更新，欢迎关注并在github上点赞我们   
+本项目是一个精简小程序项目，包含丰富的小程序组件及其演示demo，不定期更新，欢迎关注并在github上点赞我们
 
 `queryUI`是一套我们内部项目孵化而出的小程序核心库(基于原生小程序)，糅合了一些jQuery特性及一些方便好用的特性，用于简化小程序开发成本及帮助后期能更好的维护项目  
 
-小程序社区： https://developers.weixin.qq.com/community/personal/oCJUsw9JDs23M0Y9XuAMiTuUX214  
-gitee(码云): https://gitee.com/webkixi/aotoo-xquery
-
+小程序社区： <https://developers.weixin.qq.com/community/personal/oCJUsw9JDs23M0Y9XuAMiTuUX214>  
+gitee(码云): <https://gitee.com/webkixi/aotoo-xquery>
 
 * 原生微信小程序  
 * 动态模板构建
@@ -50,13 +48,14 @@ gitee(码云): https://gitee.com/webkixi/aotoo-xquery
 * 俄罗斯大转盘
 * 手势锁
 
-
 ## 如何使用  
+
 clone或下载本项目，`queryUI`基于微信小程序的原生库，不影响小程序原生开发使用，引入核心库文件后就能方便的引入queryUI的组件  
 
 > 本项目本身是一个完整的小程序示例demo，引入小程序开发工具中即可直接打开，或者导入下例核心文件及配置，即可以融入到已有项目中  
 
 ### 源码目录
+
     components 
         ├─ aotoo 核心代码必须有 ✔︎
         ├─ actionSide  弹窗组件
@@ -71,8 +70,9 @@ clone或下载本项目，`queryUI`基于微信小程序的原生库，不影响
        pages  基础示例
         │
       app.json  注册全局组件
- 
-### 核心目录/文件   
+
+### 核心目录/文件
+
 融合项目中必须引入以下核心目录、文件  
 
     components 
@@ -95,22 +95,24 @@ clone或下载本项目，`queryUI`基于微信小程序的原生库，不影响
 ```
 
 核心文件内置支持  
+
 1. markdown(全语法)
 2. html
-3. from表单 
+3. from表单
 4. item
 5. list
 6. tree
 7. img
 
 且支持外挂组件， 方便扩展使用  
-> 一套引入未压缩核心代码包大概为500k左右，后期考虑插件化可以大大降低小程序包容量   
-
+> 一套引入未压缩核心代码包大概为500k左右，后期考虑插件化可以大大降低小程序包容量
 
 ### Pager与Page的关系  
+
 Demo代码中有大量Pager的相关使用，需要注意正确的使用方式  
 Pager是queryUI对于Page的封装方法，该方法与Page一脉相承，使用逻辑，用法均保持一致，因此你可以使用Pager代替Page使用  
-queryUI的组件需要在Pager的环境中才能生效    
+queryUI的组件需要在Pager的环境中才能生效
+
 ```js
 const Pager = require('../../components/aotoo/core/index')
 Pager({
@@ -121,23 +123,27 @@ Pager({
 ```
 
 ### 超级组件  
+
 可以观察项目modules组件集合目录，该目录中存放各种组件库，可以看到组件的wxml结构非常简单，使用时模板方面的维护成本几乎为0，可以做到拿来即用
 所有逻辑几乎都在JS部分完成，方便扩展、升级。  
 
 #### 超级组件item
+
 item是核心元组件，该组件支持输出非常丰富的结构, 组件结构支持递归item组件来生成复杂结构  
 
 wxml
+
 ```html
 <ui-item item="{{itemConfig}}" />
 ```
 
 js  
+
 ```js
 Pager({
   data: {  
     // item组件的基础配置
-    itemConfig: { 
+    itemConfig: {
       $$id: {String} // item组件实例化后查找id
       title: {String|Array|{Object}},  // 标题，标题组
       img: {String|Array|Object},  // 图片，图组
@@ -153,17 +159,19 @@ Pager({
   }
 })
 ```
-    
 
 #### 超级组件list
+
 list是核心元组件，该组件基于item元组件构建而成，适用于列表类的场景使用，项目中的各种组件几乎都是基于list组件构建  
 
 wxml  
+
 ```html
 <ui-list list="{{listConfig}}" />
 ```
-    
+
 js
+
 ```js
 Pager({
   data: {  
@@ -183,15 +191,18 @@ Pager({
 ```
 
 #### 超级组件tree
-tree是核心元组件，该组件基于list组件构建而成，在扁平化的数据结构的基础上，能够输出层次化的结构   
+
+tree是核心元组件，该组件基于list组件构建而成，在扁平化的数据结构的基础上，能够输出层次化的结构
 tree元组件配置如同list元组件  
 
 wxml
+
 ```html
 <ui-tree list="{{treeConfig}}" />
 ```
 
 js
+
 ```js
 Pager({
   data: {  
@@ -211,6 +222,7 @@ Pager({
 ```
 
 ### 内嵌组件  
+
 内嵌组件不需要额外引入模板，直接嵌入在其他组件中使用的组件，内嵌组件基于寻址算法，会自动处理父子级的组件关系，比如子级使用父级定义的方法，或者\`Page\`中定义的方法
 下列是常用的内嵌组件  
 
@@ -225,6 +237,7 @@ Pager({
 比如我们在`item组件`中需要引入一个`列表组件`  
 
 wxml
+
 ```html
 <ui-item item="{{itemConfig}}" />
 ```
@@ -244,6 +257,7 @@ Pager({
 ```
 
 ### 如何在Pager中查找组件实例并使用其API方法  
+
 ```js
 Pager({
   data: {
@@ -265,7 +279,9 @@ Pager({
 ```
 
 #### 随意支持，谢谢
+
 ![DEMO小程序](http://www.agzgz.com/myimgs/wxzan.jpg)
 
 #### 更多demo请关注小程序
+
 ![DEMO小程序](http://www.agzgz.com/myimgs/xquery.png)
