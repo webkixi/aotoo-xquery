@@ -148,7 +148,11 @@
 </template>
 
 <template name="for-title-obj-string">
-  <text wx:if="{{item.itemDataRoot}}" class="htitle" selectable="{{true}}">{{item.title}}</text>
+  <text 
+    wx:if="{{item.itemDataRoot}}" 
+    class="htitle" 
+    user-select="{{ item['user-select'] || item['selectable'] || '' }}"
+  >{{item.title}}</text>
   <block wx:else>
     <template is="make-title" data="{{item}}" />
     <!-- <text wx:if="{{item.itemStyle || item.style}}" style="{{item.itemStyle||item.style}}" class="htitle {{item.itemClass||item.class}}">{{item.title}}</text>
@@ -173,7 +177,7 @@
       wx:else
       class="htitle {{item.itemClass||item.class||''}}"
       style="{{item.itemStyle||item.style||''}}"
-    ><text selectable="{{true}}">{{item.title}}</text></view>
+    ><text user-select="{{true}}">{{item.title}}</text></view>
     <!-- <view 
       class="htitle {{item.itemClass||item.class||''}}"
       style="{{item.itemStyle||item.style||''}}"

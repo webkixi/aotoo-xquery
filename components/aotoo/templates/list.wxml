@@ -108,7 +108,7 @@
     vertical	="{{ list.type['vertical']||'' }}" 
     previous-margin	="{{ list.type['previous-margin']||'' }}" 
     next-margin	="{{ list.type['next-margin']||'' }}" 
-    display-multiple-items="{{ list.type['display-multiple-items']||'' }}" 
+    display-multiple-items="{{ list.type['display-multiple-items']||'1' }}" 
     skip-hidden-item-layout="{{ list.type['skip-hidden-item-layout']||'' }}" 
     bindchange="{{list.type&&list.type.bindchange ? '_swiperMethod' : ''}}" 
     bindtransition="{{list.type&&list.type.bindtransition ? '_swiperMethod' : ''}}" 

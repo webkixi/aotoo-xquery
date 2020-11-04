@@ -11,6 +11,10 @@ module.exports = function(app, isParam) {
   if (tmp && !tmp.__active_page__) {
     tmp.__active_page__ = []
   }
+  
+  if (tmp && !tmp.__active_page_ready__) {
+    tmp.__active_page_ready__ = []
+  }
 
   return tmp
 }

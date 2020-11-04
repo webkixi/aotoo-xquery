@@ -64,7 +64,7 @@
         id="{{props.id||''}}" 
         data-treeid="{{props && util.isObject(props.attr) && (props.attr['data-treeid']||props.attr['treeid']||'')}}"
         data-id="{{(props && util.isObject(props.attr) && (props.attr['id'] || props.attr['data-id']) || '')}}"
-        selectable="{{props.selectable === false ? false : true}}"
+        user-select="{{ props['user-select'] || props['selectable'] || '' }}"
         space="{{props.space||''}}"
         decode="{{props.decode||''}}"
       >{{props.text}}</text>
@@ -243,7 +243,7 @@
     cursor="{{props.cursor||''}}"
     selection-start="{{props['selection-start']||''}}"
     selection-end="{{props['selection-end']||''}}"
-    adjust-position="{{props['adjust-position']||''}}"
+    adjust-position="{{props['adjust-position']||true}}"
     hold-keyboard="{{props['hold-keyboard']||''}}"
 
     catch:tap="{{props.tap||props.aim||props.catchtap ? 'itemMethod' : ''}}"
@@ -292,7 +292,7 @@
     show-confirm-bar="{{props['show-confirm-bar']||''}}"
     selection-start="{{props['selection-start']||''}}"
     selection-end="{{props['selection-end']||''}}"
-    adjust-position="{{props['adjust-position']||''}}"
+    adjust-position="{{props['adjust-position']||true}}"
     hold-keyboard="{{props['hold-keyboard']||''}}"
     disable-default-padding="{{props['disable-default-padding']||''}}"
 
@@ -389,9 +389,9 @@
   <block wx:if="{{util.isString(props.src)}}">
       <block wx:if="{{props.type&&props.type.is === 'cover'}}">
         <cover-image 
-          src="{{props.src}}"
+          src="{{props.src || (props.img&&props.img.src)}}" 
           id="{{props.id||''}}"
-          data-treeid="{{(source.attr&&source.attr['data-treeid']) || ''}}"
+          data-treeid="{{(props.attr&&props.attr['data-treeid']) || props.treeid || ''}}"
           class="{{props.itemClass||props.class||''}}"
 
           catch:touchstart= "{{(props.touchstart || props.catchtouchstart) ? 'itemMethod' : ''}}"
@@ -411,14 +411,14 @@
       <image 
         wx:else
         id="{{props.id||''}}"
-        data-treeid="{{(source.attr&&source.attr['data-treeid']) || ''}}"
+        data-treeid="{{(props.attr&&props.attr['data-treeid']) || props.treeid || ''}}"
         class="{{props.itemClass||props.class||''}}"
         style="{{props.style||props.itemStyle||''}}" 
         lazy-load="{{true}}" 
         class="himg {{props.class||props.itemClass||''}}" 
         mode="{{props.mode || 'widthFix'}}" 
-        src="{{props.src}}" 
-        data-src = "{{props.src}}"
+        src="{{props.src || (props.img&&props.img.src)}}" 
+        data-src = "{{props.src || (props.img&&props.img.src)}}"
         webp="{{props.webp||''}}" 
         show-menu-by-longpress="{{props['show-menu-by-longpress']||''}}"
 
@@ -436,4 +436,69 @@
         data-evt="{{util.dataEvt(props, ['bindload', 'binderror', 'preview', 'tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
       />
     </block>
+</template>
+
+<template name="@video">
+  <block wx:if="{{util.isObject(props)}}">
+    <video 
+      id="{{props.id||''}}"
+      class="video-class {{props.itemClass}}"
+      style="{{props.itemStyle||''}}"
+
+      src="{{props.src||''}}"
+      title="{{props.title||''}}"
+      duration="{{props.duration||''}}"
+      controls="{{props.controls||'true'}}"
+      danmu-list="{{props['danmu-list']||''}}"
+      danmu-btn="{{props['danmu-btn']|| false }}"
+      enable-danmu="{{props['enable-danmu']|| false }}"
+      autoplay="{{props['autoplay']|| false }}"
+      loop="{{props['loop']|| false }}"
+      muted="{{props['muted']|| false }}"
+      initial-time="{{props['initial-time']||0}}"
+      page-gesture="{{props['page-gesture']|| false }}"
+      direction="{{props['direction']||''}}"
+      show-progress="{{props['show-progress']||true}}"
+      show-fullscreen-btn="{{props['show-fullscreen-btn']||true}}"
+      show-play-btn="{{props['show-play-btn']||true}}"
+      show-center-play-btn="{{props['show-center-play-btn']||true}}"
+      enable-progress-gesture="{{props['enable-progress-gesture']||true}}"
+      object-fit="{{props['object-fit']||'contain'}}"
+
+      poster="{{props['poster']||''}}"
+      show-mute-btn="{{props['show-mute-btn']||false}}"
+      play-btn-position="{{props['play-btn-position']||'bottom'}}"
+      enable-play-gesture="{{props['enable-play-gesture']||false}}"
+      auto-pause-if-navigate="{{props['auto-pause-if-navigate']||true}}"
+      auto-pause-if-open-native="{{props['auto-pause-if-open-native']||true}}"
+      vslide-gesture="{{props['vslide-gesture']||false}}"
+      vslide-gesture-in-fullscreen="{{props['vslide-gesture-in-fullscreen']||true}}"
+      ad-unit-id="{{props['ad-unit-id']||''}}"
+
+      poster-for-crawler="{{props['poster-for-crawler']||''}}"
+      show-casting-button="{{props['show-casting-button']||false}}"
+      picture-in-picture-mode="{{props['picture-in-picture-mode']||''}}"
+      picture-in-picture-show-progress="{{props['picture-in-picture-show-progress']|| false }}"
+      enable-auto-rotation="{{props['enable-auto-rotation']|| false }}"
+      show-screen-lock-button="{{props['show-screen-lock-button']|| false }}"
+      show-snapshot-button="{{props['show-snapshot-button']|| false }}"
+
+      bindplay="{{props['bindplay'] ? 'itemMethod' : ''}}"
+      bindpause="{{props['bindpause'] ? 'itemMethod' : ''}}"
+      bindended="{{props['bindended'] ? 'itemMethod' : ''}}"
+      bindtimeupdate="{{props['bindtimeupdate'] ? 'itemMethod' : ''}}"
+      bindfullscreenchange="{{props['bindfullscreenchange'] ? 'itemMethod' : ''}}"
+      bindwaiting="{{props['bindwaiting'] ? 'itemMethod' : ''}}"
+      binderror="{{props['binderror'] ? 'itemMethod' : ''}}"
+      bindprogress="{{props['bindprogress'] ? 'itemMethod' : ''}}"
+      bindloadedmetadata="{{props['bindloadedmetadata'] ? 'itemMethod' : ''}}"
+      bindcontrolstoggle="{{props['bindcontrolstoggle'] ? 'itemMethod' : ''}}"
+
+      bindenterpictureinpicture="{{props['bindenterpictureinpicture'] ? 'itemMethod' : ''}}"
+      bindleavepictureinpicture="{{props['bindleavepictureinpicture'] ? 'itemMethod' : ''}}"
+      bindseekcomplete="{{props['bindseekcomplete'] ? 'itemMethod' : ''}}"
+      
+      data-evt="{{util.dataEvt(props, ['bindplay', 'bindpause', 'bindended', 'bindtimeupdate', 'bindfullscreenchange', 'bindwaiting', 'binderror', 'bindprogress', 'bindloadedmetadata', 'bindcontrolstoggle', 'bindenterpictureinpicture', 'bindleavepictureinpicture', 'bindseekcomplete', 'tap', 'aim'])}}"
+    />
+  </block>
 </template>

@@ -80,7 +80,15 @@ export function reSetItemAttr(item, list){
     // item['__moreAttributs'] = extraAttr.length
   }
 
-  const newItem = resetItem(item, this)
+  let oMethods = null;
+  let oItemMethod = null
+  if (isObject(item)) {
+    oMethods = item.methods; delete item.methods;
+    oItemMethod = item.itemMethod; delete item.itemMethod
+  }
+  let newItem = resetItem(item, this)
+  newItem.methods = oMethods
+  newItem.itemMethod = oItemMethod
   return newItem
 }
 

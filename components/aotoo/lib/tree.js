@@ -116,14 +116,6 @@ export function tree(dataAry, props, fromTree){
         item.$parent = item.$parent || item.parent
         delete item.parent
       }
-      // if (item.idf && item.title) {
-      //   if (isObject(item.title)) {
-      //     item.title.itemClass = item.title.itemClass ? item.title.itemClass+' caption' : 'caption'
-      //   }
-      //   if (isString(item.title)) {
-      //     item.title = {title: item.title, itemClass: 'caption'}
-      //   }
-      // }
     }
     return item
   })
@@ -133,8 +125,6 @@ export function tree(dataAry, props, fromTree){
       menus.push(item.toString())
     }
     if (item && typeof item == 'object' && !Array.isArray(item)) {
-      // item.fromTree = fromTree
-      // item.fromComponent = fromTree
       if (item.idf && !item.$parent && idrecode.indexOf(item.idf) == -1) {
         var clsName = item.itemClass || item.class
         clsName = clsName ? clsName.indexOf('level0') == -1 ? clsName + ' level0' : clsName : 'level0'

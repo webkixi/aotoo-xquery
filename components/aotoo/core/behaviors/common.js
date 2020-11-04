@@ -571,6 +571,15 @@ export const commonBehavior = (app, mytype) => {
       defFields.methods = defFields.methods || {}
       defFields.methods._setData_ = function (data, callback) {
         let that = this
+        /**
+         * setData补充状态
+         * selfDataChanging  // 内部方法修改中
+         * selfDataChanged   // 内部方法是否已经修改过, false时，props允许修改，true时，拒绝修改
+         * 
+         * 配置参数补充参数
+         * alwaysSyncProps   // 配置参数，true始终允许props传入数据修改，不保证现有状态, false不允许修改
+         * forceSyncProps // alwaysSyncProps为false时，传入props包含此参数，则允许修改
+         */
         const originalSetData = this._originalSetData // 原始 setData
         originalSetData.call(this, data, function() {
           if (that.activePage) {
@@ -612,6 +621,9 @@ export const commonBehavior = (app, mytype) => {
         app['_vars'][this.uniqId] = this
         this._originalSetData = this.setData // 原始 setData
         this.setData = this._setData_ // 封装后的 setData
+        this.selfDataChanging = false
+        this.selfDataChanged = false
+        this.isINmemery = false
       },
       //节点树完成，可以用setData渲染节点，但无法操作节点
       attached: function () { //节点树完成，可以用setData渲染节点，但无法操作节点
@@ -650,7 +662,10 @@ export const commonBehavior = (app, mytype) => {
         let properties = this.properties
         let ds = (properties.item || properties.list || properties.dataSource || {})
         if (lib.isObject(ds) || lib.isArray(ds)) this.originalDataSource = lib.clone(ds)
-        else this.originalDataSource = ds
+        else {
+          this.originalDataSource = ds
+        }
+
         if (lib.isObject(ds)) {
           if (ds.$$id || ds.id || this.data.id) {
             activePage['elements'] = activePage['elements'] || {}
@@ -675,19 +690,20 @@ export const commonBehavior = (app, mytype) => {
         let preSet = {
           uniqId: this.uniqId,
           show: true,
-          fromComponent: this.data.fromComponent
+          fromComponent: this.data.fromComponent || ''
         }
+
         if (lib.isObject(ds)) {
           ds['show'] = ds.hasOwnProperty('show') ? ds.show : true
           preSet.show = ds['show']
-          preSet.fromComponent = ds.fromComponent
+          preSet.fromComponent = ds.fromComponent || ''
 
           /**
            * 设置this.data.fromParent为自身
            * ds数据需要传递给其子组件使用，子组件需要知道来源组件 
            */
           preSet.__fromParent = this.uniqId
-          preSet.id = properties.id || ds.id
+          preSet.id = properties.id || ds.id || ''
 
           /**
            * ds.treeid是透过模板传递过来的
@@ -711,19 +727,10 @@ export const commonBehavior = (app, mytype) => {
             this.treeid = ds.treeid
           }
         }
-        if (!preSet.fromComponent) delete preSet.fromComponent
-        if (!preSet.id) delete preSet.id
-        this.setData(preSet)
 
-        if (this.__ready) {
-          if (activePage.hooks) {
-            activePage.hooks.reverseOn('__READY', function () {
-              that.__ready()
-            })
-          } else {
-            activePage.__READY = [that.__ready].concat(activePage.__READY||[])
-          }
-        }
+        // if (!preSet.fromComponent) delete preSet.fromComponent
+        // if (!preSet.id) delete preSet.id
+        this.setData(preSet)
       },
 
 
@@ -739,60 +746,14 @@ export const commonBehavior = (app, mytype) => {
         this.hooks.emit('ready')
         this.hooks.fire('__ready')
 
-        // if (this.__ready) {
-        //   console.log('======= 3333');
-        //   this.activePage.hooks.reverseOn('__READY', function() {
-        //     that.__ready()
-        //   })
-        //   // if (this.activePage.__rendered) {
-        //   //   clearTimeout(this.activePage.timmer)
-        //   //   this.activePage.timmer = setTimeout(() => {
-        //   //     that.activePage.hooks.fire('__READY')
-        //   //   }, 60);
-        //   // }
-        // }
-
-        // let ods = this.originalDataSource
-        // if (ods && lib.isObject(ods) && ods.__fromParent) {
-        //   this.parentInst = app['_vars'][ods.__fromParent]
-        //   this.parentInst && this.parentInst.children.push(this)
-        // }
-
-        // /** 执行在数据中预置__ready方法
-        //  * {
-        //  *    title: '',
-        //  *    methods: {
-        //  *      __ready(){}
-        //  *    }
-        //  * }
-        // */
-        // if (this.__ready&&lib.isFunction(this.__ready)) {
-        //   let activePage = this.activePage
-        //   that.__ready()
-        //   // if (activePage.__rendered) {
-        //   //   that.__ready()
-        //   // } else {
-        //   //   this.activePage.hooks.on('onReady', function() {
-        //   //     // setTimeout(that.__ready.bind(that), 50);
-        //   //     // that.__ready.call(that)
-        //   //     that.__ready()
-        //   //   })
-        //   // }
-        // }
-
-
-
-
-        // let activePage = this.activePage
-        // let proto = activePage.__prototype
-        // let uniqId = this.uniqId
-        // let fcid = this.data.fromComponent || this.originalDataSource.fromComponent
-        // if (fcid) {
-        //   proto[fcid] = (proto[fcid]||[fcid]).concat(uniqId)
-        // } else {
-        //   proto[uniqId] = [uniqId]
-        // }
-        // activePage.__prototype = proto
+        if (this.__ready) {
+          this.activePage.hooks.reverseOn('__READY', function() {
+            that.__ready()
+          })
+          if (this.activePage.__rendered) {
+            that.activePage.hooks.fire('__READY')
+          }
+        }
       },
 
       //组件实例被移动到树的另一个位置

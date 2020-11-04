@@ -268,11 +268,13 @@ function core(params, _page) {
 
     function doneActivePage(ctx){
       app.__active_page__.forEach(item=>{
-        if (typeof item === 'function') {
-          item(ctx)
-        }
+        if (typeof item === 'function') item(ctx)
+      })
+      app.__active_page_ready__.forEach(item=>{
+        if (typeof item === 'function') item(ctx)
       })
       app.__active_page__ = []
+      app.__active_page_ready__ = []
     }
 
     const oldLoad = params.onLoad
@@ -303,24 +305,28 @@ function core(params, _page) {
           this.hooks.fire('__READY')
         }
       }
-      let oldSetData = this.setData
-      this.setData = function (param, cb) {
-        oldSetData.call(that, param, function () {
-          if (lib.isFunction(cb)) {
-            that.doReady()
-            cb.call(that)
-          }
-        })
-      }
-      app.hooks.emit('activePage', activePage)
-      app.hooks.emit('changeActivePage', activePage)
-      if (typeof oldLoad == 'function') {
-        oldLoad.apply(this, arguments)
-      }
-    }
 
-    const oldReady = params.onReady
-    params.onReady = function() {
+
+      // let oldSetData = this.setData
+      // this.setData = function (param, cb) {
+      //   oldSetData.call(that, param, function () {
+      //     if (lib.isFunction(cb)) {
+      //       that.doReady()
+      //       cb.call(that)
+      //     }
+      //   })
+      // }
+
+
+      app.hooks.emit('activePage', activePage)
+      app.hooks.fire('changeActivePage', activePage)
+
+
+      /**
+       * ==================
+       * 从onReady搬过来
+       * ==================
+       */
       const elements = this.eles
       const actions = this.acts
       const actionIds = Object.keys(actions)
@@ -328,12 +334,48 @@ function core(params, _page) {
         const defineMethods = actions[$$id]
         if (elements[$$id]) {
           const instId = elements[$$id]
-          if (that.elements[instId]) {
-            let $component = that.elements[instId]
+          if (this.elements[instId]) {
+            let $component = this.elements[instId]
             mergeActions($component, defineMethods)
           }
         }
       })
+
+      /**
+       * ????????
+       * 把依赖onReady和__rendered状态的方法，修改为依赖onLoad
+       * this.hooks.emit('onLoad')
+       * 或者改为对 app.hooks.fire('changeActivePage', activePage)的依赖
+       * ????????
+       */
+      // this.__rendered = true
+      // this.hooks.emit('onReady')
+      // this.doReady()
+
+      // mkFind(this, app)
+      // this.find = wx.$$find
+      /** ================== */
+
+      if (typeof oldLoad == 'function') {
+        oldLoad.apply(this, arguments)
+      }
+    }
+
+    const oldReady = params.onReady
+    params.onReady = function() {
+      // const elements = this.eles
+      // const actions = this.acts
+      // const actionIds = Object.keys(actions)
+      // actionIds.forEach($$id => {
+      //   const defineMethods = actions[$$id]
+      //   if (elements[$$id]) {
+      //     const instId = elements[$$id]
+      //     if (that.elements[instId]) {
+      //       let $component = that.elements[instId]
+      //       mergeActions($component, defineMethods)
+      //     }
+      //   }
+      // })
 
       mkFind(this, app)
       this.find = wx.$$find
