@@ -31,7 +31,7 @@ function htmlDecodeByRegExp(str) {
   s = str.replace(/&amp;/g, "&");
   s = s.replace(/&lt;/g, "<");
   s = s.replace(/&gt;/g, ">");
-  s = s.replace(/&nbsp;/g, " ");
+  s = s.replace(/&nbsp;/g, "\xa0");
   s = s.replace(/&#39;/g, "\'");
   s = s.replace(/&quot;/g, "\"");
   return s;
@@ -137,16 +137,24 @@ class htmlparser {
     }
 
     let tag = attribs || {};
-    if (hasAttr) tag.attr = attr;
-    tag.itemClass = tag.itemClass ? name + " " + tag.itemClass : name;
 
     if (name === "img") {
       let $imgOption = options.img
       attribs = Object.assign({}, $imgOption, attribs)
-      tag = {img: attribs}
+      tag = { '@image': attribs }
+    }
 
-      // tag.img = attribs.src || "";
-      // delete tag.src;
+    if (name === "video") {
+      let $videoOption = options.video
+      attribs = Object.assign({}, $videoOption, attribs)
+      tag = { '@video': attribs }
+    }
+    
+    if (hasAttr) tag.attr = attr;
+    tag.itemClass = tag.itemClass ? name + " " + tag.itemClass : name;
+
+    if (typeof options.openTag === 'function') {
+      tag = options.openTag(name, tag) || tag
     }
     
     if (!this._code || name === 'code') {
@@ -174,17 +182,30 @@ class htmlparser {
         let curTag = _codes[_codes.length - 1]
         curTag.text = text || ''
       } else {
-        _codes.push({text, decode: true, space: true, itemClass: 'code-zoom'})
+        _codes.push({text, decode: true, space: true, itemClass: 'code-zone'})
       }
     }
     else {
-      text = text.trim()
-      if (tags.length && /[\w\u4e00-\u9fa5]/g.test(text)) {
-        let curTag = tags[tags.length - 1];
-        if (curTag.title) {
-          curTag.dot = (curTag.dot||[]).concat({text})
+      // text = text.trim()
+      // if (tags.length && /[\w\u4e00-\u9fa5]/g.test(text)) {
+      if (text && text.length === 1) {
+        text = text.trim()
+        if (!text) return
+      }
+      if (tags.length && /[\s\S]/g.test(text)) {
+        if (this._open) {
+          let curTag = tags[tags.length - 1];
+          if (curTag.title) {
+            curTag.dot = (curTag.dot||[]).concat({text})
+          } else {
+            curTag.title = text;
+          }
         } else {
-          curTag.title = text;
+          let last = tags[tags.length - 1];
+          let dot = last.dot || [];
+          dot.push({ text })
+          last.dot = dot
+          tags[tags.length - 1] = last
         }
       } else {
         if (text) {
@@ -212,8 +233,13 @@ class htmlparser {
       }
 
       if (tagname === 'span') {
-        curTag.text = curTag.title
-        delete curTag.title
+        // curTag.text = curTag.title
+        // delete curTag.title
+      }
+
+      if (tagname === 'video') {
+        curTag['@video'] = curTag.video
+        delete curTag.video
       }
       
       if (stack.length) {
@@ -236,11 +262,13 @@ class htmlparser {
 
   html(content, param={}, fromMd){
     let dft = {
-      img: {mode: 'scaleToFill'},
+      img: {mode: 'scaleToFill', itemClass: 'html-img'},
+      video: {},
       url: {}
     }
-    let opts = {}
+    let opts = {openTag: param.openTag}
     opts.img = Object.assign({}, dft.img, param.img)
+    opts.video = Object.assign({}, dft.video, param.video)
     opts.url = Object.assign({}, dft.url, param.url)
     this.options = Object.assign({}, dft, opts)
     this._codes = []
