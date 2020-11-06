@@ -6,12 +6,13 @@
  * @Description: In User Settings Edit
  * @FilePath: /xquery/README.md
  -->
-demo图片均有效，github图片需要翻墙才能查看  
 微信号: aotoodemo
 
 ![demo](http://www.agzgz.com/myimgs/demo.jpg)  
 
 # XQUERY
+
+__[文档](http://www.agzgz.com)__  
 
 小程序端更名为`queryUI`，在微信中搜索`queryUI`可以查看更多的DEMO  
 
@@ -280,8 +281,8 @@ Pager({
 
 #### 随意支持，谢谢
 
-![DEMO小程序](http://www.agzgz.com/myimgs/wxzan.jpg)
+![DEMO小程序](http://www.agzgz.com/imgs/wxzan.jpg)
 
 #### 更多demo请关注小程序
 
-![DEMO小程序](http://www.agzgz.com/myimgs/xquery.png)
+![DEMO小程序](http://www.agzgz.com/imgs/xquery.png)
