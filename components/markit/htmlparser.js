@@ -95,12 +95,12 @@ class htmlparser {
         else
         if (ky === "class") {
           attribs["itemClass"] = attribs[ky];
-          // delete attribs[ky];
+          delete attribs[ky];
         }
         else
         if (ky === "style") {
           attribs["itemStyle"] = attribs[ky];
-          // delete attribs[ky];
+          delete attribs[ky];
         }
         else
         if (ky === 'href') {
@@ -188,8 +188,8 @@ class htmlparser {
     else {
       // text = text.trim()
       // if (tags.length && /[\w\u4e00-\u9fa5]/g.test(text)) {
-      if (text && text.length === 1) {
-        text = text.trim()
+      if (text) {
+        text = text.trim().replace(/[\r\n]/g, '')
         if (!text) return
       }
       if (tags.length && /[\s\S]/g.test(text)) {
@@ -294,8 +294,7 @@ class htmlparser {
     marked.setOptions({
       sanitize: true,
       highlight: function (code) {
-        let val = hl.highlightAuto(code).value
-        return val
+        return hl.highlightAuto(code).value
       }
     })
     content = marked(content)
