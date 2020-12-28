@@ -206,7 +206,21 @@ export const itemBehavior = function(app, mytype) {
                 target[nkey] = opts[key]
               }
             })
-  
+
+            let $ds = lib.isObject(this.originalDataSource) ? this.originalDataSource : {}
+            let $$id = $ds['$$id']
+            let _id = $ds['id']
+            let dataId = this.data.id
+
+            if (target['$$id'] && target['$$id'] === $$id) {
+              delete target['$$id']
+            } 
+            if (target['id'] && target['id'] === _id) {
+              delete target['id']
+            }
+            if (target['id'] && target['id'] === dataId) {
+              delete target['id']
+            }
             that.setData(target)
             const _item = _resetItem(that.data.$tmp, that)
             that.setData({ $item: _item }, callback)
