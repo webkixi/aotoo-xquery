@@ -213,6 +213,8 @@ function tintRange(fromInit) {
  *  disable: true/false  全局无效
  *  date: Object|Function,  // 默认日期
  *  festival: Boolean|Array 为true时显示所有预定义的节日，数组时显示特定的节日  true | ['清明节’, '平安夜', '圣诞节'...] 能够带节的都是用'节'
+ *  setFestival: Object 如果设置该属性，则替换或者更新阳历假期数据
+ *  setLunarFestival: Object 如果设置该属性，则替换或者更新农历假期数据
  * }
  */
 
@@ -264,6 +266,16 @@ function adapter(source={}) {
     })
   } else {
     coptions.rangeTip = []
+  }
+
+  if (lib.isObject(coptions.setFestival)) {
+    setFestival(coptions.setFestival)
+    delete coptions.setFestival
+  }
+
+  if (lib.isObject(coptions.setLunarFestival)) {
+    setLunarFestival(coptions.setLunarFestival)
+    delete coptions.setLunarFestival
   }
 
   let {
