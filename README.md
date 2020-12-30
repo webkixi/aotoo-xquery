@@ -10,17 +10,16 @@
 
 ![demo](http://www.agzgz.com/myimgs/demo.jpg)  
 
-# XQUERY
+# AOTOO-XQUERY
 
-__[文档](http://www.agzgz.com)__  
+__[说明文档](http://www.agzgz.com)__  
 
-小程序端更名为`queryUI`，在微信中搜索`queryUI`可以查看更多的DEMO  
+小程序端更名为`queryUI`，在微信中搜索`queryUI`可以查看DEMO  
 
-本项目是一个精简小程序项目，包含丰富的小程序组件及其演示demo，不定期更新，欢迎关注并在github上点赞我们
+该项目是一个精简小程序项目，包含小程序一些好用的UI组件及其演示demo，不定期更新，欢迎关注并在github上点赞我们  
 
-`queryUI`是一套我们内部项目孵化而出的小程序核心库(基于原生小程序)，糅合了一些jQuery特性及一些方便好用的特性，用于简化小程序开发成本及帮助后期能更好的维护项目  
+`aotoo`是我们web项目(react)开发工具库，`queryui`基于aotoo的开发理念，我们希望统一多端的开发思想，降低成员开发成本，也便于降低后期的维护成本。
 
-小程序社区： <https://developers.weixin.qq.com/community/personal/oCJUsw9JDs23M0Y9XuAMiTuUX214>  
 gitee(码云): <https://gitee.com/webkixi/aotoo-xquery>
 
 * 原生微信小程序  
@@ -51,9 +50,11 @@ gitee(码云): <https://gitee.com/webkixi/aotoo-xquery>
 
 ## 如何使用  
 
-clone或下载本项目，`queryUI`基于微信小程序的原生库，不影响小程序原生开发使用，引入核心库文件后就能方便的引入queryUI的组件  
+1. aotoo-hub环境中可远程安装`queryui`，并使用webpack编译，支持动态样式编译，导入markdown等等[**这里**](http://www.agzgz.com)  
 
-> 本项目本身是一个完整的小程序示例demo，引入小程序开发工具中即可直接打开，或者导入下例核心文件及配置，即可以融入到已有项目中  
+2. clone本项目，使用微信小程序开发工具打开
+
+3. 引入核心源码在其他项目中使用，查看下例说明
 
 ### 源码目录
 
