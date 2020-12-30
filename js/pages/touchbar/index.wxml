@@ -1,0 +1,5 @@
+<ui-item wx:if="{{showpan}}" item="{{showpan}}" />
+<ui-item wx:if="{{touchbarConfig}}" item="{{touchbarConfig}}" />
+<ui-item wx:if="{{touchbarConfig1}}" item="{{touchbarConfig1}}" />
+<!-- <ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" /> -->

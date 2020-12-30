@@ -1,0 +1,408 @@
+page {
+  --item-width: 90vw;
+  --item-height: 400px;
+  --item-height-cover: 500px;
+  --item-height-section: 360px;
+
+  --markdown-width: 380px;
+
+  --topic-fontsize: 46rpx;
+  --cover-subject-fontsize: 26px;
+  --subject-fontsize: 14px;
+  --subject-fontweight: 500;
+  --light-subject-color: #666;
+
+  --dark-subject-color: #dedede;
+  --dark-topic-color: #fff;
+}
+
+button {
+  flex: 0 0 auto;
+  /* height: 40px; */
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
+  display: none;
+}
+
+.markdown-body{
+  width: var(--markdown-width);
+}
+.markdown-body .h6{
+  margin-bottom: -12px;
+  margin-top: 10px;
+}
+
+.appstore-pad{
+  padding-top: 0;
+  width: 100vw;
+  /* height: calc(100vh - 120rpx); */
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+/* 骨架item */
+.appstore-item{
+  width: var(--item-width);
+  min-height: var(--item-height);
+  box-sizing: border-box;
+  position: relative;
+  margin: 0 auto;
+  margin-bottom: 30px;
+}
+.appstore-item:first-child {
+  margin-top: 120rpx;
+}
+
+/* 默认容器item样式 */
+.appstore-item .appstore-popitem{
+  width: var(--item-width);
+  height: var(--item-height);
+  border-radius: 10px;
+  box-sizing: border-box;
+  background-color: #fff;
+  /* display: block; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  padding-top: 0;
+  box-shadow: 0px 10px 30px 0px rgba(0, 0, 0, 0.4);
+  transition: all .2s;
+}
+
+/* 手势按下时的特效 */
+.appstore-item .appstore-popitem:active{
+  /* transform: scale(0.98, 0.98); */
+  transform: scale(1, 1);
+}
+
+.appstore-item .appstore-popitem image:first-child{
+  flex: 0 0 auto;
+  width: 100%;
+  height: 275px;
+}
+
+/* 封面模式框架高度 */
+.appstore-item.frame-cover{
+  height: var(--item-height-cover);
+}
+
+/* 封面模式容器收起时的默认高度 */
+.appstore-item .appstore-popitem.project-cover{
+  height: var(--item-height-cover);
+}
+
+/* 封面模式的主题图片 */
+.appstore-item .appstore-popitem.project-cover .himg {
+  width: 100%;
+  height: var(--item-height-cover);
+}
+
+/* 文档模块，默认为顶部 */
+.appstore-item .appstore-popitem .htitles{
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  margin-left: 20px;
+  height: 90px;
+  position: relative;
+}
+
+/* 底部文档模块 */
+.appstore-item .appstore-popitem.project-title-footer .htitles{
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+/* 封面文档模块 */
+.appstore-item .appstore-popitem.project-cover .htitles {
+  margin-left: 10px;
+  position: absolute;
+  left: 0;
+}
+
+.appstore-item .appstore-popitem.project-cover image {
+  height: 480px;
+  flex: 0 0 auto;
+}
+
+/* 封面文档模块-顶部 */
+.appstore-item .appstore-popitem.project-cover.project-title-header .htitles{
+  margin-top: 12px;
+  top: 0;
+}
+
+/* 封面文档模块-底部 */
+.appstore-item .appstore-popitem.project-cover.project-title-footer .htitles{
+  margin-top: 0;
+  top: 390px;
+}
+
+/* 
+ * 文档样式设置
+ * 包括子标题(subject)，标题(topic)，描述(desc)等三个部分
+ */
+.appstore-item .appstore-popitem.topic .htitles .t-item:first-child{
+  font-size: var(--topic-fontsize);
+  font-weight: 700;
+}
+.appstore-item .appstore-popitem.subject-topic .htitles .t-item:first-child{
+  font-size: var(--subject-fontsize);
+  font-weight: var(--subject-fontweight);
+  color: var(--light-subject-color);
+  line-height: 1.5;
+}
+.appstore-item .appstore-popitem.subject-topic .htitles .t-item:last-child {
+  font-size: var(--topic-fontsize);
+  font-weight: 700;
+}
+
+.appstore-item .appstore-popitem.subject-topic-desc .htitles .t-item:first-child{
+  font-size: var(--subject-fontsize);
+  font-weight: var(--subject-fontweight);
+  color: var(--light-subject-color);
+  line-height: 1.5;
+}
+.appstore-item .appstore-popitem.subject-topic-desc .htitles .t-item:nth-child(2) {
+  font-size: var(--topic-fontsize);
+  font-weight: 700;
+}
+.appstore-item .appstore-popitem.subject-topic-desc .htitles .t-item:last-child {
+  font-size: var(--subject-fontsize);
+  font-weight: 300;
+  color: var(--light-subject-color);
+  line-height: 1.5;
+}
+
+/* 封面模式的文档，包括子标题(subject)，标题(topic)，描述(desc)等三个部分 */
+.appstore-item .appstore-popitem.project-cover.topic .htitles .t-item:first-child {
+  font-size: var(--cover-subject-fontsize);
+  font-weight: 700;
+}
+
+.appstore-item .appstore-popitem.project-cover.subject-topic .htitles .t-item:first-child {
+  line-height: 1.5;
+}
+.appstore-item .appstore-popitem.project-cover.subject-topic .htitles .t-item:last-child {
+  font-size: var(--cover-subject-fontsize);
+  font-weight: 700;
+}
+
+.appstore-item .appstore-popitem.project-cover.subject-topic-desc .htitles .t-item:first-child {
+  line-height: 1.5;
+}
+.appstore-item .appstore-popitem.project-cover.subject-topic-desc .htitles .t-item:nth-child(2) {
+  font-size: var(--cover-subject-fontsize);
+  font-weight: 700;
+}
+.appstore-item .appstore-popitem.project-cover.subject-topic-desc .htitles .t-item:last-child {
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+/* section */
+.appstore-item .appstore-popitem.section {
+  display: block;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-top: 10px;
+  height: var(--item-height-section);
+  margin-bottom: -36px;
+}
+
+/* .appstore-item .appstore-popitem.section .htitles:first-child {
+  padding-left: 15px;
+} */
+
+.appstore-item .appstore-popitem.section .section-zone {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  font-size: 16px;
+  box-sizing: border-box;
+  background-image: linear-gradient(to right, #fff 20%, #eee 20%);
+  position: relative;
+}
+.appstore-item .appstore-popitem.section .section-zone .li-item{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  background-color: #fff;
+  margin-bottom: 1px;
+  height: 62px;
+  padding: 0 20px;
+  flex: 0 0 auto;
+}
+.appstore-item .appstore-popitem.section .section-zone ui-item{
+  width: 100%;
+}
+.appstore-item .appstore-popitem.section .section-zone .li-item image {
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+  margin-left: 6px;
+}
+
+.appstore-item .appstore-popitem.section .section-zone .li-item .htitles {
+  margin-left: 10px;
+  width: calc(100% - 32px);
+}
+.appstore-item .appstore-popitem.section .section-zone .htitles .t-item:first-child{
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #000;
+}
+.appstore-item .appstore-popitem.section .section-zone .htitles .t-item:nth-child(2){
+  font-size: 26rpx;
+  font-weight: 200;
+  color: #666;
+}
+.appstore-item .appstore-popitem.section .section-zone .htitles .t-item.section-demo{
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #666;
+  position: absolute;
+  right: 0;
+  line-height: 30px;
+  width: 60px;
+  height: 30px;
+  background-color: #e9e9e9;
+  text-align: center;
+  border-radius: 20px;
+  color: rgb(52, 52, 250);
+  top: 50%;
+  margin-top: -15px;
+}
+
+/* ----section end---- */
+
+/* banner */
+.appstore-item .appstore-popitem.project-cover.banner.topic .htitles {
+  margin-left: 0;
+  height: 120px;
+  top: 380px;
+}
+.appstore-item .appstore-popitem.project-cover.banner.topic .htitles > .t-item:first-child {
+  font-size: 36px;
+  margin-left: 10px;
+}
+.appstore-item .appstore-popitem.project-cover.banner.topic .htitles .banner-zone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 300;
+  color: #fff;
+  /* background-color: red; */
+  background-image: linear-gradient(90deg, rgba(218, 212, 212, 0.1), rgba(151, 150, 150, 0.9));
+  height: 74px;
+  padding: 0 10px;
+}
+/* ----banner end---- */
+
+.appstore-item .appstore-popitem.project-cover.project-title-header.subject-topic-desc .htitles .t-item:last-child {
+  display: block;
+  position: absolute;
+  top: 440px;
+}
+
+/* 
+ * 黑模式模式
+ * 背景图片颜色较深时使用白色字体
+ */
+.appstore-item .appstore-popitem.dark.topic .htitles .t-item:first-child {
+  color: var(--dark-topic-color);
+}
+
+.appstore-item .appstore-popitem.dark.subject-topic .htitles .t-item:first-child {
+  color: var(--dark-subject-color);
+}
+.appstore-item .appstore-popitem.dark.subject-topic .htitles .t-item:last-child {
+  color: var(--dark-topic-color);
+}
+
+.appstore-item .appstore-popitem.dark.subject-topic-desc .htitles .t-item:first-child {
+  color: var(--dark-subject-color);
+}
+.appstore-item .appstore-popitem.dark.subject-topic-desc .htitles .t-item:nth-child(2) {
+  color: var(--dark-topic-color);
+}
+.appstore-item .appstore-popitem.dark.subject-topic-desc .htitles .t-item:last-child {
+  color: var(--dark-subject-color);
+}
+
+
+/* 遮罩层 */
+.appstore-masker {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 590;
+  filter:blur(5px);
+  background: rgba(177, 176, 176, 0.9) fixed;
+  background-image: linear-gradient(#999 10px, transparent 0);
+  background-size: 0 100%;
+}
+
+/* 关闭按钮 */
+.appstore-close-button{
+  position: fixed;
+  z-index: 603;
+  width: 30px;
+  height: 30px;
+  margin: 2px;
+  border: 2px solid;
+  transition: all .2s;
+  border-radius: 50%;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: middle;
+  font-style: normal;
+  color: #f6f6f6;
+  background-color: #555;
+  text-align: left;
+  text-indent: -9999px;
+  direction: ltr;
+  transform: rotate(45deg) scale(.9,.9);
+  padding: 0;
+  font-family: Roboto,sans-serif;
+}
+
+.appstore-close-button::before{
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 2px;
+  box-shadow: inset 0 0 0 32px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.appstore-close-button::after{
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 18px;
+  box-shadow: inset 0 0 0 32px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.appstore-close-button::selection{
+  background-color: #333;
+  color: #fff;
+}
