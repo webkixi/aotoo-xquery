@@ -1,7 +1,0 @@
-@import "../common/source.wxss";
-@import "../../components/modules/appstorelist.wxss";
-
-.container{
-  padding: 0;
-}
-

@@ -1,5 +1,0 @@
-<view class="container">
-  <ui-list wx:if="{{appstoreList}}" list="{{appstoreList}}" />
-</view>
-<ui-item item="{{codeButton}}" />
-<ui-pop item="{{readme}}" />
