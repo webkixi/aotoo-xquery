@@ -173,13 +173,6 @@ export function completeMonth(timestart) {
     // let ori = {title: num, timestamp: theStamp, date: theDate, year, month, day: _num, itemClass: 'valid'}
     let ori = {timestamp: theStamp, date: theDate, year, month, day: _num, itemClass: 'valid', ...num}
     if (theStamp <= endDayStamp) {
-      if (lib.isObject(defaultDate)) {
-        ori = Object.assign({}, ori, defaultDate)
-      }
-      if (lib.isFunction(defaultDate)) {
-        ori = defaultDate.call(this, ori) || ori
-      }
-      
       let dateTap = `onSelected?type=date&date=${theDate}`
       if (globalDisable === false) {
         ori.tap = dateTap
@@ -215,40 +208,34 @@ export function completeMonth(timestart) {
       }
 
       if (ori.disable) {
-        ori.itemClass = 'valid invalid'
+        ori.itemClass = 'valid invalid pre-start-day'
         if (fillupData.length) ori.valid = false // 只有data有数据的时候才设置该值
         delete ori.tap
       } else {
         ori.itemClass = 'valid'
         ori.tap = dateTap
       }
-
-      // if (ori.disable === false) {
-      //   ori.itemClass = 'valid'
-      //   ori.tap = dateTap
-      // } else if(ori.disable) {
-      //   ori.itemClass = 'valid invalid'
-      //   delete ori.tap
-      // }
-      // return ori
     } else {
       if (_num <= theMonthCount) {
-        ori.itemClass = 'valid invalid'
+        ori.itemClass = 'valid invalid after-end-day'
         ori.valid = false
         ori.tap = undefined
-        // return ori
       } else {
-        // return {title: num, itemClass: 'valid invalid'}
         ori =  {itemClass: 'valid invalid', ...num}
       }
+    }
+
+    if (lib.isObject(defaultDate)) {
+      ori = Object.assign({}, ori, defaultDate)
+    }
+
+    if (lib.isFunction(defaultDate)) {
+      ori = defaultDate.call(this, ori) || ori
     }
     // return {originalDate: JSON.stringify(ori), ...ori}
     // return {originalDate: lib.clone(ori), ...ori}
     
     return ori
-
-    // _ori = {originalDate: JSON.stringify(_ori), ...ori,}
-    // return _ori
   })
 
   res = [].concat(preArr, currentMonth, nextArr);
@@ -327,36 +314,36 @@ export function oneMonthListConfig(timestart) {
     let nexts = follow.nexts
     let preset = follow.preset
     // preset.pop()
+    // that.hooks.emit('empty-month-checked')
     preset.forEach(monInstId=>{
       let handle = that.activePage.getElementsById(monInstId)
-      handle&&handle.hooks.emit('restore-month-days')
+      handle && handle.unChecked()
+      // handle&&handle.hooks.emit('restore-month-days')
     })
-
-    // that.calendar.children.forEach(child=>{
-    //   child.visible(true)
-    //   child.show()
-    //   if (child.lazyDisplay) {
-    //     child.hooks.emit('emptyChecked', {itemClass: 'invalid'})
-    //   }
-    // })
 
     // 隐藏所有需要隐藏的月份
-    others.forEach(monInstId => {
-      let handle = that.activePage.getElementsById(monInstId)
-      if (handle) {
-        if (rangeMode === 2) {
-          handle.hide()
-        } else {
-          handle.hooks.emit('disable-month-days')
+    setTimeout(() => {
+      others.forEach(monInstId => {
+        let handle = that.activePage.getElementsById(monInstId)
+        if (handle) {
+          if (rangeMode === 2) {
+            handle.hide()
+          } else {
+            handle.hooks.emit('disable-month-days')
+          }
         }
-      }
-    })
+      })
+    }, 100);
 
     if (!nexts.length) {
       nexts.push(that.calenderId + '-' + edgeMonth)
-    } else {
-      // nexts.unshift(`${that.calenderId}-${curPoint.year}-${curPoint.month}`)
     }
+    
+    // if (!nexts.length) {
+    //   nexts.push(that.calenderId + '-' + edgeMonth)
+    // } else {
+    //   // nexts.unshift(`${that.calenderId}-${curPoint.year}-${curPoint.month}`)
+    // }
 
     let newEdgeDate = null // 自定义边界日期
     let myhandle = null
@@ -386,20 +373,17 @@ export function oneMonthListConfig(timestart) {
       }
     } else {
       nexts.forEach(monInstId => {
+        // if (preset.indexOf(monInstId) > -1) return
         let edgeId = that.calenderId + '-' + edgeMonth
         let handle = that.activePage.getElementsById(monInstId)
         if (handle) {
-          // handle.visible(true)
           handle.show()
           let handleData = handle.getData().data
           if (!handleData.length) {
             handle.fillMonth()
           }
           if (edgeId === monInstId) {
-            handle.hooks.emit('restore-month-days')
             handle.tint(edgeDate, null, 'invalid')
-          } else {
-            handle.hooks.emit('restore-month-days')
           }
         }
       })
@@ -458,24 +442,6 @@ export function oneMonthListConfig(timestart) {
            */
           theMon.hooks.once('emptyChecked', function(cls={itemClass: 'selected'}) {
             theMon.hooks.emit('restore-month-days')
-            // theMon.forEach(item => {
-            //   if (item.data && item.data.date) {
-            //     let date = item.data.date
-            //     let stamp = newDate(date).getTime()
-            //     if (stamp >= that.validStartDay && stamp <= that.validEndDay) {
-            //       if (item.hasClass(cls.itemClass)) {
-            //         // let $data = originalMonthDays.find(function(it){
-            //         //   return it.date === date
-            //         // })
-            //         // if ($data) {
-            //         //   $data = lib.clone($data)
-            //         //   item.reset($data)
-            //         // }
-            //         item.removeClass(`${cls.itemClass} range`)
-            //       }
-            //     }
-            //   }
-            // })
           })
 
           that.hooks.on('update-month-days', function(param){
@@ -682,7 +648,16 @@ export function oneMonthListConfig(timestart) {
         
         // 响应tap事件
         onSelected(e, param, inst){
-          if (inst.hasClass('invalid')) return
+          let tapFun = coptions.tap
+          if (inst.hasClass('invalid')) {
+            const res = that.customResponse(tapFun, e, param, inst)
+            if (res !== true) {
+              return
+            } else {
+              inst.removeClass('invalid')
+            }
+          }
+          
           this.checked(param, inst, function() {
             that.selectDate(e, param, inst) // tap=selected?date=2019-11-21 that.itemMethod.call(inst, e)
           })
@@ -719,39 +694,35 @@ export function oneMonthListConfig(timestart) {
         },
 
         unChecked(targetDate){
-          // this.hooks.emit('emptyChecked')
           let findIt = false
           if (lib.isArray(targetDate)){
             let uids = []
             let uinst = []
             targetDate.forEach((item, ii)=>{
               item.removeClass('selected range')
-              if (uids.indexOf(item.parentInst.uniqId)===-1) {
-                uids.push(item.parentInst.uniqId)
-                uinst.push(item)
-              }
             })
-            uinst.forEach(it=>it.exec())
+            // targetDate.forEach((item, ii)=>{
+            //   item.removeClass('selected range')
+            //   if (uids.indexOf(item.parentInst.uniqId)===-1) {
+            //     uids.push(item.parentInst.uniqId)
+            //     uinst.push(item)
+            //   }
+            // })
+            // uinst.forEach(it=>it.exec())
             return 
           }
 
           if (this.checkedIndex.length) {
             findIt = true
             this.forEach((item, index)=>{
-              if (this.checkedIndex.indexOf(index)>-1) {
-                item.removeClass('selected range')
-              }
+              item.removeClass('selected range')
+              // if (this.checkedIndex.indexOf(index)>-1) {
+              //   item.removeClass('selected range')
+              // }
             })
             this.checkedIndex = []
           }
           
-          // if (this.checkedIndex || this.checkedIndex === 0) {
-          //   let target = this.find(this.checkedIndex)
-          //   if (target) {
-          //     findIt = true
-          //     target.removeClass('selected range')
-          //   }
-          // } 
 
           if (!findIt) {
             this.forEach(item=>{

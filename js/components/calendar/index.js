@@ -132,9 +132,11 @@ function tintRange(fromInit) {
   if (!endDate) return  // endDate必须有效磁能渲染range
 
   let startInstId = `${this.calenderId}-${startDate.year}-${startDate.month}`
-  let startInst = this.rangeStartMonth || activePage.getElementsById(startInstId)
+  // let startInst = this.rangeStartMonth || activePage.getElementsById(startInstId)
+  let startInst = activePage.getElementsById(startInstId)
   let endInstId = `${this.calenderId}-${endDate.year}-${endDate.month}`
-  let endInst = this.rangeEndMonth || activePage.getElementsById(endInstId)
+  // let endInst = this.rangeEndMonth || activePage.getElementsById(endInstId)
+  let endInst = activePage.getElementsById(endInstId)
 
   if (value[0] && !value[1] && fromInit) {
     setTimeout(() => {
@@ -147,11 +149,6 @@ function tintRange(fromInit) {
 
   this.hooks.off('empty-month-checked')
   this.hooks.one('empty-month-checked', function () {
-    // if (!startInst) {
-    //   startInst = activePage.getElementsById(startInstId)
-    //   endInst = activePage.getElementsById(endInstId)
-    // }
-
     if (startInst && endInst) {
       let smDate = startInst.getDate()
       let emDate = endInst.getDate()
@@ -509,6 +506,12 @@ Component({
           if (lib.isObject(params)) {
             this.rendered = false
             params = Object.assign({}, this.coptions, params)
+            if (params.$$id) {
+              const calenderInst = this.activePage.getElementsById(params.$$id)
+              if (!calenderInst) {
+                this.mount(params.$$id)
+              }
+            }
             adapter.call(this, params)
           }
         }
@@ -719,7 +722,10 @@ Component({
 
     // 设置指定日期数据
     renderDate(param){
-      this.hooks.emit('update-month-days', param)
+      if (param) {
+        param = [].concat(param)
+        this.hooks.emit('update-month-days', param)
+      }
       // this.calendar.children.forEach(month=>{
       //   if (month.lazyDisplay) {
       //     month.fillMonth()
@@ -902,6 +908,27 @@ Component({
       }
     },
 
+    // 响应用户的点击方法
+    customResponse(tapFun, e, param, inst){
+      let coptions = this.coptions
+      let type = coptions.type
+      let activePage = this.activePage
+      let results
+      if (this[tapFun]) {
+        results=this[tapFun](e, param, inst)
+      } else {
+        let parent = funInParent(this, tapFun)
+        if (parent) {
+          results=parent[tapFun].call(this, e, param, inst)
+        } else {
+          if (typeof activePage[tapFun] === 'function') {
+            results=activePage[tapFun].call(activePage, e, param, inst)
+          }
+        }
+      }
+      return results
+    },
+
     // 响应业务tap事件的回调方法
     selectDate(e, param, inst){
       let that = this
@@ -926,6 +953,8 @@ Component({
         if (type === 'range') {
           if (len === 1) {
             param.range = 'start'
+            param.dateDiff = 0
+            e.currentTarget.dataset.dateDiff = 0
             e.currentTarget.dataset.range = 'start'
           }
           if (len === 2) {
@@ -974,27 +1003,25 @@ Component({
               monInst.forEach(item => item.data.date === ss ? that.removeValue(ss, item) : '')
             }
 
-            param.dateDiff = gap
-            e.currentTarget.dataset.dateDiff = gap
             param.range = diffStamp < 0 ? 'start' : 'end'
-            e.currentTarget.dataset.range = diffStamp < 0 ? 'start' : 'end'
+            diffStamp < 0 ? (()=>{
+              param.range = 'start'
+              param.dateDiff = 0
+              e.currentTarget.dataset.range = 'start'
+              e.currentTarget.dataset.dateDiff = 0
+            })()
+            : (()=>{
+              param.range = 'end'
+              param.dateDiff = gap
+              e.currentTarget.dataset.range = 'end'
+              e.currentTarget.dataset.dateDiff = gap
+            })()
           }
         }
       }
 
       if (tapFun) {
-        if (this[tapFun]) {
-          this[tapFun](e, param, inst)
-        } else {
-          let parent = funInParent(this, tapFun)
-          if (parent) {
-            parent[tapFun].call(this, e, param, inst)
-          } else {
-            if (typeof activePage[tapFun] === 'function') {
-              activePage[tapFun].call(activePage, e, param, inst)
-            }
-          }
-        }
+        this.customResponse(tapFun, e, param, inst)
 
         if (type === 'range' && rangeTip) {
           let startTip = rangeTip[0]
@@ -1301,7 +1328,7 @@ Component({
       let scrollWidth = container.scrollWidth
 
       let zoneItems = this.zoneItems
-      let outItems = []
+      let outItems = [] 
       items.forEach(item => {
         let {top, left, right, bottom, width, height, showed} = item
         left = left - scrollLeft

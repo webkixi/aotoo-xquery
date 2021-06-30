@@ -17,21 +17,24 @@ Pager({
       calendarConfig: {
         $$id: 'calendar',
         mode: 1,
-        type: 'single',
-        total: 360,
+        type: 'range',
+        total: 120,
         festival: ['元旦', '情人节', '劳动节', '青年节', '儿童节', '教师节', '国庆节', '圣诞节', '清明节', '冬至', '除夕', '春节', '元宵节', '端午节', '中秋节', '重阳节'],
         tap: 'onTap',
-        rangeCount: 15,
-        // disable: true,
-        // data: mydata,
-        value: ['2020-06-20', '2020-06-28'],
+        rangeCount: 30,
+        rangeMode: 1,
+        toolbox: {
+          header:false,
+          discontinue: false 
+        },
       }
     })
   },
 
   onTap(e, param, inst){
-    const ca = this.getElementsById('calendar')
-    let value = ca.getValue()
-    console.log(value)
+    // const ca = this.getElementsById('calendar')
+    // let value = ca.getValue()
+    // console.log(value)
+    console.log(param);
   }
 })

@@ -97,7 +97,7 @@ export function _hasClass(params, data) {
     params = params.replace(/\./g, '')
     let cls = params.split(' ')
     let itCls = (data.itemClass || ' ').split(' ')
-    let _cls = cls.filter(c => itCls.indexOf(c) !== -1)
+    let _cls = cls.filter(c => itCls.indexOf(c) > -1)
     return cls.length === _cls.length
   }
 }
@@ -254,6 +254,7 @@ function syncChildData(ctx, data) {
   return data
 }
 
+let batchUpdateTimmer = null
 export function listInstDelegate(treeid, listInst, from){
   let index = null
   if (treeid && (treeid.__realIndex || treeid.__realIndex===0)) {
@@ -280,8 +281,11 @@ export function listInstDelegate(treeid, listInst, from){
         // 本对象原来的使用环境是list.forEach场景中使用，由forEach方法批来量更新数据，脱离forEach后没有触发机制
         // 在有些场景当中本对象会作为个体变量传递给外部，如 return [inst1, inst2, inst3]
         // 此时即便应用了更新方法仍然不能更新数据、渲染，因为没有触发事件执行更新
-        if (!listInst.__foreachUpdata) return 
-        listInst.update(listInst.__foreachUpdata, cb)
+        clearTimeout(batchUpdateTimmer)
+        batchUpdateTimmer = setTimeout(() => {
+          if (!listInst.__foreachUpdata) return 
+          listInst.update(listInst.__foreachUpdata, cb)
+        }, 17);
       },
       reset(param, cb){
         if (!param) return
@@ -295,6 +299,7 @@ export function listInstDelegate(treeid, listInst, from){
           upData[key] = data
           if (from === 'foreach') {
             listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
+            this.exec()
           } else {
             listInst.update(upData, cb)
           }
@@ -325,6 +330,7 @@ export function listInstDelegate(treeid, listInst, from){
         if (styData) {
           if (from === 'foreach') {
             listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, styData)
+            this.exec()
           } else {
             listInst.update(styData, cb)
           }
@@ -352,6 +358,7 @@ export function listInstDelegate(treeid, listInst, from){
         if (clsData) {
           if (from === 'foreach') {
             listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, clsData)
+            this.exec()
           } else {
             listInst.update(clsData, cb)
           }
@@ -379,6 +386,7 @@ export function listInstDelegate(treeid, listInst, from){
         let clsData = _removeClass(key, params, data)
         if (from === 'foreach') {
           listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, clsData)
+          this.exec()
         } else {
           listInst.update(clsData, cb)
         }
@@ -401,6 +409,7 @@ export function listInstDelegate(treeid, listInst, from){
           upData[key] = data
           if (from === 'foreach') {
             listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
+            this.exec()
           } else {
             listInst.update(upData, cb)
           }
@@ -415,6 +424,7 @@ export function listInstDelegate(treeid, listInst, from){
           // listInst.update(upData)
           if (from === 'foreach') {
             listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
+            this.exec()
           } else {
             listInst.update(upData, cb)
           }
@@ -429,6 +439,7 @@ export function listInstDelegate(treeid, listInst, from){
           // listInst.update(upData)
           if (from === 'foreach') {
             listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
+            this.exec()
           } else {
             listInst.update(upData, cb)
           }
