@@ -11,7 +11,8 @@ import {
 } from './util'
 
 import {
-  resetItem
+  resetItem,
+  itemTouchoption
 } from "./foritem";
 
 export function reSetItemAttr(item, list){
@@ -64,6 +65,8 @@ export function reSetItemAttr(item, list){
   }
 
   if (isObject(item)) {
+    item.id = item['$$id'] || item['id'] || suid('item_')
+
     if (item['attr']) {
       if (!item['attr']['data-treeid']) item['attr']['data-treeid'] = $ii
     } else {
@@ -73,19 +76,23 @@ export function reSetItemAttr(item, list){
         item['attr'] = {'data-treeid': $ii}
       }
     }
-
-    // let _attr = item.attr||{}
-    // let excludeAttr = ['id', 'treeid', 'data-treeid']
-    // let extraAttr = Object.keys(_attr).filter(kyname => excludeAttr.indexOf(kyname) == -1)
-    // item['__moreAttributs'] = extraAttr.length
   }
+  
 
   let oMethods = null;
   let oItemMethod = null
   if (isObject(item)) {
-    oMethods = item.methods; delete item.methods;
-    oItemMethod = item.itemMethod; delete item.itemMethod
+    oMethods = item.methods; 
+    delete item.methods;
+    
+    oItemMethod = item.itemMethod; 
+    delete item.itemMethod
   }
+
+  if (list.hasTouchoption) {
+    item.touchoption = Object.assign({}, list.itemMethod.touchoption, (item.touchoption || {}))
+  }
+
   let newItem = resetItem(item, this)
   newItem.methods = oMethods
   newItem.itemMethod = oItemMethod
@@ -111,15 +118,16 @@ export function reSetArray(data, list) {
       let methods = list.itemMethod
       let tmp = {}
       Object.keys(methods).forEach(key => {
+        let customEvent = methods[key]
         if (key === 'touchoption') {
-          tmp[key] = methods[key]
+          tmp[key] = customEvent
+          list.hasTouchoption = true
         } else {
-          let funKey = '__on'+key
+          let funKey = isString(customEvent) ? customEvent : '__on'+key
           tmp[key] = funKey
-          let fun = methods[key]
-          if (isFunction(fun)) {
-            fun = fun.bind(that)
-            that[funKey] = fun
+          if (isFunction(customEvent)) {
+            customEvent = customEvent.bind(that)
+            that[funKey] = customEvent
           }
         }
       })
@@ -146,65 +154,71 @@ export function reSetArray(data, list) {
       }
 
       list.data = data.map(item => {
-        if (list.hasTouchoption) {
-          item.id = item.id || suid('item_')
-          let touchoption =  list.itemMethod.touchoption
+        // if (list.hasTouchoption) {
+        //   item.id = item.id || suid('item_')
+        //   let touchoption =  list.itemMethod.touchoption
           
-          let slip = touchoption.slip || {}
-          let autoDelete = slip.autoDelete === false ? false : true
-          let slipLeft = slip.slipLeft
-          let deletePart = {title: '删除', itemClass: 'slip-menu', _aim: '_onSlipMenus?id='+item.id+'&action=delete'}
+        //   let slip = touchoption.slip || {}
+        //   let autoDelete = slip.autoDelete === false ? false : true
+        //   let slipLeft = slip.slipLeft
+        //   let deletePart = {title: '删除', itemClass: 'slip-menu', _aim: '_onSlipMenus?id='+item.id+'&action=delete'}
           
-          if (slipLeft) {
-            if (slipLeft === true) slipLeft = []
-            slip.menuWidth = slip.menuWidth || '80px'
-            if (!autoDelete) deletePart = []
-            slipLeft = [].concat(slipLeft, deletePart)
-          }
+        //   if (slipLeft) {
+        //     if (slipLeft === true) slipLeft = []
+        //     slip.menuWidth = slip.menuWidth || '80px'
+        //     if (!autoDelete) deletePart = []
+        //     slipLeft = [].concat(slipLeft, deletePart)
+        //   }
 
-          let itemSlipLeft = []
-          let itemTouchoption = item.touchoption
-          if (itemTouchoption) {
-            let itemSlip = itemTouchoption.slip || {}
-            itemSlipLeft = itemSlip.slipLeft
-            if (itemSlipLeft) {
-              if (itemSlipLeft === true) itemSlipLeft = []
-              if (isString(itemSlipLeft)) {
-                itemSlipLeft = [itemSlipLeft]
-              }
-            }
-          }
+        //   let itemSlipLeft = []
+        //   let itemTouchoption = item.touchoption
+        //   if (itemTouchoption) {
+        //     let itemSlip = itemTouchoption.slip || {}
+        //     itemSlipLeft = itemSlip.slipLeft
+        //     if (itemSlipLeft) {
+        //       if (itemSlipLeft === true) itemSlipLeft = []
+        //       if (isString(itemSlipLeft)) {
+        //         itemSlipLeft = [itemSlipLeft]
+        //       }
+        //     }
+        //   }
 
-          if (itemSlipLeft.length) {
-            slipLeft = itemSlipLeft
-          }
+        //   if (itemSlipLeft.length) {
+        //     slipLeft = itemSlipLeft
+        //   }
           
-          if (slipLeft && slipLeft.length) {
-            slipLeft = slipLeft.map(it=>{
-              if (isString(it)) {
-                it = {title: it, itemClass: 'slip-menu', _aim: '_onSlipMenus?id='+item.id+'&action='+it}
-              }
-              if (isObject(it)) {
-                // let styleWidth = 'width:' + (slip.menuWidth) + ';'
-                let styleWidth = ''
-                it.containerStyle = styleWidth + (it.itemStyle||'') 
-              }
-              return it
-            })
+        //   if (slipLeft && slipLeft.length) {
+        //     slipLeft = slipLeft.map(it=>{
+        //       if (isString(it)) {
+        //         it = {title: it, itemClass: 'slip-menu', _aim: '_onSlipMenus?id='+item.id+'&action='+it}
+        //       }
+        //       if (isObject(it)) {
+        //         // let styleWidth = 'width:' + (slip.menuWidth) + ';'
+        //         let styleWidth = ''
+        //         it.containerStyle = styleWidth + (it.itemStyle||'') 
+        //       }
+        //       return it
+        //     })
 
-            if (!item.idf || (item.idf && item.slip===true)) {
-              item.li = [].concat((item.li||[]), slipLeft)
-              item.liClass = (item.liClass||'') + ' slip-menus'
-              slip.menuCount = (slipLeft.length || 0)
-            }
+        //     if (!item.idf || (item.idf && item.slip===true)) {
+        //       item.li = [].concat((item.li||[]), slipLeft)
+        //       item.liClass = (item.liClass||'') + ' slip-menus'
+        //       slip.menuCount = (slipLeft.length || 0)
+        //     }
 
-            if (item.slip === false) {
-              item.li = null
-              item.liClass = null
-              slip.menuCount = 0
-            }
-          }
-        }
+        //     if (item.slip === false) {
+        //       item.li = null
+        //       item.liClass = null
+        //       slip.menuCount = 0
+        //     }
+        //   }
+        // }
+
+        // if (list.hasTouchoption) {
+        //   item.id = item.id || suid('item_')
+        //   item.touchoption = Object.assign({}, list.itemMethod.touchoption, (item.touchoption || {}))
+        //   item = itemTouchoption(item)
+        // }
         return reSetItemAttr.call(this, item, list)
       })
     }

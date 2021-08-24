@@ -49,7 +49,7 @@ export const itemBehavior = function(app, mytype) {
     behaviors: [commonBehavior(app, mytype), commonMethodBehavior(app, mytype)],
     properties: {
       item: {
-        type: Object|String|Number, 
+        type: Object, 
         observer: function (params) { 
           if (!this.init) {
             if (params) {
@@ -62,7 +62,6 @@ export const itemBehavior = function(app, mytype) {
           }
         } 
       },
-      id: String,
     },
     data: {
 
@@ -78,9 +77,10 @@ export const itemBehavior = function(app, mytype) {
             "$item": xitem
           })
         }
+        if (typeof this.customLifeCycle.attached === 'function') {
+          this.customLifeCycle.attached.call(this)
+        }
       },
-      ready: function () { //组件布局完成，这时可以获取节点信息，也可以操作节点
-      }
     },
     methods: {
       attr: function (params) {
@@ -116,7 +116,7 @@ export const itemBehavior = function(app, mytype) {
         return this._reset.apply(this, arguments)
       },
       
-      addClass: function(itCls) {
+      addClass: function(itCls, cb) {
         if (itCls) {
           itCls = itCls.replace(/\./g, '')
           itCls = lib.isString(itCls) ? itCls.split(' ') : []
@@ -126,7 +126,7 @@ export const itemBehavior = function(app, mytype) {
           $itemClass = $itemClass.concat(itCls)
           this.update({
             itemClass: $itemClass.join(' ')
-          })
+          }, cb)
         }
       },
 
@@ -143,7 +143,7 @@ export const itemBehavior = function(app, mytype) {
         }
       },
 
-      removeClass: function(itCls) {
+      removeClass: function(itCls, cb) {
         if (itCls) {
           itCls = itCls.replace(/\./g, '')
           itCls = lib.isString(itCls) ? itCls.split(' ') : []
@@ -153,7 +153,7 @@ export const itemBehavior = function(app, mytype) {
           $itemClass = _cls
           this.update({
             itemClass: ($itemClass.join(' ') || ' ')
-          })
+          }, cb)
 
           // let indexs = []
           // $itemClass.forEach((cls, ii) => {

@@ -2,5 +2,4 @@
 <!-- github: webkixi -->
 <!-- 小程序的模板真是又长又臭 -->
 
-<!-- <ui-list list="{{$list}}" id="{{id}}" fromTree="{{ fromComponent || uniqId }}" /> -->
 <include src="../templates/list.wxml" />

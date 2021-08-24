@@ -9,11 +9,20 @@ page{
   background-color: #fff;
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 
 .nav-btn{
-  width: 180px;
-  height: 70px;
-  margin-bottom: 30px;
+  width: 90vw;
+  height: 60px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   justify-content: center;

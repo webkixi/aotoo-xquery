@@ -1,9 +1,10 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/calendar/index",
+    "pages/test/index",
     "pages/markdown/index",
     "pages/button/index",
-    "pages/calendar/index",
     "pages/html/index",
     "pages/checklist/index",
     "pages/form/index",    

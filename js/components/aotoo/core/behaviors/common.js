@@ -128,6 +128,7 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
       let forEachTmp = {}
       let tmpData = this.data
       let datas = Object.keys(tmpData)
+      let changed = false
       datas.forEach((key, ii) => {
         // let _data = {[key]: tmpData[key]}
         let _data = tmpData[key]
@@ -137,6 +138,13 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
             parent(param){
               return that.parent(param)
             },
+            attr(){
+              return _data.attr
+            },
+            reset(){
+              changed = true
+              forEachTmp = Object.assign(forEachTmp, {[key]: _data})
+            },
             getChilds(){
               if (_data && _data.idf) {
                 let attr = _data.attr || {}
@@ -145,17 +153,27 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
               }
             },
             addClass(cls) {
+              changed = true
               let clsData = _addClass(key, cls, _data)
               forEachTmp = Object.assign(forEachTmp, clsData)
             },
             removeClass(cls) {
+              changed = true
               let clsData = _removeClass(key, cls, _data)
               forEachTmp = Object.assign(forEachTmp, clsData)
             },
             hasClass(cls) {
               return _hasClass(cls, _data)
             },
+            toggleClass(cls) {
+              if (this.hasClass(cls)) {
+                this.removeClass(cls)
+              } else {
+                this.addClass(cls)
+              }
+            },
             update(param) {
+              changed = true
               let keyData = {
                 [key]: param
               }
@@ -163,13 +181,9 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
             }
           }
           cb(context, ii)
-          // cb.call(context, _data, ii)
         }
-        // if ((ii + 1) === datas.length) {
-        //   listInst.update(forEachTmp)
-        // }
       })
-      listInst.update(forEachTmp, callback)
+      changed && listInst.update(forEachTmp, callback)
     },
     hasClass(params){
       let hasCls = false
@@ -275,6 +289,10 @@ export function listInstDelegate(treeid, listInst, from){
         let $data = (listInst.getData()).data[index]
         return syncChildData(listInst, $data)
       },
+      attr(){
+        const $data = this.getData()
+        return $data.attr
+      },
       exec(cb){
         // 列表实例批量更新方法
         // exec方法允许执行以下若干更新方法后，触发批量更新数据并渲染
@@ -288,15 +306,16 @@ export function listInstDelegate(treeid, listInst, from){
         }, 17);
       },
       reset(param, cb){
-        if (!param) return
-        let upData = {}
-        if (data) {
+        if (!param) param = {}
+        const upData = {}
+        const $data = listInst.originalDataSource.data[index]
+        if ($data) {
+          let tmpData = param
           if (lib.isFunction(param)) {
-            data = param(data) || data
-          } else {
-            data = param
+            tmpData = param($data)||{}
           }
-          upData[key] = data
+          tmpData = Object.assign({}, $data, tmpData)
+          upData[key] = tmpData
           if (from === 'foreach') {
             listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
             this.exec()
@@ -304,6 +323,23 @@ export function listInstDelegate(treeid, listInst, from){
             listInst.update(upData, cb)
           }
         }
+
+        // if (!param) return
+        // let upData = {}
+        // if (data) {
+        //   if (lib.isFunction(param)) {
+        //     data = param(data) || data
+        //   } else {
+        //     data = param
+        //   }
+        //   upData[key] = data
+        //   if (from === 'foreach') {
+        //     listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
+        //     this.exec()
+        //   } else {
+        //     listInst.update(upData, cb)
+        //   }
+        // }
       },
       parent(param){
         if (!param) return listInst
@@ -419,6 +455,7 @@ export function listInstDelegate(treeid, listInst, from){
         let upData = {}
         if (data) {
           data = this.getData()
+          if (data.show) return
           data.show = true
           upData[key] = data
           // listInst.update(upData)
@@ -434,6 +471,7 @@ export function listInstDelegate(treeid, listInst, from){
         let upData = {}
         if (data) {
           data = this.getData()
+          if (data.show === false) return
           data.show = false
           upData[key] = data
           // listInst.update(upData)
@@ -472,6 +510,7 @@ export function listInstDelegate(treeid, listInst, from){
         let tmpData = lib.clone(__refreshData())
         this.__refreshData = __refreshData
         return fakeListInstance(tmpData, listInst, this)
+        
         // return {
         //   length: Object.keys(tmpData).length,
         //   data: tmpData,
@@ -571,17 +610,26 @@ export const commonBehavior = (app, mytype) => {
         type: String, // 类型（必填），目前接受的类型包括：String, Number, Boolean, Object, Array, null（表示任意类型）
         // value: '', // 属性初始值（可选），如果未指定则会根据类型选择一个
         // observer: function () { }  // 属性被改变时执行的函数（可选），也可以写成在methods段中定义的方法名字符串, 如：'_propertyChange'
+        value: ''
       },
       fromComponent: {
         type: String,
         value: ''
-      }
+      },
+      fromTree: {
+        type: String,
+        value: ''
+      },
+      dataSource: Object,
     },
     definitionFilter(defFields, definitionFilterArr) {
       // 监管组件的setData
       defFields.methods = defFields.methods || {}
       defFields.methods._setData_ = function (data, callback) {
         let that = this
+        let didUpdate = this.customLifeCycle.didUpdate
+        const parentSamilarIdInstance = this.parentSamilarIdInstance
+        const samilarContext = parentSamilarIdInstance
         /**
          * setData补充状态
          * selfDataChanging  // 内部方法修改中
@@ -591,22 +639,37 @@ export const commonBehavior = (app, mytype) => {
          * alwaysSyncProps   // 配置参数，true始终允许props传入数据修改，不保证现有状态, false不允许修改
          * forceSyncProps // alwaysSyncProps为false时，传入props包含此参数，则允许修改
          */
-        const originalSetData = this._originalSetData // 原始 setData
-        originalSetData.call(this, data, function() {
-          if (that.activePage) {
-            that.activePage.doReady()
-            if (lib.isFunction(callback)) {
-              callback.call(this)
-            }
-          } else {
-            that.hooks.on('__ready', function() {
+
+        const setCallback = function(ctx){
+          return function(){
+            if (that.activePage) {
+              // 必须在页面稳定后执行
+              that.hooks.emit('didUpdate', {}, that)
+              if (lib.isFunction(didUpdate)) {
+                didUpdate.call(ctx)
+              }
+
               that.activePage.doReady()
               if (lib.isFunction(callback)) {
-                callback.call(this)
+                callback.call(ctx)
               }
-            })
+            } else {
+              that.hooks.on('__ready', function() {
+                that.activePage && that.activePage.doReady()
+                if (lib.isFunction(callback)) {
+                  callback.call(ctx)
+                }
+              })
+            }
           }
-        }) // 做 data 的 setData
+        }
+
+        const originalSetData = this._originalSetData // 原始 setData
+        originalSetData.call(this, data, setCallback(this) )
+        
+        if (parentSamilarIdInstance && parentSamilarIdInstance.uniqId !== this.uniqId) {
+          parentSamilarIdInstance.setData(data, setCallback(samilarContext))
+        }
       }
     },
     externalClasses: ['class-name'],
@@ -635,33 +698,23 @@ export const commonBehavior = (app, mytype) => {
         this.selfDataChanging = false
         this.selfDataChanged = false
         this.isINmemery = false
+        this.parentSamilarIdInstance = null
+
+
+        this.customLifeCycle = {
+          created: null,
+          attached: null,
+          ready: null,
+          moved: null,
+          detached: null,
+          didUpdate: null
+        };
       },
       //节点树完成，可以用setData渲染节点，但无法操作节点
       attached: function () { //节点树完成，可以用setData渲染节点，但无法操作节点
-        // let properties = this.properties
-        // if (lib.isObject(properties.item)) {
-        //   properties.item = lib.clone(properties.item)
-        // }
-        // if (lib.isObject(properties.list)) {
-        //   properties.list = lib.clone(properties.list)
-        // }
-        // if (lib.isObject(properties.dataSource)) {
-        //   properties.dataSource = lib.clone(properties.dataSource)
-        // }
-        
-        // // ??? 没有赋值给$item/$list，造成不能通过show/hide来显示隐藏结构
-        // let props = (properties.item || properties.list || properties.dataSource || {})
-        // if (lib.isObject(props)) {
-        //   props['show'] = props.hasOwnProperty('show') ? props.show : true
-        // }
-        // let id = properties.id
-        // // this.mountId = props.$$id ? false : id  // 如果$$id，则交给
-        // this.mountId = id || props.$$id // 如果$$id，则交给
-        // this.setData({uniqId: this.uniqId})
-
         let that = this
         let pages = getCurrentPages()
-        let activePage = this.activePage || pages[pages.length - 1]
+        let activePage = this.activePage || pages[pages.length - 1] || app.activePage
         this.activePage = activePage
         if (!this.activePage) {
           app.__active_page__.push(function(actpage){
@@ -678,9 +731,29 @@ export const commonBehavior = (app, mytype) => {
         }
 
         if (lib.isObject(ds)) {
+
+          this.customLifeCycle = {
+            created: ds.created,
+            attached: ds.attached,
+            ready: ds.ready,
+            moved: ds.moved,
+            detached: ds.detached,
+            didUpdate: ds.didUpdate
+          };
+
+          delete ds.created; 
+          delete ds.attached;
+          delete ds.ready;
+          delete ds.moved;
+          delete ds.detached;
+
+          if (typeof this.customLifeCycle.created === 'function') {
+            this.customLifeCycle.created.call(this)
+          }
+          
           if (ds.$$id || ds.id || this.data.id) {
             activePage['elements'] = activePage['elements'] || {}
-            activePage[(ds.$$id||ds.id)] = this
+            // activePage[(ds.$$id||ds.id)] = this
             activePage['elements'][(ds.$$id || ds.id || this.data.id)] = this
           }
 
@@ -750,27 +823,30 @@ export const commonBehavior = (app, mytype) => {
         const that = this
         this.init = false
         this.mounted = true
-        // // let oriData = this.data.item || this.data.list || this.data.dataSource || {}
-        // // this.originalDataSource = lib.clone(oriData)
-        // this.mount()
         this._mount()
         this.hooks.emit('ready')
         this.hooks.fire('__ready')
 
-        if (this.__ready) {
-          this.activePage.hooks.reverseOn('__READY', function() {
-            that.__ready()
-          })
-          if (this.activePage.__rendered) {
-            that.activePage.hooks.fire('__READY')
+        const activePage = this.activePage || app.activePage
+        activePage.hooks.reverseOn('__READY', function() {
+          that.__ready && typeof that.__ready==='function' && that.__ready()
+          if (typeof that.customLifeCycle.ready === 'function') {
+            that.customLifeCycle.ready.call(that)
           }
-        }
+          if (activePage.__rendered) {
+            activePage.hooks.fire('__READY')
+          }
+        })
+
       },
 
       //组件实例被移动到树的另一个位置
       moved: function () {
         if (this.__moved) {
           this.__moved()
+        }
+        if (typeof this.customLifeCycle.moved === 'function') {
+          this.customLifeCycle.moved.call(this)
         }
       },
 
@@ -779,24 +855,13 @@ export const commonBehavior = (app, mytype) => {
         if (this.__detached) {
           this.__detached()
         }
+        if (typeof this.customLifeCycle.detached === 'function') {
+          this.customLifeCycle.detached.call(this)
+        }
         this.hooks.emit('componentDetached')
-        // this.hooks = null
-        // setTimeout(() => {
-        //   app['_vars'][this.uniqId] = null
-        // }, 50);
       }
     },
     methods: {
-      // __getAppVers(param){
-      //   if (lib.isString(param)) {
-      //     return app['_vars'][param]
-      //   }
-      // },
-
-      findPath(param){
-        /** 查找路径 */
-      },
-
       parent(param, ctx){
         if (!ctx) ctx = this
         let res
@@ -900,7 +965,7 @@ export const commonBehavior = (app, mytype) => {
         return this.data.$item || this.data.$list || this.data.$dataSource || this.data.dataSource || {}
       },
 
-      css: function (param = {}) {
+      css: function (param = {}, cb) {
         let cssStr = ''
         if (typeof param === 'string') {
           cssStr = param
@@ -913,31 +978,31 @@ export const commonBehavior = (app, mytype) => {
         if (this.$$is == 'item') {
           this.setData({
             '$item.itemStyle': cssStr
-          })
+          }, cb)
         } 
         else if (this.$$is == 'list' || this.$$is == 'tree') {
           this.setData({
             // '$list.itemStyle': cssStr
             '$list.listStyle': cssStr
-          })
+          }, cb)
         }
         else if (this.data.$dataSource) {
           this.setData({
             '$dataSource.itemStyle': cssStr
-          })
+          }, cb)
         }
         return this
       },
 
-      toggleClass(cls) {
+      toggleClass(cls, cb) {
         if (cls && lib.isFunction(this.hasClass)) {
           let clsAry = lib.isString(cls) ? cls.split(' ') : []
           if (clsAry.length) {
             cls = clsAry[0]
             if (this.hasClass(cls)) {
-              this.removeClass(cls)
+              this.removeClass(cls, cb)
             } else {
-              this.addClass(cls)
+              this.addClass(cls, cb)
             }
           }
         }
@@ -1052,7 +1117,21 @@ export const commonBehavior = (app, mytype) => {
         }
         if (__fromParent) {
           this.parentInst = app['_vars'][__fromParent]
-          this.parentInst && this.parentInst.children.push(this)
+          if (this.parentInst) {
+            const eleId = _id || $$id
+            let   parentSamilarIdInstance = null
+            this.parentInst.children.forEach(child=>{
+              const $data = child.getData()
+              const $$id = child.id || $data.id || $data.$$id
+              if ($$id && eleId && ($$id === eleId)) {
+                parentSamilarIdInstance = child  // true
+              }
+            })
+            this.parentSamilarIdInstance = parentSamilarIdInstance
+            if (!parentSamilarIdInstance) {
+              this.parentInst.children.push(this)
+            }
+          }
         }
         if (lib.isString(fromTree)) {
           let treeInst = app['_vars'][fromTree]
@@ -1062,88 +1141,23 @@ export const commonBehavior = (app, mytype) => {
 
         this.hooks.one('componentDetached', function () {
           app['_vars'][uniqId] = null
-          if (_id) elements[_id] = null
-          if ($$id) elements[$$id] = null
-          if (pageDataKey) elements[pageDataKey] = null
+          if (_id) activePage['elements'][_id] = null
+          if ($$id) activePage['elements'][$$id] = null
+          if (pageDataKey) activePage['elements'][pageDataKey] = null
         })
       },
       mount: function(id) {
         this._mount(id)
-        // let that = this
-        // let activePage = this.activePage
-        // let uniqId = this.uniqId
-        // if (!this.init) {
-        //   if (id) {
-        //     activePage['elements'][id] = this
-        //   }
-
-        //   let $is = this.$$is
-        //   // let $id = this.data.id || this.properties.id
-        //   let $id = ''
-        //   let $ds = this.data.$item || this.data.$list || this.data.$dataSource || this.data.dataSource
-        //   let fromTree
-        //   let fromComponent = this.data.fromComponent || ($ds && $ds['fromComponent'])
-
-        //   if (fromComponent) {
-        //     this.componentInst = app['_vars'][fromComponent]
-        //   }
-
-        //   if ($is == 'list') {
-        //     fromTree = this.data.fromTree || this.data.$list.fromTree
-        //     if (lib.isString(fromTree)) {
-        //       const treeInst = app['_vars'][fromTree]
-        //       // $id ? treeInst['childs'][$id] = this : ''
-        //       this.treeInst = treeInst
-        //     }
-        //   }
-
-        //   if ($is == 'item') {
-        //     // $id = $id || this.data.item['$$id'] || this.data.item['id']
-        //     $id = $id || this.data.item && this.data.item['$$id']
-        //   }
-          
-        //   if ($is == 'list' || $is == 'tree') {
-        //     $id = $id || this.data.$list && this.data.$list['$$id']
-        //   }
-
-        //   let $$$id = this.data.id
-
-        //   $id = $id||id
-        //   if ($id) {
-        //     const itemKey = activePage['eles'][$id]
-        //     if (itemKey) {
-        //       activePage['elements'][$id] = activePage['elements'][itemKey] = this
-        //     } else {
-        //       activePage['elements'][$id] = this
-        //     }
-        //   }
-
-        //   if ($$$id) {
-        //     activePage['elements'][$$$id] = this
-        //   }
-
-        //   // 该页面实例销毁时，销毁所有组件实例
-        //   activePage.hooks.on('destory', function () {
-        //     app['_vars'][uniqId] = null
-        //     if (id || $id) {
-        //       const myid = id || $id
-        //       const itemKey = activePage['eles'][$id]
-        //       // activePage['elements'][$id] = null
-        //       // activePage['elements'][itemKey] = null
-        //     }
-        //     activePage['elements'] = null
-        //   })
-        // } else {
-        //   this.hooks.on('ready', function() {
-        //     that.mount(id)
-        //   })
-        // }
       },
-      show: function(params) {
-        lib.isFunction(this.update) && this.update({ show: true })
+      show: function(cb) {
+        let data = this.getData()
+        if (data.show) return
+        lib.isFunction(this.update) && this.update({ show: true }, cb)
       },
-      hide: function(params) {
-        lib.isFunction(this.update) && this.update({ show: false })
+      hide: function(cb) {
+        let data = this.getData()
+        if (!data.show) return
+        lib.isFunction(this.update) && this.update({ show: false }, cb)
       },
       toggle: function(cb) {
         const data = this.getData()
@@ -1163,58 +1177,7 @@ export const commonMethodBehavior = (app, mytype) => {
   return Behavior({
     behaviors: [],
     methods: {
-      // aim: function (e) {
-      //   if (this.treeInst) {
-      //     this.treeInst.aim.call(this.treeInst, e)
-      //     return false
-      //   }
-      //   const that = this
-      //   const activePage = this.activePage
-      //   const target = e.currentTarget
-      //   const currentDset = target.dataset
-      //   const parentInstance = this._getAppVars()
-      //   let query
-      //   let theAim = currentDset.aim
-
-      //   if (theAim) {
-      //     const aimObj = lib.formatQuery(theAim)
-      //     theAim = aimObj.url
-      //     query = aimObj.query
-      //     e.currentTarget.dataset.aim = theAim
-      //     e.currentTarget.dataset._query = query
-      //   }
-
-      //   const evtFun = activePage['aim']
-      //   const isEvt = lib.isFunction(evtFun)
-      //   let vals = this.hooks.emit('beforeAim', {ctx: this, event: e, aim: theAim, param: query})
-      //   if (parentInstance && lib.isFunction(parentInstance['aim'])) {
-      //     parentInstance['aim'].call(parentInstance, e)
-      //   } else {
-      //     if (vals) {
-      //       vals.forEach(function(val) {
-      //         if (val !== 0 && isEvt) evtFun.call(activePage, e, query, that) // 返回值为0则不透传
-      //       })
-      //     } else {
-      //       if (isEvt) evtFun.call(activePage, e, query, that)
-      //     }
-      //   }
-      // },
-
       _rightEvent: function (e, prefix) {
-        // const is = this.$$is
-        // const currentTarget = e.currentTarget
-        // const dataset = currentTarget.dataset
-        // let dsetEvt = (e.__type || e.type)+'@@'+dataset['evt']  // __type，改写原生type，适合不同场景
-        // if (is == 'list' || is == 'tree') {
-        //   const mytype = this.data.$list.type
-        //   if (mytype && (mytype.is == 'scroll' || mytype.is == 'swiper')) {
-        //     dsetEvt = 'bind'+dsetEvt
-        //   }
-        // }
-        // const tmp = rightEvent(dsetEvt)
-        // e.currentTarget.dataset._query = tmp.param
-        // return tmp
-
 
         let that = this
         let is = this.$$is
@@ -1285,7 +1248,8 @@ export const commonMethodBehavior = (app, mytype) => {
         let $img = $item.img
         let findIt = null
         if (lib.isArray($img)) {
-          findIt = $img.find({src})
+          // findIt = $img.find({src})
+          findIt = ($img.filter(pic=> pic.src === src ))[0]
         } else {
           findIt = $img
         }
@@ -1329,22 +1293,6 @@ export function reactFun(app, e, prefix) {
   const activePage = this.activePage
   const oType = e.__type || e.type
 
-  
-  // const that = this
-  // const currentTarget = e.currentTarget
-  // const dataset = currentTarget.dataset
-  // const activePage = this.activePage
-  
-  // // const oType = e.type.indexOf('catch') == 0 ? e.type.replace('catch', '') : e.type
-  // const oType = e.__type || e.type
-  // let nType = prefix ? prefix + oType : oType
-  // nType = nType.replace('catchcatch', 'catch')
-  
-  // let dsetEvtStr = dataset['evt'].replace(/_/g, '').replace(/aim/g, 'catchtap')
-  // let dsetEvt = nType + '@@' + dsetEvtStr
-  // let rEvt = rightEvent(dsetEvt)
-  // let {fun, param, allParam} = rEvt
-
   let rEvt = this._rightEvent(e, prefix)
   let {fun, param, allParam} = rEvt
   if (fun === 'true') return
@@ -1385,6 +1333,8 @@ export function reactFun(app, e, prefix) {
       rootInstance = undefined
     }
     let parentInstance = getParent(this, fun)
+
+    const parentSamilarIdInstance = this.parentSamilarIdInstance
     
     e.currentTarget.dataset._query = param
     const evtFun = activePage[fun] || app.activePage[fun]
@@ -1394,61 +1344,25 @@ export function reactFun(app, e, prefix) {
     if (vals) {
 
     } else {
-      // let rootInstance = rootInstance
-      // function getParent(ctx, f){
-      //   if (ctx.parentInst) {
-      //     if (ctx.parentInst[f]) {
-      //       return ctx.parentInst
-      //     } else {
-      //       return getParent(ctx.parentInst, f)
-      //     }
-      //   }
-      // }
-      // parentInstance = getParent(this, fun)
-
       if (lib.isFunction(thisFun)) {
         thisFun.call(this, e, param, context)
-      } else if (parentInstance) {
+      } 
+      else if (parentSamilarIdInstance &&lib.isFunction(parentSamilarIdInstance[fun])) {
+        parentSamilarIdInstance[fun].call(parentSamilarIdInstance, e, param, context)
+      } 
+      else if (parentInstance && lib.isFunction(parentInstance[fun])) {
         parentInstance[fun].call(parentInstance, e, param, context)
-      } else if(rootInstance && lib.isFunction(rootInstance[fun])) {
+      } 
+      else if(rootInstance && lib.isFunction(rootInstance[fun])) {
         rootInstance[fun].call(rootInstance, e, param, context)
-      } else {
+      } 
+      else {
         if (isEvt) evtFun.call(activePage, e, param, context)
         else {
           console.warn(`找不到定义的${fun}方法`)
         }
       }
-      
-      // if (lib.isFunction(thisFun)) {
-      //   thisFun.call(this, e, param, context)
-      // } else if (parentInstance && lib.isFunction(parentInstance[fun])) {
-      //   parentInstance[fun].call(parentInstance, e, param, context)
-      // } else {
-      //   if (isEvt) evtFun.call(activePage, e, param, context)
-      //   else {
-      //     console.warn(`找不到定义的${fun}方法`);
-      //   }
-      // }
     }
-
-    // if (parentInstance && lib.isFunction(parentInstance[fun])) {
-    //   parentInstance[fun].call(parentInstance, e, param, that)
-    // } else {
-    //   if (vals) {
-    //     vals.forEach(function (val) {
-    //       if (val !== 0 && isEvt) evtFun.call(activePage, e, param, that) // 返回值为0则不透传
-    //     })
-    //   } else {
-    //     if (lib.isFunction(thisFun)) {
-    //       thisFun.call(this, e, param, this)
-    //     } else {
-    //       if (isEvt) evtFun.call(activePage, e, param, that)
-    //       else {
-    //         console.warn(`找不到定义的${fun}方法`);
-    //       }
-    //     }
-    //   }
-    // }
   }
 }
 

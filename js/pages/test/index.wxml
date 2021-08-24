@@ -1,0 +1,3 @@
+<view class="container">
+  <ui-list wx:if="{{demosConfig}}" list="{{demosConfig}}" />
+</view>

@@ -669,9 +669,34 @@ function slipStart(e, ins) {
   var pageY = changedTouches.pageY
   var listSlip = globleVar.listSlip
   var slipEnv = globleVar.touchoption.slip
-  var wth = parseInt(slipEnv.menuWidth.replace('px', ''))
-  var count = inst.selectAllComponents('.li-item').length || slipEnv.menuCount
-  var maxDistance = wth*count  // 左移最大距离
+  var wth = slipEnv.menuWidth
+  var count = slipEnv.menuCount || inst.selectAllComponents('.li-item').length
+  var maxDistance = 80  // 左移最大距离
+  if (isString(wth)) {
+    wth = parseInt(wth.replace('px', ''))
+    maxDistance = wth*count
+  }
+
+  if (isNumber(wth)) {
+    maxDistance = wth*count
+  }
+
+  if (isArray(wth)) {
+    var tmp = 0
+    for (var ii=0; ii<count; ii++) {
+      if (wth[ii]) {
+        if (isString(wth[ii])) {
+          tmp += parseInt(wth[ii].replace('px', '')) || 80
+        }
+        if (isNumber(wth[ii])) {
+          tmp += wth[ii]
+        }
+      } else {
+        tmp += 80
+      }
+    }
+    maxDistance = tmp
+  }
 
   listSlip.start = listSlip.start || {}
   listSlip.finish = listSlip.finish || {}

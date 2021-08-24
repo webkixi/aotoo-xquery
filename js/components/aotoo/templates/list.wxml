@@ -20,10 +20,9 @@
 
 <template name="itemContent">
   <block wx:if="{{item.show}}">
-    <slot name="top"></slot>
     <block wx:if="{{type && util.isObject(type) && type.is === 'drop'}}">
       <block wx:if="{{item.$$id}}">
-        <ui-item item="{{ {__drop: type.option, ...item} }}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+        <ui-item item="{{ {__drop: type.option, ...item} }}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId') || ''}}"/>
       </block>
       <block wx:else>
         <!-- <block wx:if="{{item.attr}}">
@@ -33,18 +32,17 @@
       </block>
     </block>
     <block wx:elif="{{type && util.isObject(type) && type.isItem}}">
-      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId') || '' }}"/>
     </block>
     <block wx:elif="{{item.type && util.isObject(item.type) && item.type.isItem}}">
-      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId') || '' }}"/>
     </block>
     <block wx:elif="{{item.$$id}}">
-      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId') || '' }}"/>
     </block>
     <block wx:else>
       <template is="item" data="{{item}}" />
     </block>
-    <slot></slot>
   </block>
 </template>
 
@@ -63,33 +61,50 @@
       style="{{list.listStyle || list.style || ''}}" 
     >
       <block wx:if="{{util.isArray(list.data)}}">
-        <block wx:for="{{list.data}}" wx:key="__key">
-          <template is="itemContent" data="{{item, type: list.type}}" />
-        </block>
-      </block>
-    </view>
+        <block wx:if="{{ list.type && list.type.is === 'slip'}}">
 
-    <!-- <view id="{{list.id||id}}" class="hlist {{list.listClass||list.class}}" wx:if="{{list.listStyle||list.style}}" style="{{list.listStyle || list.style}}" >
-      <block wx:if="{{util.isArray(list.data)}}">
-        <block wx:for="{{list.data}}" wx:key="__key">
-          <template is="itemContent" data="{{item, type: list.type}}" />
+          <block wx:for="{{list.data}}" wx:key="__key">
+            <movable-area class='movable-area'>
+              <movable-view direction="horizontal" animation="{{true}}" class='movable-view'>
+                <template is="itemContent" data="{{item, type: list.type}}" />
+                <!-- <view class="touch-item {{item.isTouchMove ? 'touch-move-active' : ''}}" data-index="{{index}}" bindtouchstart="touchstart" bindtouchmove="touchmove">
+                  <view class="content" bindtap='goDetail'>{{item.content}}</view>
+                  <view class="del" catchtap="del" data-index="{{index}}">删除</view>
+                </view> -->
+              </movable-view>
+            </movable-area>
+          </block>
+
+
+          <movable-area class="moveArea" wx:for="{{list.data}}" wx:key="__key">
+            <movable-view class="moveView" x="{{item.x}}" direction="horizontal" bindtouchend="touchEnd" bindtouchstart="touchStart" animation="{{true}}" data-id="{{item.id}}">
+              <view class="parent"></view>
+              <view class="delete" catchtap="delete" data-id="{{item.work.id}}">
+                <text>删除</text>
+              </view>
+            </movable-view>
+          </movable-area>
+
         </block>
-      </block>
-    </view>
-    <block wx:else>
-      <view id="{{list.id||id}}" class="hlist {{list.listClass||list.class}}" >
-        <block wx:if="{{util.isArray(list.data)}}">
+
+        <block wx:else>
           <block wx:for="{{list.data}}" wx:key="__key">
             <template is="itemContent" data="{{item, type: list.type}}" />
           </block>
         </block>
-      </view>
-    </block> -->
 
+      </block>
+    </view>
   </block>
   <slot name="list-bottom" />
 </template>
 
+
+
+
+
+
+<!-- swiper-view -->
 <template name="swiperWrap">
   <slot name="swiper-top"></slot>
   <swiper 
@@ -116,7 +131,7 @@
     data-evt="{{util.dataEvt(list.type, ['bindchange', 'bindtransition', 'bindanimationfinish'])}}"
   >
     <block wx:if="{{util.isArray(list.data)}}">
-      <block wx:for="{{list.data}}" wx:key="__key">
+      <block wx:for="{{  (list.screens || list.data) }}" wx:key="__key">
         <swiper-item
           item-id="{{item.id || (item.attr && item.attr['id']) || ''}}"
         >
@@ -128,9 +143,64 @@
   <slot name="swiper-bottom"></slot>
 </template>
 
-    <!-- class="hlist {{list.listClass||list.class||''}}"  -->
+
+
+
+
+
+<!-- scroll-view -->
+<!-- class="hlist {{list.listClass||list.class||''}}"  -->
 <template name="scrollWrap">
+  <block wx:if="{{list.type['scroll-top'] ||  list.type['scroll-left']}}">
+    <scroll-view 
+      id="{{list.id||list.type.id||''}}"
+      class="{{list.type.container ? '' : 'hlist '+(list.listClass||list.class||'') }}"
+      style="{{list.listStyle||''}}" 
+      scroll-x="{{ list.type['scroll-x']||''}}" 
+      scroll-y="{{ list.type['scroll-y']||'' }}"
+      upper-threshold="{{ list.type['upper-threshold']||'' }}" 
+      lower-threshold="{{ list.type['lower-threshold']||'' }}" 
+      scroll-top="{{ list.type['scroll-top']||'' }}" 
+      scroll-left="{{ list.type['scroll-left']||'' }}" 
+      scroll-with-animation	="{{ list.type['scroll-with-animation']||'' }}" 
+      enable-back-to-top="{{ list.type['enable-back-to-top']||'' }}" 
+      enable-flex="{{ list.type['enable-flex']||'' }}" 
+      scroll-anchoring="{{ list.type['scroll-anchoring']||'' }}" 
+      refresher-enabled="{{ list.type['refresher-enabled']||'' }}" 
+      refresher-threshold="{{ list.type['refresher-threshold']||'' }}" 
+      refresher-default-style="{{ list.type['refresher-default-style']||'' }}" 
+      refresher-background="{{ list.type['refresher-background']||'' }}" 
+      refresher-triggered="{{ list.type['refresher-triggered']||'' }}" 
+      bindscrolltoupper="{{list.type&&list.type.bindscrolltoupper ? '_scrollMethod' : ''}}"
+      bindscrolltolower="{{list.type&&list.type.bindscrolltolower ? '_scrollMethod' : ''}}"  
+      bindscroll="{{list.type&&list.type.bindscroll ? '_scrollMethod' : ''}}"
+      bindrefresherpulling="{{list.type&&list.type.bindrefresherpulling ? '_scrollMethod' : ''}}"
+      bindrefresherrefresh="{{list.type&&list.type.bindrefresherrefresh ? '_scrollMethod' : ''}}"
+      bindrefresherrestore="{{list.type&&list.type.bindrefresherrestore ? '_scrollMethod' : ''}}"
+      bindrefresherabort="{{list.type&&list.type.bindrefresherabort ? '_scrollMethod' : ''}}"
+      data-evt="{{util.dataEvt(list.type, ['bindrefresherabort', 'bindrefresherrestore', 'bindrefresherrefresh', 'bindrefresherpulling', 'bindscroll', 'bindscrolltolower', 'bindscrolltoupper'])}}"
+    >
+      <slot name="scroll-top"></slot>
+      <block wx:if="{{util.isArray(list.data)}}">
+        <block wx:if="{{list.type.container}}">
+          <view class="hlist {{list.listClass||list.class||''}}">
+            <block wx:for="{{list.data}}" wx:key="__key">
+              <template is="itemContent" data="{{item}}" />
+            </block>
+          </view>
+        </block>
+        <block wx:else>
+          <block wx:for="{{list.data}}" wx:key="__key">
+            <template is="itemContent" data="{{item}}" />
+          </block>
+        </block>
+      </block>
+      <slot name="bottom"></slot>
+      <slot name="scroll-bottom"></slot>
+    </scroll-view>
+  </block>
   <scroll-view 
+    wx:else
     id="{{list.id||list.type.id||''}}"
     class="{{list.type.container ? '' : 'hlist '+(list.listClass||list.class||'') }}"
     style="{{list.listStyle||''}}" 
@@ -138,8 +208,6 @@
     scroll-y="{{ list.type['scroll-y']||'' }}"
     upper-threshold="{{ list.type['upper-threshold']||'' }}" 
     lower-threshold="{{ list.type['lower-threshold']||'' }}" 
-    scroll-top="{{ list.type['scroll-top']||'' }}" 
-    scroll-left="{{ list.type['scroll-left']||'' }}" 
     scroll-into-view="{{ list.type['scroll-into-view']||''}}" 
     scroll-with-animation	="{{ list.type['scroll-with-animation']||'' }}" 
     enable-back-to-top="{{ list.type['enable-back-to-top']||'' }}" 
@@ -283,11 +351,16 @@
   </block> -->
 </template>
 
+
+
+
+
+
 <template name="mylist">
   <slot name="header"></slot>
   <slot></slot>
   <block wx:if="{{list.header}}">
-    <ui-item item="{{list.header}}" class="ui-item list-header" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+    <ui-item item="{{list.header}}" class="ui-item list-header" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId') || '' }}"/>
   </block>
   <block wx:if="{{list.type && util.isObject(list.type)}}">
     <block wx:if="{{list.type.is == 'swiper'}}"> <template is="swiperWrap" data="{{list}}" /> </block>
@@ -298,7 +371,7 @@
     <template is="listWrap" data="{{list}}" />
   </block>
   <block wx:if="{{list.footer}}">
-    <ui-item item="{{list.footer}}" class="ui-item list-footer" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId')}}"/>
+    <ui-item item="{{list.footer}}" class="ui-item list-footer" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId') || '' }}"/>
   </block>
   <slot name="footer"></slot>
 </template>

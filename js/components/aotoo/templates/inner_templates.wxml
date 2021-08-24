@@ -61,7 +61,7 @@
       <text 
         class="{{props.itemClass||''}}"
         style="{{props.itemStyle||''}}"
-        id="{{props.id||''}}" 
+        id="{{props.id||props['$$id']||''}}" 
         data-treeid="{{props && util.isObject(props.attr) && (props.attr['data-treeid']||props.attr['treeid']||'')}}"
         data-id="{{(props && util.isObject(props.attr) && (props.attr['id'] || props.attr['data-id']) || '')}}"
         user-select="{{ props['user-select'] || props['selectable'] || '' }}"
@@ -70,10 +70,10 @@
       >{{props.text}}</text>
     </block>
     <block wx:elif="{{props.fromComponent}}">
-      <ui-item item="{{props}}" class="ui-item {{props.containerClass}}" style="{{props.containerStyle||''}}" fromComponent="{{props.fromComponent}}"/>
+      <ui-item id="{{props.id||props['$$id']||''}}" item="{{props}}" class="ui-item {{props.containerClass}}" style="{{props.containerStyle||''}}" fromComponent="{{props.fromComponent}}"/>
     </block>
     <block wx:else>
-      <ui-item item="{{props}}" class="ui-item {{props.containerClass}}" style="{{props.containerStyle||''}}"/>
+      <ui-item id="{{props.id||props['$$id']||''}}" item="{{props}}" class="ui-item {{props.containerClass}}" style="{{props.containerStyle||''}}"/>
     </block>
   </block>
 </template>
@@ -81,10 +81,10 @@
 <template name="@list">
   <block wx:if="{{util.isObject(props)}}">
     <block wx:if="{{props.fromComponent || props.fromTree}}">
-      <ui-list class="ui-list {{props.containerClass}}" style="{{props.containerStyle||''}}" list="{{props}}" fromComponent="{{props.fromComponent||props.fromTree}}"/>
+      <ui-list id="{{props.id||props['$$id']||''}}" class="ui-list {{props.containerClass}}" style="{{props.containerStyle||''}}" list="{{props}}" fromComponent="{{props.fromComponent||props.fromTree}}"/>
     </block>
     <block wx:else>
-      <ui-list list="{{props}}" class="ui-list"/>
+      <ui-list id="{{props.id||props['$$id']||''}}" list="{{props}}" class="ui-list"/>
     </block>
   </block>
 </template>
@@ -92,10 +92,10 @@
 <template name="@tree">
   <block wx:if="{{util.isObject(props)}}">
     <block wx:if="{{props.fromComponent}}">
-      <ui-tree class="ui-tree {{props.containerClass}}" style="{{props.containerStyle||''}}" list="{{props}}" fromComponent="{{props.fromComponent}}"/>
+      <ui-tree id="{{props.id||props['$$id']||''}}" class="ui-tree {{props.containerClass}}" style="{{props.containerStyle||''}}" list="{{props}}" fromComponent="{{props.fromComponent}}"/>
     </block>
     <block wx:else>
-      <ui-tree class="ui-tree {{props.containerClass}}" style="{{props.containerStyle||''}}" list="{{props}}"/>
+      <ui-tree id="{{props.id||props['$$id']||''}}" class="ui-tree {{props.containerClass}}" style="{{props.containerStyle||''}}" list="{{props}}"/>
     </block>
   </block>
 </template>
@@ -122,20 +122,26 @@
 
 <template name="@form">
   <block wx:if="{{util.isObject(props)}}">
-    <ui-form class="ui-form" dataSource="{{props}}" />
+    <ui-form id="{{props.id||props['$$id']||''}}" class="ui-form" dataSource="{{props}}" />
   </block>
 </template>
 
 <template name="@slip">
-  <ui-slip class="ui-slip" dataSource="{{props}}" />
+  <ui-slip id="{{props.id||props['$$id']||''}}" class="ui-slip" dataSource="{{props}}" />
 </template>
 
 <template name="@html">
-  <ui-markit dataSource="{{props}}" class="ui-markit" textType="html" />
+  <block wx:if="{{util.isString(props)}}">
+    <ui-markit id="{{props.id||props['$$id']||''}}" dataSource="{{ {content: props} }}" class="ui-markit" textType="html" />
+  </block>
+  <ui-markit wx:else id="{{props.id||props['$$id']||''}}" dataSource="{{props}}" class="ui-markit" textType="html" />
 </template>
 
 <template name="@md">
-  <ui-markit dataSource="{{props}}" class="ui-markit" textType="md" />
+  <block wx:if="{{util.isString(props)}}">
+    <ui-markit id="{{props.id||props['$$id']||''}}" dataSource="{{ {content: props} }}" class="ui-markit" textType="html" />
+  </block>
+  <ui-markit id="{{props.id||props['$$id']||''}}" dataSource="{{props}}" class="ui-markit" textType="md" />
 </template>
 
 <template name="@button">
@@ -176,11 +182,16 @@
 
     class="{{props.itemClass||props.class||''}}"
     style="{{props.itemStyle||props.style||''}}"
-    id="{{props.id||''}}"
+    id="{{props.id||props['$$id']||''}}"
     data-address="{{props.uAddress||''}}"
     data-evt="{{util.dataEvt(props, ['bindcontact', 'bindgetphonenumber', 'bindgetuserinfo', 'bindopensetting', 'bindlaunchapp', 'binderror', 'tap'])}}"
   >
-    {{props.value}}
+    <block wx:if="{{util.isObject(props.value)}}">
+      <ui-item item="{{props.value}}" />
+    </block>
+    <block wx:else>
+      {{props.value}}
+    </block>
   </button>
 </template>
 
@@ -210,7 +221,7 @@
       bindsuccess="{{props['bindsuccess']||''}}"
       bindfail="{{props['bindfail']||''}}"
       bindcomplete="{{props['bindcomplete	']||''}}"
-      class="{{props.itemClass||props.class||''}}"
+      class="navigator {{props.itemClass||props.class||''}}"
       style="{{props.itemStyle||props.style||''}}"
     >
       <block wx:if="{{util.isString(props.title)}}"><text>{{props.title}}</text></block>
@@ -226,7 +237,7 @@
   <input 
     class="{{props.itemClass||props.class||''}}"
     style="{{props.itemStyle||props.style||''}}"
-    id="{{props.id||''}}"
+    id="{{props.id||props['$$id']||''}}"
 
     value="{{props.value||''}}"
     type="{{props.type||'text'}}"
@@ -273,7 +284,7 @@
   <textarea 
     class="{{props.itemClass||props.class||''}} input-item-textarea"
     style="{{props.itemStyle||props.style||''}}"
-    id="{{props.id||''}}"
+    id="{{props.id||props['$$id']||''}}"
 
     value="{{props.value||''}}"
     placeholder="{{props.placeholder||''}}"
@@ -313,7 +324,7 @@
 
 <template name="@switch">
   <switch 
-    id="{{props.id}}" 
+    id="{{props.id||props['$$id']||''}}" 
     class="{{props.itemClass}} input-item-switch" 
     style="{{props.itemStyle||''}}"
 
@@ -333,7 +344,7 @@
 
 <template name="@slider">
   <slider 
-    id="{{props.id||''}}"
+    id="{{props.id||props['$$id']||''}}" 
     class="{{props.itemClass}} input-item-slider"
     style="{{props.itemStyle||''}}"
 
@@ -363,7 +374,7 @@
 
 <template name="@editor">
   <editor 
-    id="{{props.id||''}}"
+    id="{{props.id||props['$$id']||''}}" 
     class="{{props.itemClass}} input-item-editor"
     style="{{props.itemStyle||''}}"
 
@@ -390,7 +401,7 @@
       <block wx:if="{{props.type&&props.type.is === 'cover'}}">
         <cover-image 
           src="{{props.src || (props.img&&props.img.src)}}" 
-          id="{{props.id||''}}"
+          id="{{props.id||props['$$id']||''}}" 
           data-treeid="{{(props.attr&&props.attr['data-treeid']) || props.treeid || ''}}"
           class="{{props.itemClass||props.class||''}}"
 
@@ -410,7 +421,7 @@
       </block>
       <image 
         wx:else
-        id="{{props.id||''}}"
+        id="{{props.id||props['$$id']||''}}" 
         data-treeid="{{(props.attr&&props.attr['data-treeid']) || props.treeid || ''}}"
         class="{{props.itemClass||props.class||''}}"
         style="{{props.style||props.itemStyle||''}}" 
@@ -441,7 +452,7 @@
 <template name="@video">
   <block wx:if="{{util.isObject(props)}}">
     <video 
-      id="{{props.id||''}}"
+      id="{{props.id||props['$$id']||''}}" 
       class="video-class {{props.itemClass}}"
       style="{{props.itemStyle||''}}"
 

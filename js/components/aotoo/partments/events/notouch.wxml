@@ -44,24 +44,6 @@
 </template>
 
 <template name="noEvent">
-  <!-- <block wx:if="{{item.url}}">
-    <template is="@url" data="{{props: item.url}}" />
-  </block>
-  <view 
-    wx:else
-    data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
-    data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
-    id="{{item.id || id||''}}" 
-    hover-class="{{item['hover-class']||''}}"
-    hover-stop-propagation="{{item['hover-stop-propagation']||''}}"
-    hover-start-time="{{item['hover-start-time']||''}}"
-    hover-stay-time="{{item['hover-stay-time']||''}}"
-    animation="{{item.animation||''}}"
-    style="{{item.style||item.itemStyle || ''}}"
-    class="{{item.class||item.itemClass}}"  
-  >
-    <include src="../slot.wxml" />
-  </view> -->
   <view 
     data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
     data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
@@ -90,37 +72,3 @@
     <template is="noEvent" data="{{item}}"></template>
   </block>
 </block>
-
-<!-- <block wx:if="{{item.longtap||item.longpress}}">
-  <view 
-    data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
-    data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}" 
-    id="{{item.id || id||''}}" 
-    animation="{{item.animation||''}}"
-    style="{{item.style||item.itemStyle||''}}"
-    class="{{item.class||item.itemClass}}"  
-    data-evt="{{util.dataEvt(item, ['tap', 'longtap', 'longpress'])}}"
-    bind:tap= "{{item.tap ? 'itemMethod' : ''}}" 
-    bind:longtap= "{{item.longtap ? 'itemMethod' : ''}}"
-    bind:longpress= "{{item.longpress ? 'itemMethod' : ''}}"
-  >
-    <include src="../slot.wxml" />
-  </view>
-</block>
-<block wx:elif="{{item.catchlongtap || item.catchlongpress}}">
-  <view 
-    data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
-    data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
-    id="{{item.id || id||''}}" 
-    animation="{{item.animation||''}}"
-    style="{{item.style||item.itemStyle||''}}"
-    class="{{item.class||item.itemClass}}"  
-    data-evt="{{util.dataEvt(item, ['catchtap', 'catchlongtap', 'catchlongpress'])}}"
-    catch:tap= "{{item.catchtap ? 'catchItemMethod' : ''}}" 
-    catch:longtap= "{{item.catchlongtap ? 'catchItemMethod' : ''}}"
-    catch:longpress= "{{item.catchlongpress ? 'catchItemMethod' : ''}}"
-  >
-    <include src="../slot.wxml" />
-  </view>
-</block> -->
-

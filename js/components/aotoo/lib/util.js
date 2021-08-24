@@ -130,9 +130,11 @@ export function formatQuery(url) {
       let params = urls[1].split('&')
       params.forEach(param => {
         let attrs = param.split('=')
-        if (!attrs[1]) attrs[1] = true
+        if (attrs[0] && !attrs[1]) attrs[1] = true
         if (attrs[1]==='true' || attrs[1] === 'false') attrs[1] = JSON.parse(attrs[1])
-        query[attrs[0]] = attrs[1]
+        if (attrs[0]) {
+          query[attrs[0]] = attrs[1]
+        }
         // query[attrs[0]] = attrs[1] ? attrs[1] : true
       })
     }
@@ -249,7 +251,7 @@ export function findChilds(ctx) {
   return xxx
 }
 
-export function syncChildData(res, rid, data) {
+export function syncChildData(res={}, rid, data) {
   if (res.__relationId === rid) {
     res = data
   } else {

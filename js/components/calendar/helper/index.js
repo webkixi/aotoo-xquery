@@ -317,8 +317,8 @@ export function oneMonthListConfig(timestart) {
     // that.hooks.emit('empty-month-checked')
     preset.forEach(monInstId=>{
       let handle = that.activePage.getElementsById(monInstId)
-      handle && handle.unChecked()
-      // handle&&handle.hooks.emit('restore-month-days')
+      // handle && handle.unChecked()
+      handle&&handle.hooks.emit('restore-month-days')
     })
 
     // 隐藏所有需要隐藏的月份
@@ -650,10 +650,14 @@ export function oneMonthListConfig(timestart) {
         onSelected(e, param, inst){
           let tapFun = coptions.tap
           if (inst.hasClass('invalid')) {
+            param.isInvalid = true
+            delete param.range
+            delete param.dateDiff
             const res = that.customResponse(tapFun, e, param, inst)
             if (res !== true) {
               return
             } else {
+              param.isInvalid = false
               inst.removeClass('invalid')
             }
           }

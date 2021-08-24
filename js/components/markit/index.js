@@ -15,7 +15,7 @@ Component({
   },
   properties: {
     dataSource: {
-      type: Object|String,
+      type: Object,
     },
     textType: {
       type: String,

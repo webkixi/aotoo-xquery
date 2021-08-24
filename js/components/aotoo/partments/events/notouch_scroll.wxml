@@ -42,7 +42,12 @@
 
     data-evt="{{util.dataEvt(item, ['tap', 'longtap', 'longpress', 'bindrefresherabort', 'bindrefresherrestore', 'bindrefresherrefresh', 'bindrefresherpulling', 'bindscroll', 'bindscrolltolower', 'bindscrolltoupper'])}}"
   >
-    <include src="../slot.wxml" />
+    <slot name="header"></slot>
+    <slot name="top"></slot>
+    <slot></slot>
+        <include src="../slot.wxml" />
+    <slot name="bottom"></slot>
+    <slot name="footer"></slot>
   </scroll-view>
 </template>
 

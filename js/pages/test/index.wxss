@@ -1,6 +1,5 @@
 /* @import "../../css/calendar.wxss"; */
-@import "../common/source.wxss";
-page {
+page{
   --date-item-height: 140rpx;
   --append-date-item-height: 0rpx;
   --calendar-week-tils-height: 50rpx;
@@ -38,7 +37,6 @@ page {
   border-radius: 6rpx;
   color: #fff
 }
-
 .calendar-list .calendar-list-item .valid.range {
   background-color: #b4cfff;
   border-radius: 6rpx;
@@ -70,7 +68,7 @@ page {
   justify-content: flex-end;
 }
 
-.week-box>.htitle {
+.week-box > .htitle {
   display: block;
   margin-bottom: 1em
 }
@@ -108,7 +106,7 @@ page {
   padding: 0 20rpx;
 }
 
-.calendar-weektils.mode3 {
+.calendar-weektils.mode3{
   /* margin-top: 100rpx; */
   /* position: fixed;
   top: 110rpx;
@@ -134,7 +132,7 @@ page {
   color: #333;
 }
 
-.date-list>ui-item.ui-item {
+.date-list > ui-item.ui-item {
   width: calc(100% / 7);
 }
 
@@ -187,14 +185,14 @@ page {
 
 
 
-.swiper-list {
+.swiper-list{
   height: 100vh;
   width: 100vw;
   position: relative;
   background: #fff;
 }
 
-.swiper-list .swiper-item {
+.swiper-list .swiper-item{
   height: calc(var(--date-item-height) * 5 + var(--append-date-item-height) + var(--calendar-month-header));
   /* height: calc(var(--date-item-height) * 5); */
   position: relative;
@@ -208,12 +206,12 @@ page {
 
 
 
-.slip-list {
+.slip-list{
   width: 100vw;
   box-sizing: border-box;
 }
 
-.slip-item {
+.slip-item{
   height: 70px;
   display: flex;
   justify-content: flex-start;
@@ -224,8 +222,7 @@ page {
   transition: margin-left .2s ease;
 }
 
-.slip-item>.htitle,
-.slip-item>.slip-menus {
+.slip-item > .htitle, .slip-item > .slip-menus{
   flex: 0 0 auto;
   width: calc(100vw - 72px);
   display: flex;

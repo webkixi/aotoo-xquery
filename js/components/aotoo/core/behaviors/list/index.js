@@ -1,5 +1,5 @@
-const lib = require('../../lib/index')
-const getmyApp = require('../getapp')
+const lib = require('../../../lib/index')
+const getmyApp = require('../../getapp')
 import {
   commonBehavior,
   commonMethodBehavior,
@@ -10,7 +10,12 @@ import {
   _hasClass,
   listInstDelegate,
   fakeListInstance
-} from "./common";
+} from "../common";
+
+import {
+  initFlatList,
+  adapterDataFlatList
+} from "./types/flatlist/index"
 
 const {
   resetItem,
@@ -21,6 +26,30 @@ const {
   isObject,
   isString
 } = lib
+
+const extendListType = [
+  'flatlist',
+  'flatswiper',
+  'swiper-loop'
+]
+
+// 扩展定义的列表
+function presetType(properties, isDidUpdate){
+  let   ds = (properties.list || properties.dataSource) || properties || {}
+  const type = this.originalDataSource.type || ds.type || {is: 'list'}
+  const id = ds['$$id'] || ds.id
+
+  if (extendListType.indexOf(type.is) > -1) {
+    if (isDidUpdate) {
+      const $data = adapterDataFlatList(ds.data, id)
+      ds = {data: $data}
+    } else {
+      ds = initFlatList.call(this, ds)
+    }
+  }
+
+  return ds
+}
 
 function updateSelf(params) {
   if (params && isObject(params)) {
@@ -114,26 +143,6 @@ export const listBehavior = function(app, mytype) {
           }
         } 
       },
-
-      dataSource: {
-        type: Object, 
-        observer: function (params) {
-          if (!this.init) {
-            this.reset()
-            updateSelf.call(this, params)
-          }
-        } 
-      },
-      
-      fromTree: {
-        type: Boolean|String,  // 来自tree，tree的结构依赖list生成
-        value: false   // 来自tree实例的 uniqId
-      },
-      
-      fromComponent: {
-        type: String,
-        value: ''
-      }
     },
     data: {
 
@@ -144,8 +153,12 @@ export const listBehavior = function(app, mytype) {
       },
       attached: function attached() { //节点树完成，可以用setData渲染节点，但无法操作节点
         const properties = this.properties
-        const list = properties.list || properties.dataSource
+        // const list = properties.list || properties.dataSource
+        const list = presetType.call(this, properties)
         updateSelf.call(this, list)
+        if (typeof this.customLifeCycle.attached === 'function') {
+          this.customLifeCycle.attached.call(this)
+        }
       },
 
       ready: function () { //组件布局完成，这时可以获取节点信息，也可以操作节点
@@ -177,12 +190,25 @@ export const listBehavior = function(app, mytype) {
         this.setData({'$list.data': []})
         let oriData = lib.clone(this.originalDataSource)
         param = param || oriData.data
+
+
         if (lib.isArray(param)) {
-          let tmp = reSetArray.call(this, param, this.data.props)
-          oriData.data = tmp.data
+          oriData.data = param
         }
+
+        oriData = presetType.call(this, oriData, true)
+        oriData = reSetArray.call(this, oriData.data, this.data.props)
         this.setData({$list: oriData}, cb)
         return this
+
+
+        // if (lib.isArray(param)) {
+        //   const list = presetType.call(this, {data: param, ...this.data.props}, true)
+        //   let tmp = reSetArray.call(this, list.data, this.data.props)
+        //   oriData.data = tmp.data
+        // }
+        // this.setData({$list: oriData}, cb)
+        // return this
       },
       reset(){
         return this._reset.apply(this, arguments)
@@ -320,7 +346,8 @@ export const listBehavior = function(app, mytype) {
             }
 
             if (param.data) {
-              let tmp = reSetArray.call(this, param.data, $list)
+              let tmp = presetType.call(this, {...$list, data: param.data}, true)
+              tmp = reSetArray.call(this, tmp.data, $list)
               param.data = tmp.data
               if (this.$$type === 'tree') {
                 param = lib.listToTree.call(this, param)
@@ -406,7 +433,9 @@ export const listBehavior = function(app, mytype) {
       },
       
       __newItem: function(params, act) {
-        let self = this
+        const self = this
+        const tmp = presetType.call(this, {...this.data.$list, data: ([].concat(params))}, true)
+        params = tmp.data
         if (this.$$type === 'tree') {
           let treeProps = this.data.props
           if (!lib.isArray(params)) {
@@ -515,6 +544,21 @@ export const listBehavior = function(app, mytype) {
         if (params || params === 0) {
           if (lib.isNumber(params)) {
             return params
+          }
+
+          if (typeof params === 'function') {
+            let $list = this.data.$list
+            let $data = $list.data
+            let index = -1
+            for (let ii = 0; ii < $data.length; ii++) {
+              const item = $data[ii]
+              const res = params(item, $data)
+              if (res) {
+                index = ii
+                break;
+              }
+            }
+            return index === -1 ? -1 : index
           }
 
           if (params.type && params.currentTarget && params.changedTouches) {
@@ -670,8 +714,9 @@ export const listBehavior = function(app, mytype) {
           let $list = this.data.$list
           let $data = $list.data
           let appendFun = (opts) => {
-            $list.data = $data.concat(that.__newItem(opts, 'append'))
-            that.setData({$list}, cb)
+            let newData = $data.concat(that.__newItem(opts, 'append'))
+            // that.setData({$list}, cb)
+            that.setData({ "$list.data": newData }, cb)
           }
 
           let result = this.hooks.emit('append', params)
@@ -698,8 +743,9 @@ export const listBehavior = function(app, mytype) {
           let $list = this.data.$list
           let $data = $list.data
           let prependFun = (opts) => {
-            $list.data = [].concat(this.__newItem(opts, 'prepend')).concat($data)
-            that.setData({$list}, cb)
+            let newData = [].concat(this.__newItem(opts, 'prepend')).concat($data)
+            // that.setData({$list}, cb)
+            that.setData({ "$list.data": newData }, cb)
           }
 
           let result = this.hooks.emit('prepend', params)
@@ -726,7 +772,8 @@ export const listBehavior = function(app, mytype) {
         let $selectIndex = this.findIndex(params)
         if ($selectIndex || $selectIndex == 0) {
           $data.splice($selectIndex, 1)
-          this.setData({ $list }, cb)
+          // this.setData({ $list }, cb)
+          this.setData({ "$list.data": $data }, cb)
         }
         return this
       },
@@ -752,7 +799,8 @@ export const listBehavior = function(app, mytype) {
                 } else {
                   $data.splice($selectIndex, 0, payload)
                 }
-                that.setData({ $list }, cb)
+                // that.setData({ $list }, cb)
+                that.setData({ "$list.data": $data }, cb)
               }
             }
           }

@@ -1,4 +1,3 @@
 <view class="container">
-  <ui-item wx:if="{{demosConfig}}" item="{{demosConfig}}" />
-  <ui-item wx:if="{{pagesConfig}}" item="{{pagesConfig}}" />
+  <ui-list wx:if="{{listConfig}}" list="{{listConfig}}" />
 </view>

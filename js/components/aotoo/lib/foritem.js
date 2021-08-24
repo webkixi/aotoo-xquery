@@ -73,51 +73,74 @@ function formatImg(props) {
 function formatUrl(props) {
   let url = props.url
   if (isString(url) && url.length > 1) {
-    let ary = url.split('#')
-    let isbutton = url.indexOf('button://') === 0
-    let __isAd = null
-    let funName = (()=>{
-      if (url.indexOf('button://') === 0) {
-        ary[0] = ary[0].replace('button://', '')
-        return ary[0]
+    const isbutton = url.indexOf('button://') === 0
+    const __isAd = url.indexOf('ad://') === 0
+    const __isMp = url.indexOf('mp://') === 0
+    const ary = url.split('#')
+    const hash = ary[1] || ''
+    url = ary[0]
+    const funName = (()=>{
+      if (isbutton) {
+        return url.replace('button://', '')
       }
-      if (url.indexOf('ad://') === 0) {
-        __isAd = true
-        ary[0] = ary[0].replace('ad://', '')
-        return ary[0]
+      if (__isAd) {
+        return url.replace('ad://', '')
+      }
+      if (__isMp) {
+        return url.replace('mp://', '')
       }
     })()
-    if (ary.length === 1) {
+    const urlobj = formatQuery(url)
+    const hashobj = formatQuery(('?'+hash))
+    // const query = Object.assign({}, urlobj.query, hashobj.query, {__isAd})
+    let   compConfig = Object.assign({}, hashobj.query, {__isAd})
+    if (isbutton || __isAd) {
+      props.url = {tap: funName, ...compConfig}
       if (isbutton) {
-        props.url = {value: props.title, tap: funName}
-      } else {
-        props.url = {title: props.title, url: url}
+        props.url.value = props.title
       }
     } else {
-      let obj = formatQuery('?'+ary[1])  // 获取navigate的配置
-      if (isbutton) {
-        props.url = {value: props.title, tap: funName, ...obj.query}
-      } else if(__isAd){
-        props.url = {__isAd: true, tap: funName, ...obj.query}
-      } else {
-        url = ary[0]
-        props.url = {title: props.title, url, ...obj.query}
+      props.url = {title: props.title, url, ...compConfig}
+      if (__isMp) {
+        url = funName
+        compConfig = Object.assign({}, urlobj.query, compConfig)
+        props.url = {target: 'miniProgram', title: props.title, 'app-id': url, ...compConfig}
       }
-      
-      // let tmp = {}
-      // let param = ary[1]
-      // tmp.url = ary[0]
-      // let paramAry = param.split('&')
-      // for (let ii = 0; ii < paramAry.length; ii++) {
-      //   let val = paramAry[ii]
-      //   let kv = val.split('=')
-      //   if (!kv[1]) kv[1] = true
-      //   if (kv[1]==='false' || kv[1]==='true') kv[1] = JSON.parse(kv[1])
-      //   tmp[kv[0]] = kv[1]
-      // }
-      // props.url = {...tmp}
     }
     delete props.title
+
+    
+    // if (ary.length === 1) {
+    //   if (isbutton) {
+    //     props.url = {value: props.title, tap: funName}
+    //   } else {
+    //     props.url = {title: props.title, url: url}
+    //   }
+    // } else {
+    //   let obj = formatQuery('?'+ary[1])  // 获取navigate的配置
+    //   if (isbutton) {
+    //     props.url = {value: props.title, tap: funName, ...obj.query}
+    //   } else if(__isAd){
+    //     props.url = {__isAd: true, tap: funName, ...obj.query}
+    //   } else {
+    //     url = ary[0]
+    //     props.url = {title: props.title, url, ...obj.query}
+    //   }
+      
+    //   // let tmp = {}
+    //   // let param = ary[1]
+    //   // tmp.url = ary[0]
+    //   // let paramAry = param.split('&')
+    //   // for (let ii = 0; ii < paramAry.length; ii++) {
+    //   //   let val = paramAry[ii]
+    //   //   let kv = val.split('=')
+    //   //   if (!kv[1]) kv[1] = true
+    //   //   if (kv[1]==='false' || kv[1]==='true') kv[1] = JSON.parse(kv[1])
+    //   //   tmp[kv[0]] = kv[1]
+    //   // }
+    //   // props.url = {...tmp}
+    // }
+    // delete props.title
   }
   return props
 }
@@ -142,9 +165,72 @@ const accessKey = [
   'header', 'body', 'footer', 'dot', 'li', 'k', 'v', 'url'
 ]
 
+export function itemTouchoption(item){
+  const touchoption =  item.touchoption
+  const slipOptions = touchoption.slip
+  const deletePart = {title: '删除', itemClass: 'slip-menu', _aim: '_onSlipMenus?id='+item.id+'&action=delete'}
+  const fakeEventName = ['aim', 'tap', 'catchtap', 'longpress', 'catchlongpress', 'longtap', 'catchlongtap']
+  
+  if (slipOptions) {
+    slipOptions.menuWidth = slipOptions.menuWidth || '80px'
+    const autoDelete = slipOptions.autoDelete
+    let   slipLeft = autoDelete ? slipOptions.slipLeft ? slipOptions.slipLeft : true : slipOptions.slipLeft
+
+    if (slipLeft) {
+      if (slipLeft === true) {
+        slipLeft = [deletePart]
+      }
+
+      if (typeof slipLeft === 'object') {
+        slipLeft = [].concat(slipLeft)
+      }
+
+      if (slipLeft && slipLeft.length) {
+        slipLeft = slipLeft.map(it=>{
+          if (isString(it)) {
+            it = {title: it, itemClass: 'slip-menu', _aim: '_onSlipMenus?id='+item.id+'&action='+it}
+          }
+          if (isObject(it)) {
+            it.containerStyle = it.itemStyle||''
+          }
+
+          Object.keys(it).forEach(key=>{
+            if (fakeEventName.includes(key)) {
+              const fakeKey = "_"+key
+              it[fakeKey] = it[key]
+              delete it[key]
+            }
+          })
+          
+          return it
+        })
+  
+        if (!item.idf || (item.idf && item.slip===true)) {
+          item.li = [].concat((item.li||[]), slipLeft)
+          item.liClass = (item.liClass||'') + ' slip-menus'
+          item.touchoption.slip.menuCount = slipLeft.length || 0
+        }
+  
+        if (item.slip === false) {
+          item.li = null
+          item.liClass = null
+          item.touchoption.slip.menuCount = 0
+        }
+      }
+    }
+  }
+
+  return item
+}
+
 export function resetItem(data, context, loop, attrkey) {
   if (typeof data == 'string' || typeof data == 'number' || typeof data == 'boolean') return data
   if (isObject(data)) {
+    
+    if (data.touchoption) {
+      data = itemTouchoption(data)
+    }
+
     let extAttrs = {}
     let incAttrs = []
     data['__sort'] = []

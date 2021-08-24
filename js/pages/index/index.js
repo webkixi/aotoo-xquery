@@ -6,16 +6,30 @@ const lib = Pager.lib
 
 Pager({
   data: {
-    demosConfig: {
-      itemClass: 'nav-item',
-      title: '列表demo',
-      url: '/demos/list01/index#class=nav-btn'
-    },
 
-    pagesConfig: {
+    listConfig: {
+      data: [
+        {
+          title: '导航面板',
+          url: '/pages/navpad/index#class=nav-btn'
+        },
+
+        {
+          title: '日历',
+          url: '/pages/calendar/index#class=nav-btn'
+        },
+
+        {
+          title: '列表demo',
+          url: '/demos/list01/index#class=nav-btn'
+        },
+
+        {
+          title: '文档说明',
+          url: '/pages/markdown/index#class=nav-btn'
+        },
+      ],
       itemClass: 'nav-item',
-      title: '文档说明',
-      url: '/pages/markdown/index#class=nav-btn'
     }
   }
 })

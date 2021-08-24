@@ -3,7 +3,7 @@ const lib = require('../../lib/index')
 import {
   listBehavior,
   listComponentBehavior
-} from "./list";
+} from "./list/index";
 
 export const treeBehavior = function(app, mytype) {
   mytype = mytype || 'tree'
@@ -14,8 +14,6 @@ export const treeBehavior = function(app, mytype) {
         // this.$$is = 'tree'
         this.childs = {}
       },
-      ready: function() {
-      }
     }
   })
 }

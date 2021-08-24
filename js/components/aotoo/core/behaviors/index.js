@@ -16,7 +16,7 @@ export {
 export {
   listBehavior,
   listComponentBehavior
-} from "./list";
+} from "./list/index";
 
 export {
   treeBehavior,
