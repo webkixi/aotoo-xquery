@@ -247,7 +247,7 @@ module.exports = function (id=lib.suid('step_'), data, options={}) {
           that.touchbarEvent = false
         })
         this.touchbar.hooks.on('onTouchStart', function (param) {
-          if (!that.touchbarEvent) that.update({ "type.scroll-top": (that.scrollTop||0) })
+          // if (!that.touchbarEvent) that.update({ "type.scroll-top": (that.scrollTop||0) })
           that.touchbarEvent = true
           let target = param.data.target || param.data.to
           let ctx = {

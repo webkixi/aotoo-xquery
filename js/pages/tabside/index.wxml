@@ -1,5 +1,5 @@
 <view class="container">
-  <ui-list list="{{tabConfig}}" class="tab-boxer" />
+  <ui-item item="{{tabConfig}}" class="tab-boxer" />
 </view>
-<ui-item item="{{codeButton}}" />
-<ui-pop item="{{readme}}" />
+<ui-item wx:if="{{codeButton}}" item="{{codeButton}}" />
+<ui-pop wx:if="{{readme}}" item="{{readme}}" />

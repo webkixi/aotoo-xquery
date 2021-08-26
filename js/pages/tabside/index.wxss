@@ -1,5 +1,5 @@
 @import "../common/source.wxss";
-@import "../../components/modules/tabside.wxss";
+/* @import "../../components/modules/tabside.wxss"; */
 
 .container {
   display: flex;
@@ -8,4 +8,52 @@
   align-items: center;
   justify-content: center;
   position: relative;
+}
+
+.sidetab{
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+}
+
+
+.sidetab > .hdot-item:last-child{
+  flex: 1;
+}
+
+.sidetab>.hdot-item:last-child>view {
+  width: 100%;
+  height: 100%;
+}
+
+.sidetab>.hdot-item:last-child>view > .ui-list{
+  width: 100%;
+  height: 100%;
+}
+
+.sidetab-menus {
+  width: 180rpx;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 0.5em 0;
+}
+
+.sidetab-menus-item {
+  display: flex;
+  width: 180rpx;
+  height: 70rpx;
+  justify-content: center;
+  align-items: center;
+}
+.sidetab-menus-item.active {
+  color: red;
+}
+
+.sidetab-content {
+  width: 100%;
+  height: 100vh;
 }

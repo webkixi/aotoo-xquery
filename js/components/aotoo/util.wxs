@@ -286,20 +286,6 @@ function rightEvent(dsetEvt) {
 
     // 取出字串中的object对象字串，并重新解析为object
     var targetAry = parseObject(dsetEvt, 'return ary')
-    // var re = getRegExp("\<\{[^\>]*\}\>", "g")
-    // var objAry = dsetEvt.match(re)
-    // var targetAry = []
-    // dsetEvt = dsetEvt.replace(re, '__xxx__')
-    // objAry && objAry.forEach(function (it, ii) {
-    //   var myQuery = {}
-    //   it = it.replace('<{', '').replace('}>', '').replace(getRegExp('"', 'g'), '')
-    //   var ary = it.split(',')
-    //   ary.forEach(function (ele) {
-    //     var aa = ele.split(':')
-    //     myQuery[aa[0]] = aa[1]
-    //   })
-    //   targetAry.push(myQuery)
-    // })
 
     var rightEvt
     if (dsetEvt.indexOf('?') > -1) {
@@ -408,17 +394,19 @@ function merge(a, b) {
   var re = getRegExp("([^:,\}\{:]*):", "g")
   var bstr = JSON.stringify(b).replace(getRegExp('"', "g"), '')
   var keys = bstr.match(re)
-  keys.forEach(function(_key) {
-    var key = _key.replace(':', '')
-    if (b[key] || b[key]!==undefined) {
-      a[key] = b[key]
-    }
-  })
+  if (isArray(keys)) {
+    keys.forEach(function(_key) {
+      var key = _key.replace(':', '')
+      if (b[key] || b[key]!==undefined) {
+        a[key] = b[key]
+      }
+    })
+  }
   return a
 }
 
 function optionObserver(newValue, oldValue, ownerInstance, instance) {
-  globleVar.touchoption = merge(globleVar.touchoption, newValue)
+  globleVar.touchoption = merge((globleVar.touchoption||{}), (newValue||{}))
   globleVar.oldTouchoption = oldValue
   if (newValue.ssliderAixs) {
     globleVar.ssliderAixs = instance
