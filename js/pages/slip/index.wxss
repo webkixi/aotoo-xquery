@@ -1,0 +1,55 @@
+@import "../common/source.wxss";
+
+.container{
+  display: block;
+  padding: 0;
+  overflow: hidden;
+}
+
+.anyListClassName{
+  width: 90vw;
+  height: 400px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: auto;
+  padding: 10px;
+}
+
+.list-item-class{
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+
+
+
+.slip-class{
+  height: 100vh;
+}
+
+.slip-item-class {
+  height: 200rpx;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.3em;
+  padding-top: 0.5em;
+  border-top: 2rpx solid #efefef;
+}
+
+.slip-menus{
+  display: flex;
+  height: 100%;
+  background-color: #efefef
+}
+
+.slip-menus-item{
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  border-left: 2rpx #bbb dotted;
+}

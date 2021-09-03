@@ -8,7 +8,7 @@ import createCalendar from '../../components/modules/calendar/index'
 
 
 Pager({
-  // 左滑菜单列表
+  // 左滑菜单列表简单版，使用wxs完成，左滑菜单时仍然可以上下滚动，新版使用movable-area实现，已解决此问题
   // data: {
   //   demosConfig: {
   //     data: [],

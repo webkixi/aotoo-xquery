@@ -155,14 +155,10 @@ const attrKey = [
   'data', 'mode'
 ]
 
-// const accessKey = [
-//   'title', 'img', 'icon', 'list', 'tree', 'item', 
-//   'header', 'body', 'footer', 'dot', 'li', 'k', 'v', 'url'
-// ]
-
+// menus有特殊性，不会加入排序(__sort)
 const accessKey = [
   'title', 'img',  
-  'header', 'body', 'footer', 'dot', 'li', 'k', 'v', 'url'
+  'header', 'body', 'footer', 'dot', 'li', 'k', 'v', 'url', 'menus'
 ]
 
 export function itemTouchoption(item){
@@ -181,7 +177,7 @@ export function itemTouchoption(item){
         slipLeft = [deletePart]
       }
 
-      if (typeof slipLeft === 'object') {
+      if (isObject(slipLeft)) {
         slipLeft = [].concat(slipLeft)
       }
 
@@ -206,9 +202,21 @@ export function itemTouchoption(item){
         })
   
         if (!item.idf || (item.idf && item.slip===true)) {
-          item.li = [].concat((item.li||[]), slipLeft)
-          item.liClass = (item.liClass||'') + ' slip-menus'
-          item.touchoption.slip.menuCount = slipLeft.length || 0
+          item.li = [].concat((item.li||[]))
+          const tmpli = []
+          item.li.forEach(item=>{
+            tmpli.push(item.__key)
+          })
+
+          // 之所以这样写是为了去重
+          slipLeft.forEach(it=>{
+            const key = it.__key
+            if (tmpli.indexOf(key) === -1) {
+              item.li.push(it)
+              item.liClass = (item.liClass||'') + ' slip-menus'
+              item.touchoption.slip.menuCount = slipLeft.length || 0
+            }
+          })
         }
   
         if (item.slip === false) {
@@ -337,6 +345,12 @@ export function resetItem(data, context, loop, attrkey) {
       }
     }
     if (!data.parent && !loop) data.itemDataRoot = true // 标识该item是最顶层item，class style用作容器描述
+  }
+
+  // menus不做渲染排序，单独处理模板
+  if (data['__sort'] && data['__sort'].indexOf('menus')>-1)  {
+    const sortIndex = data['__sort'].indexOf('menus')
+    data['__sort'].splice(sortIndex, 1)
   }
   return data
 }

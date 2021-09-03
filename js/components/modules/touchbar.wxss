@@ -68,3 +68,31 @@
   background-color: #56bf6a;
   /* border-radius: 50%; */
 }
+
+
+
+
+
+/**
+以下样式属于touchbarpro
+*/
+
+.touchbar {
+  width: 100rpx;
+  background-color: #ebebeb;
+  border-radius: 40rpx;
+  padding: 16rpx 0;
+}
+
+.touchbar-item {
+  width: 100%;
+  height: 60rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.touchbar-item.active {
+  color: red;
+}

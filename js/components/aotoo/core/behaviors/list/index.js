@@ -14,7 +14,8 @@ import {
 
 import {
   initFlatList,
-  adapterDataFlatList
+  adapterDataFlatList,
+  getShowStat
 } from "./types/flatlist/index"
 
 const {
@@ -33,19 +34,175 @@ const extendListType = [
   'swiper-loop'
 ]
 
+function presetUpdateAdapterData(data, id){
+  const viewStat = getShowStat()
+  const $data = this.getData().data
+  $data.forEach(item=>{
+    const attr = item.attr
+    const attrId = attr.id
+    if (viewStat['Yshowing'][attrId]){
+      item['@item'].show = true
+    }
+  })
+  return adapterDataFlatList(data, id)
+}
+
 // 扩展定义的列表
 function presetType(properties, isDidUpdate){
   let   ds = (properties.list || properties.dataSource) || properties || {}
-  const type = this.originalDataSource.type || ds.type || {is: 'list'}
+  let   type =  ds.type || this.originalDataSource.type || {is: 'list'}
   const id = ds['$$id'] || ds.id
 
   if (extendListType.indexOf(type.is) > -1) {
     if (isDidUpdate) {
-      const $data = adapterDataFlatList(ds.data, id)
-      ds = {data: $data}
+      ds.data = presetUpdateAdapterData.call(this, ds.data, id)
     } else {
       ds = initFlatList.call(this, ds)
     }
+    type = ds.type
+  } else {
+    if (isDidUpdate && this.originalDataSource.type && extendListType.indexOf(this.originalDataSource.type.is) > -1) {
+      ds.data = presetUpdateAdapterData.call(this, ds.data, id)
+    }
+  }
+
+
+  // if (extendListType.indexOf(type.is) > -1) {
+  //   if (isDidUpdate) {
+  //     const $data = adapterDataFlatList(ds.data, id)
+  //     ds = {data: $data}
+  //   } else {
+  //     ds = initFlatList.call(this, ds)
+  //   }
+  //   type = ds.type
+  // }
+
+  // 左滑菜单
+  if (type.slip && !isDidUpdate) {
+    if (typeof type.slip === 'boolean') {
+      type.slip = {}  // areaClass, areaItemClass, menus, menuWidth, width, height, menuOptions, autoClose, slipChange
+    }
+    const autoClose = type.slip.autoClose === false ? false : true
+    const slipChange = type.slip.slipChange
+
+    let slipTimmer = null
+    let startTarget = []
+    let endTarget = []
+    let slipStat = []
+    this.onSlipchange = function(e, param, inst){
+      const gap = parseInt(param.gap)
+      const detail = e.detail
+      const x = detail.x
+      slipStat = [x, gap]
+    }
+
+    ds.itemMethod = Object.assign({}, ds.itemMethod, {
+      touchstart(e, param, inst){
+        const changedItem = e.changedTouches[0]
+        const pageX = changedItem.pageX
+        const pageY = changedItem.pageY
+
+        const left = slipStat[0]
+        const gap = slipStat[1]
+
+        const oriPageX = startTarget[0]
+        const oriPageY = startTarget[1]
+        const preInst  = startTarget[2]
+        const position = startTarget[3]  // [x, gap]
+
+        if (autoClose && preInst && inst.index !== preInst.index) {
+          const gap = position[1]
+          gap ? preInst.update({x: gap}) : ''
+        }
+
+        startTarget = [pageX, pageY, inst]
+      },
+      touchend(e, param, inst){
+        const changedItem = e.changedTouches[0]
+        const pageX = changedItem.pageX
+        const pageY = changedItem.pageY
+
+        const startPageX = startTarget[0]
+        const startPageY = startTarget[1]
+
+        const left = slipStat[0]
+        const gap = slipStat[1]
+        const switchGap = gap - gap/3
+        startTarget[3] = [left, gap]
+
+        const diff = pageX - startPageX
+
+        if (diff < 0) {
+          if (left < switchGap) {
+            inst.update({x: 0}, function(){
+              if (lib.isFunction(slipChange)) slipChange({x: 0}, inst)
+            })
+          }
+        } else {
+          if (left > 30) {
+            inst.update({x: gap}, function(){
+              if (lib.isFunction(slipChange)) slipChange({x: gap}, inst)
+            })
+          }
+        }
+      },
+    })
+
+    let menuWidth = [].concat( (type.slip.menuWidth || 120) )
+    if (isArray(menuWidth)) {
+      let totalWidth = 0
+      menuWidth = menuWidth.map(wth=>{
+        const width = lib.isNumber(wth) ? wth : lib.isString(wth) ? parseInt(wth.replace(/(px|rpx|vw|vh|em|rem)/ig, '')) : 120
+        totalWidth+=width
+        return width
+      })
+      type.slip.width = type.slip.width || '100vw'   // movable-view的宽，movable-area的宽以此计算
+      type.slip.height = type.slip.height || '200rpx' // movable-view的高, movable-area的高设置为auto
+      type.slip.menuWidth = menuWidth
+      type.slip.totalOffsetDistance = totalWidth
+      type.slip.bindchange = 'onSlipchange?gap='+totalWidth
+
+      const areaWidth = `calc(${(type.slip.width)} + ${totalWidth}rpx)`
+      type.slip.areaStyle = `width: ${areaWidth}; height: auto; position: relative; left: -${totalWidth}rpx;`
+      type.slip.areaItemStyle = `position: relative; width: ${type.slip.width};height: ${type.slip.height};`,
+      ds.type = type
+    }
+
+  }
+
+  if (type.slip) {
+    ds.data = ds.data.map(item=>{
+      if (lib.isString(item)) {
+        item = {title: item}
+      }
+      const itemMenus = item.menus || []
+      const slipMenus = type.slip.menus || []
+      const tmpmenus = Object.assign([], slipMenus, itemMenus )
+      const menus = []
+      let   totalWidth = 0
+      tmpmenus.forEach((menu, ii)=>{
+        if (lib.isString(menu)) {
+          menu = {title: menu}
+        }
+        if (lib.isObject(menu)) {
+          const mWidth = parseInt((type.slip.menuWidth[ii]||120))
+          totalWidth+=mWidth
+          menu.itemClass = 'slip-menus-item '+ (menu.itemClass||'')
+          menu.itemStyle = (menu.itemStyle||'')+`;width: ${mWidth}rpx;`
+          menus.push(menu);
+        }
+      })
+  
+      item.x = totalWidth || type.slip.totalOffsetDistance
+      item.menus = menus
+      const areaWidth = `calc(${(type.slip.width)} + ${totalWidth}rpx)`
+      item.menuOptions = {
+        areaStyle: `width: ${areaWidth}; height: auto; position: relative; ${totalWidth ? 'left: -'+totalWidth+'rpx' : ''}`,
+        direction: totalWidth ? type.slip.direction : 'none',
+        totalMenusWidth: totalWidth
+      }
+      return item
+    })
   }
 
   return ds
@@ -53,6 +210,7 @@ function presetType(properties, isDidUpdate){
 
 function updateSelf(params) {
   if (params && isObject(params)) {
+    params = presetType.call(this, params)
     params = setPropsHooks.call(this, params)
 
     let $props = this.data.props||{}
@@ -145,7 +303,7 @@ export const listBehavior = function(app, mytype) {
       },
     },
     data: {
-
+      
     },
     lifetimes: {
       created: function() {
@@ -153,8 +311,8 @@ export const listBehavior = function(app, mytype) {
       },
       attached: function attached() { //节点树完成，可以用setData渲染节点，但无法操作节点
         const properties = this.properties
-        // const list = properties.list || properties.dataSource
-        const list = presetType.call(this, properties)
+        const list = properties.list || properties.dataSource
+        // const list = presetType.call(this, properties)
         updateSelf.call(this, list)
         if (typeof this.customLifeCycle.attached === 'function') {
           this.customLifeCycle.attached.call(this)
@@ -434,7 +592,7 @@ export const listBehavior = function(app, mytype) {
       
       __newItem: function(params, act) {
         const self = this
-        const tmp = presetType.call(this, {...this.data.$list, data: ([].concat(params))}, true)
+        const tmp = presetType.call(this, {...this.data.$list, data: ([].concat(params))}, act)
         params = tmp.data
         if (this.$$type === 'tree') {
           let treeProps = this.data.props
@@ -715,7 +873,6 @@ export const listBehavior = function(app, mytype) {
           let $data = $list.data
           let appendFun = (opts) => {
             let newData = $data.concat(that.__newItem(opts, 'append'))
-            // that.setData({$list}, cb)
             that.setData({ "$list.data": newData }, cb)
           }
 
@@ -737,6 +894,7 @@ export const listBehavior = function(app, mytype) {
       prepend(){
         this._prepend.apply(this, arguments)
       },
+      
       _prepend: function(params, cb) {
         const that = this
         if (params) {
@@ -772,7 +930,6 @@ export const listBehavior = function(app, mytype) {
         let $selectIndex = this.findIndex(params)
         if ($selectIndex || $selectIndex == 0) {
           $data.splice($selectIndex, 1)
-          // this.setData({ $list }, cb)
           this.setData({ "$list.data": $data }, cb)
         }
         return this
@@ -857,6 +1014,9 @@ export const listBehavior = function(app, mytype) {
 
       _swiperMethod: function (e) {
         return listReactFun.call(this, app, e, 'swiper')
+      },
+      _movableMethod: function (e) {
+        return listReactFun.call(this, app, e, 'movable')
       },
     }
   })

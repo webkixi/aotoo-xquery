@@ -1,4 +1,5 @@
 @import "../../components/modules/indexlist.wxss";
+@import "../../components/modules/touchbar.wxss";
 @import "../../components/modules/searchbar.wxss";
 @import "../common/source.wxss";
 
@@ -21,5 +22,41 @@
 
 .markdown-body text[selectable] {
   color: #666;
+}
+
+
+.indexlist{
+  width: 100vw;
+  height: 100vh;
+}
+
+.indexlist-item{
+  width: 100%;
+  display: flex;
+}
+
+.indexlist-item.level0{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.indexlist-item image{
+  flex: 0 0 15%;
+}
+
+.indexlist-item > .htitle {
+  flex: 0 0 85%;
+  text-indent: 1em;
+}
+
+.indexlist-item .slip-menus {
+  flex: 0 0 auto;
+}
+
+.touchbar{
+  position: fixed;
+  right: 20rpx;
+  top: 30%;
 }
 

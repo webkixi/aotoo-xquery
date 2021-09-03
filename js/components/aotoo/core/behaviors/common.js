@@ -943,7 +943,7 @@ export const commonBehavior = (app, mytype) => {
         }
 
         tmp = lib.isString(param) ? tmp.filter(item => item.hasClass(param)) : tmp
-        return tmp.length === 1 ? tmp[0] : {
+        return {
           addClass: params => tmp.forEach($inst => $inst.addClass(params)),
           removeClass: params => tmp.forEach($inst => $inst.removeClass(params)),
           update: params => tmp.forEach($inst => $inst.update(params)),
@@ -959,6 +959,22 @@ export const commonBehavior = (app, mytype) => {
           length: tmp.length,
           data: tmp
         }
+        // return tmp.length === 1 ? tmp[0] : {
+        //   addClass: params => tmp.forEach($inst => $inst.addClass(params)),
+        //   removeClass: params => tmp.forEach($inst => $inst.removeClass(params)),
+        //   update: params => tmp.forEach($inst => $inst.update(params)),
+        //   // setData: params => tmp.forEach($inst => $inst.setData(params)),
+        //   forEach(cb){
+        //     tmp.forEach((item, ii) => {
+        //       if (lib.isFunction(cb)) {
+        //         cb(item, ii)
+        //         // cb.call(item, item.getData())
+        //       }
+        //     })
+        //   },
+        //   length: tmp.length,
+        //   data: tmp
+        // }
       },
 
       getData: function() {
@@ -1193,7 +1209,7 @@ export const commonMethodBehavior = (app, mytype) => {
         
         if (is == 'list' || is == 'tree') {
           const mytype = this.data.$list.type
-          if (mytype && (mytype.is == 'scroll' || mytype.is == 'swiper')) {
+          if (mytype && (mytype.is == 'scroll' || mytype.is == 'swiper' || mytype.slip)) {
             dsetEvt = 'bind' + dsetEvt
           }
         }

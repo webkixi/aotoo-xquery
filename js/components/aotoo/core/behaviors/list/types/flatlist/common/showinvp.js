@@ -1,5 +1,5 @@
-const YshowTimmer = {}
-const Yshowing = {}
+let YshowTimmer = {}
+let Yshowing = {}
 export function showInScrollViewPort(
   containerRect, 
   items, 
@@ -16,11 +16,16 @@ export function showInScrollViewPort(
     const dataset = item.dataset
     const itemId = dataset.id
     const itemInst = context.activePage.getElementsById(itemId)
-    const uniqId = itemInst.uniqId
-    const itemTop = item.top - top
+    // const uniqId = itemInst.uniqId
+    const uniqId = itemId
+
+
+    // const itemTop = item.top - top
+    const itemTop = item.top
     const showState = itemInst.getData().show
     if (itemTop >= (containerRect.top - containerRect.height * scope) && itemTop <= (containerRect.bottom + containerRect.height * scope)) {
       if (!showState && !Yshowing[uniqId]) {
+        YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
         Yshowing[uniqId] = true
         YshowTimmer[uniqId] = setTimeout(() => {
           itemInst.show()
@@ -31,7 +36,9 @@ export function showInScrollViewPort(
         YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
         Yshowing[uniqId] = false
         if (autoHide) {
-          itemInst.hide()
+          YshowTimmer[uniqId] = setTimeout(() => {
+            itemInst.hide()
+          }, 100);
         }
       }
     }
@@ -56,8 +63,8 @@ export function showInScrollViewPortX(
     const dataset = item.dataset
     const itemId = dataset.id
     const itemInst = context.activePage.getElementsById(itemId)
-    const uniqId = itemInst.uniqId
-    const itemLeft = item.left - left
+    const uniqId = itemId
+    const itemLeft = item.left
     const showState = itemInst.getData().show
     if (itemLeft >= (containerRect.left - containerRect.width * scope) && itemLeft <= (containerRect.right + containerRect.width * scope)) {
       if (!showState && !Xshowing[uniqId]) {
@@ -76,4 +83,18 @@ export function showInScrollViewPortX(
       }
     }
   })
+}
+
+export function clearShowStat(){
+  YshowTimmer = {}
+  Yshowing = {}
+}
+
+export function getShowStat(){
+  return {
+    YshowTimmer,
+    Yshowing,
+    XshowTimmer,
+    Xshowing
+  }
 }

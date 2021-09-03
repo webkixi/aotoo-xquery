@@ -1,0 +1,6 @@
+<view class="container">
+  <view style="margin-bottom: 2em;">触控切换</view>
+  <ui-list list="{{listConfig}}" />
+</view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />

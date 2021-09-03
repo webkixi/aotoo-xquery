@@ -1,6 +1,7 @@
-import { showInScrollViewPort, showInScrollViewPortX } from "./common/showinvp";
+import { showInScrollViewPort, showInScrollViewPortX, clearShowStat, getShowStat } from "./common/showinvp";
 import { isFlatSwiper } from "./common/isflatswiper";
 import { isLoopSwiper, presetEvent_loop } from "./common/isloopswiper";
+export { getShowStat }
 
 const app = getApp()
 const lib = require('../../../../../lib/index')
@@ -20,12 +21,16 @@ export function adapterDataFlatList(data, flatListId, from){
       val['__key'] = flatListItemId
       val['itemClass'] = 'flatlist-unit ' + (val['itemClass']||'')
       val['show'] = false
+      const menus = val['menus']
+      const menuOptions = val['menuOptions']
       const wrapitem = {
         attr: {"id": flatListItemId},
         id: `box-${flatListItemId}`,
         idf: val['idf'],
         parent: val['parent'],
-        "@item": val
+        "@item": val,
+        menus,
+        menuOptions
       }
       val['idf'] ? (delete val['idf']) : (delete wrapitem['idf'])
       val['parent'] ? (delete val['parent']) : (delete wrapitem['parent'])
@@ -151,6 +156,9 @@ export function initFlatList(params) {
         const queryAll = this.query.selectAll('.flatlist-item').boundingClientRect((ret) => {
           let rect = this._tempRect
           if (ret && ret.length) {
+            if (this.flatItems.length && (ret.length !== this.flatItems.length)) {
+              clearShowStat()
+            }
             this.flatItems = ret
             if (rect && (rect.current || rect.current === 0)) {
               rect = ret[rect.current]

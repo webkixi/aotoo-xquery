@@ -1,7 +1,6 @@
 <view class="container">
-  <ui-tree list="{{indexList}}" class="tab-boxer" >
-    <ui-item slot="top" item="{{searchConfig}}" />
-  </ui-tree>
+  <ui-tree wx:if="{{indexList}}" list="{{indexList}}" class="tab-boxer" />
+  <ui-list wx:if="{{touchbar}}" list="{{touchbar}}" />
 </view>
-<ui-item item="{{codeButton}}" />
-<ui-pop item="{{readme}}" />
+<!-- <ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" /> -->

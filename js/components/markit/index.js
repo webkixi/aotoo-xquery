@@ -16,6 +16,7 @@ Component({
   properties: {
     dataSource: {
       type: Object,
+      optionalTypes: [String]
     },
     textType: {
       type: String,

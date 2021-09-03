@@ -7,393 +7,172 @@
 const Pager = require('../../components/aotoo/core/index')
 const lib = Pager.lib
 const nav = lib.nav
-let mkIndexList = require('../../components/modules/indexlist')
-let searchbar = require('../../components/modules/searchbar')
-let source = require('../common/source')
+const mkIndexList = require('../../components/modules/indexlist')
+const searchbar = require('../../components/modules/searchbar')
+const createTouchbar = require('../../components/modules/touchbarpro')
+const source = require('../common/source')
 
 const img = {src: '/images/xquery.png', mode: 'widthFix'}
-const mockData = [
-  {
-    "@md": `
-索引列表用于快速定位到分类项，是移动端常用的一种布局结构  
+function createIndexList(params={}){
+  const data = params.data
+  const id = params.id || lib.suid('indexlist-')
+  const items = []
+  const sorts = []
+  data.forEach((item, ii)=>{
+    if (lib.isString(item)) {
+      item = {title: item}
+    }
+    if (lib.isObject(item)) {
+      if (!item.idf) {
+        item.touchoption = {
+          slip: {
+            autoDelete: false,
+            slipLeft: [
+              {title: '删除', aim: 'onDelete'}
+            ]
+          }
+        }
+        item.touchstart = function(){}
+        item.touchmove = function(){}
+        item.touchend = function(){}
+        item.touchcancel = function(){}
+      } else {
+        sorts.push({title: item.title})
+        item.id = 'indexlist-cat-' + (sorts.length - 1)
+      }
+      items.push(item)
+    }
+  })
 
-该组件参考微型通讯录，复刻度应该90%左右  
-`, 
-    itemStyle: 'padding: 20px 10px; color: #999'
-  },
-  {idf: 'A', title: 'A'},
-  {img, title: '选项-1', parent: "A" },
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {img, title: '选项-1', parent: "A"},
-  {idf: 'B', title: 'B'},
-  {img, title: '选项-2', parent: "B"},
-  {img, title: '选项-2', parent: "B"},
-  {img, title: '选项-2', parent: "B"},
-  {img, title: '选项-2', parent: "B"},
-  {img, title: '选项-2', parent: "B"},
-  {img, title: '选项-2', parent: "B"},
-  {img, title: '选项-2', parent: "B"},
-  {img, title: '选项-2', parent: "B"},
-  {img, title: '选项-2', parent: "B"},
-  {img, title: '选项-2', parent: "B"},
-  {img, title: '选项-2', parent: "B"},
-  {img, title: '选项-2', parent: "B"},
-  {idf: 'C', title: 'C'},
-  {img, title: '选项-2', parent: "C"},
-  {img, title: '选项-2', parent: "C"},
-  {img, title: '选项-2', parent: "C"},
-  {img, title: '选项-2', parent: "C"},
-  {img, title: '选项-2', parent: "C"},
-  {img, title: '选项-2', parent: "C"},
-  {img, title: '选项-2', parent: "C"},
-  {img, title: '选项-2', parent: "C"},
-  {img, title: '选项-2', parent: "C"},
-  {img, title: '选项-2', parent: "C"},
-  {img, title: '选项-2', parent: "C"},
-  {img, title: '选项-2', parent: "C"},
-  // {idf: 'D', title: 'D'},
-  // {title: '选项-2', parent: "D"},
-  // {title: '选项-2', parent: "D"},
-  // {title: '选项-2', parent: "D"},
-  // {title: '选项-2', parent: "D"},
-  // {title: '选项-2', parent: "D"},
-  // {title: '选项-2', parent: "D"},
-  // {title: '选项-2', parent: "D"},
-  // {title: '选项-2', parent: "D"},
-  // {title: '选项-2', parent: "D"},
-  // {title: '选项-2', parent: "D"},
-  // {title: '选项-2', parent: "D"},
-  // {title: '选项-2', parent: "D"},
-  // {idf: 'E', title: 'E'},
-  // {title: '选项-2', parent: "E"},
-  // {title: '选项-2', parent: "E"},
-  // {title: '选项-2', parent: "E"},
-  // {title: '选项-2', parent: "E"},
-  // {title: '选项-2', parent: "E"},
-  // {title: '选项-2', parent: "E"},
-  // {title: '选项-2', parent: "E"},
-  // {title: '选项-2', parent: "E"},
-  // {title: '选项-2', parent: "E"},
-  // {title: '选项-2', parent: "E"},
-  // {title: '选项-2', parent: "E"},
-  // {title: '选项-2', parent: "E"},
-  // {idf: 'F', title: 'F'},
-  // {title: '选项-2', parent: "F"},
-  // {title: '选项-2', parent: "F"},
-  // {title: '选项-2', parent: "F"},
-  // {title: '选项-2', parent: "F"},
-  // {title: '选项-2', parent: "F"},
-  // {title: '选项-2', parent: "F"},
-  // {title: '选项-2', parent: "F"},
-  // {title: '选项-2', parent: "F"},
-  // {title: '选项-2', parent: "F"},
-  // {title: '选项-2', parent: "F"},
-  // {title: '选项-2', parent: "F"},
-  // {title: '选项-2', parent: "F"},
-  // {idf: 'G', title: 'G'},
-  // {title: '选项-2', parent: "G"},
-  // {title: '选项-2', parent: "G"},
-  // {title: '选项-2', parent: "G"},
-  // {title: '选项-2', parent: "G"},
-  // {title: '选项-2', parent: "G"},
-  // {title: '选项-2', parent: "G"},
-  // {title: '选项-2', parent: "G"},
-  // {title: '选项-2', parent: "G"},
-  // {title: '选项-2', parent: "G"},
-  // {title: '选项-2', parent: "G"},
-  // {title: '选项-2', parent: "G"},
-  // {title: '选项-2', parent: "G"},
-  // {idf: 'H', title: 'H'},
-  // {title: '选项-2', parent: "H"},
-  // {title: '选项-2', parent: "H"},
-  // {title: '选项-2', parent: "H"},
-  // {title: '选项-2', parent: "H"},
-  // {title: '选项-2', parent: "H"},
-  // {title: '选项-2', parent: "H"},
-  // {title: '选项-2', parent: "H"},
-  // {title: '选项-2', parent: "H"},
-  // {title: '选项-2', parent: "H"},
-  // {title: '选项-2', parent: "H"},
-  // {title: '选项-2', parent: "H"},
-  // {title: '选项-2', parent: "H"},
-  // {idf: 'I', title: 'I'},
-  // {title: '选项-2', parent: "I"},
-  // {title: '选项-2', parent: "I"},
-  // {title: '选项-2', parent: "I"},
-  // {title: '选项-2', parent: "I"},
-  // {title: '选项-2', parent: "I"},
-  // {title: '选项-2', parent: "I"},
-  // {title: '选项-2', parent: "I"},
-  // {title: '选项-2', parent: "I"},
-  // {title: '选项-2', parent: "I"},
-  // {title: '选项-2', parent: "I"},
-  // {title: '选项-2', parent: "I"},
-  // {title: '选项-2', parent: "I"},
-  // {idf: 'J', title: 'J'},
-  // {title: '选项-2', parent: "J"},
-  // {title: '选项-2', parent: "J"},
-  // {title: '选项-2', parent: "J"},
-  // {title: '选项-2', parent: "J"},
-  // {title: '选项-2', parent: "J"},
-  // {title: '选项-2', parent: "J"},
-  // {title: '选项-2', parent: "J"},
-  // {title: '选项-2', parent: "J"},
-  // {title: '选项-2', parent: "J"},
-  // {title: '选项-2', parent: "J"},
-  // {title: '选项-2', parent: "J"},
-  // {title: '选项-2', parent: "J"},
-  // {idf: 'K', title: 'K'},
-  // {title: '选项-2', parent: "K"},
-  // {title: '选项-2', parent: "K"},
-  // {title: '选项-2', parent: "K"},
-  // {title: '选项-2', parent: "K"},
-  // {title: '选项-2', parent: "K"},
-  // {title: '选项-2', parent: "K"},
-  // {title: '选项-2', parent: "K"},
-  // {title: '选项-2', parent: "K"},
-  // {title: '选项-2', parent: "K"},
-  // {title: '选项-2', parent: "K"},
-  // {title: '选项-2', parent: "K"},
-  // {title: '选项-2', parent: "K"},
-  // {idf: 'M', title: 'M'},
-  // {title: '选项-2', parent: "M"},
-  // {title: '选项-2', parent: "M"},
-  // {title: '选项-2', parent: "M"},
-  // {title: '选项-2', parent: "M"},
-  // {title: '选项-2', parent: "M"},
-  // {title: '选项-2', parent: "M"},
-  // {title: '选项-2', parent: "M"},
-  // {title: '选项-2', parent: "M"},
-  // {title: '选项-2', parent: "M"},
-  // {title: '选项-2', parent: "M"},
-  // {title: '选项-2', parent: "M"},
-  // {title: '选项-2', parent: "M"},
-  // {idf: 'L', title: 'L'},
-  // {title: '选项-2', parent: "L"},
-  // {title: '选项-2', parent: "L"},
-  // {title: '选项-2', parent: "L"},
-  // {title: '选项-2', parent: "L"},
-  // {title: '选项-2', parent: "L"},
-  // {title: '选项-2', parent: "L"},
-  // {title: '选项-2', parent: "L"},
-  // {title: '选项-2', parent: "L"},
-  // {title: '选项-2', parent: "L"},
-  // {title: '选项-2', parent: "L"},
-  // {title: '选项-2', parent: "L"},
-  // {title: '选项-2', parent: "L"},
-  // {idf: 'N', title: 'N'},
-  // {title: '选项-2', parent: "N"},
-  // {title: '选项-2', parent: "N"},
-  // {title: '选项-2', parent: "N"},
-  // {title: '选项-2', parent: "N"},
-  // {title: '选项-2', parent: "N"},
-  // {title: '选项-2', parent: "N"},
-  // {title: '选项-2', parent: "N"},
-  // {title: '选项-2', parent: "N"},
-  // {title: '选项-2', parent: "N"},
-  // {title: '选项-2', parent: "N"},
-  // {title: '选项-2', parent: "N"},
-  // {title: '选项-2', parent: "N"},
-  // {idf: 'O', title: 'O'},
-  // {title: '选项-2', parent: "O"},
-  // {title: '选项-2', parent: "O"},
-  // {title: '选项-2', parent: "O"},
-  // {title: '选项-2', parent: "O"},
-  // {title: '选项-2', parent: "O"},
-  // {title: '选项-2', parent: "O"},
-  // {title: '选项-2', parent: "O"},
-  // {title: '选项-2', parent: "O"},
-  // {title: '选项-2', parent: "O"},
-  // {title: '选项-2', parent: "O"},
-  // {title: '选项-2', parent: "O"},
-  // {title: '选项-2', parent: "O"},
-  {idf: 'P', title: 'P'},
-  {img, title: '选项-2', parent: "P"},
-  {img, title: '选项-2', parent: "P"},
-  {img, title: '选项-2', parent: "P"},
-  {img, title: '选项-2', parent: "P"},
-  {img, title: '选项-2', parent: "P"},
-  {img, title: '选项-2', parent: "P"},
-  {img, title: '选项-2', parent: "P"},
-  {img, title: '选项-2', parent: "P"},
-  {img, title: '选项-2', parent: "P"},
-  {img, title: '选项-2', parent: "P"},
-  {img, title: '选项-2', parent: "P"},
-  {img, title: '选项-2', parent: "P"},
-  {idf: 'Q', title: 'Q'},
-  {img, title: '选项-2', parent: "Q"},
-  {img, title: '选项-2', parent: "Q"},
-  {img, title: '选项-2', parent: "Q"},
-  {img, title: '选项-2', parent: "Q"},
-  {img, title: '选项-2', parent: "Q"},
-  {img, title: '选项-2', parent: "Q"},
-  {img, title: '选项-2', parent: "Q"},
-  {img, title: '选项-2', parent: "Q"},
-  {img, title: '选项-2', parent: "Q"},
-  {img, title: '选项-2', parent: "Q"},
-  {img, title: '选项-2', parent: "Q"},
-  {img, title: '选项-2', parent: "Q"},
-  {idf: 'R', title: 'R'},
-  {img, title: '选项-2', parent: "R"},
-  {img, title: '选项-2', parent: "R"},
-  {img, title: '选项-2', parent: "R"},
-  {img, title: '选项-2', parent: "R"},
-  {img, title: '选项-2', parent: "R"},
-  {img, title: '选项-2', parent: "R"},
-  {img, title: '选项-2', parent: "R"},
-  {img, title: '选项-2', parent: "R"},
-  {img, title: '选项-2', parent: "R"},
-  {img, title: '选项-2', parent: "R"},
-  {img, title: '选项-2', parent: "R"},
-  {img, title: '选项-2', parent: "R"},
-  {idf: 'S', title: 'S'},
-  {img, title: '选项-2', parent: "S"},
-  {img, title: '选项-2', parent: "S"},
-  {img, title: '选项-2', parent: "S"},
-  {img, title: '选项-2', parent: "S"},
-  {img, title: '选项-2', parent: "S"},
-  {img, title: '选项-2', parent: "S"},
-  {img, title: '选项-2', parent: "S"},
-  {img, title: '选项-2', parent: "S"},
-  {img, title: '选项-2', parent: "S"},
-  {img, title: '选项-2', parent: "S"},
-  {img, title: '选项-2', parent: "S"},
-  {img, title: '选项-2', parent: "S"},
-  {idf: 'T', title: 'T'},
-  {img, title: '选项-2', parent: "T"},
-  {img, title: '选项-2', parent: "T"},
-  {img, title: '选项-2', parent: "T"},
-  {img, title: '选项-2', parent: "T"},
-  {img, title: '选项-2', parent: "T"},
-  {img, title: '选项-2', parent: "T"},
-  {img, title: '选项-2', parent: "T"},
-  {img, title: '选项-2', parent: "T"},
-  {img, title: '选项-2', parent: "T"},
-  {img, title: '选项-2', parent: "T"},
-  {img, title: '选项-2', parent: "T"},
-  {img, title: '选项-2', parent: "T"},
-  {idf: 'U', title: 'U'},
-  {img, title: '选项-2', parent: "U"},
-  {img, title: '选项-2', parent: "U"},
-  {img, title: '选项-2', parent: "U"},
-  {img, title: '选项-2', parent: "U"},
-  {img, title: '选项-2', parent: "U"},
-  {img, title: '选项-2', parent: "U"},
-  {img, title: '选项-2', parent: "U"},
-  {img, title: '选项-2', parent: "U"},
-  {img, title: '选项-2', parent: "U"},
-  {img, title: '选项-2', parent: "U"},
-  {img, title: '选项-2', parent: "U"},
-  {img, title: '选项-2', parent: "U"},
-  {idf: 'V', title: 'V'},
-  {img, title: '选项-2', parent: "V"},
-  {img, title: '选项-2', parent: "V"},
-  {img, title: '选项-2', parent: "V"},
-  {img, title: '选项-2', parent: "V"},
-  {img, title: '选项-2', parent: "V"},
-  {img, title: '选项-2', parent: "V"},
-  {img, title: '选项-2', parent: "V"},
-  {img, title: '选项-2', parent: "V"},
-  {img, title: '选项-2', parent: "V"},
-  {img, title: '选项-2', parent: "V"},
-  {img, title: '选项-2', parent: "V"},
-  {img, title: '选项-2', parent: "V"},
-  {idf: 'W', title: 'W'},
-  {img, title: '选项-2', parent: "W"},
-  {img, title: '选项-2', parent: "W"},
-  {img, title: '选项-2', parent: "W"},
-  {img, title: '选项-2', parent: "W"},
-  {img, title: '选项-2', parent: "W"},
-  {img, title: '选项-2', parent: "W"},
-  {img, title: '选项-2', parent: "W"},
-  {img, title: '选项-2', parent: "W"},
-  {img, title: '选项-2', parent: "W"},
-  {img, title: '选项-2', parent: "W"},
-  {img, title: '选项-2', parent: "W"},
-  {img, title: '选项-2', parent: "W"},
-  {idf: 'X', title: 'X'},
-  {img, title: '选项-2', parent: "X"},
-  {img, title: '选项-2', parent: "X"},
-  {img, title: '选项-2', parent: "X"},
-  {img, title: '选项-2', parent: "X"},
-  {img, title: '选项-2', parent: "X"},
-  {img, title: '选项-2', parent: "X"},
-  {img, title: '选项-2', parent: "X"},
-  {img, title: '选项-2', parent: "X"},
-  {img, title: '选项-2', parent: "X"},
-  {img, title: '选项-2', parent: "X"},
-  {img, title: '选项-2', parent: "X"},
-  {img, title: '选项-2', parent: "X"},
-  {idf: 'Y', title: 'Y'},
-  {img, title: '选项-2', parent: "Y"},
-  {img, title: '选项-2', parent: "Y"},
-  {img, title: '选项-2', parent: "Y"},
-  {img, title: '选项-2', parent: "Y"},
-  {img, title: '选项-2', parent: "Y"},
-  {img, title: '选项-2', parent: "Y"},
-  {img, title: '选项-2', parent: "Y"},
-  {img, title: '选项-2', parent: "Y"},
-  {img, title: '选项-2', parent: "Y"},
-  {img, title: '选项-2', parent: "Y"},
-  {img, title: '选项-2', parent: "Y"},
-  {img, title: '选项-2', parent: "Y"},
-  {idf: 'Z', title: 'Z'},
-  {img, title: '选项-4', parent: "Z"},
-  {img, title: '选项-4', parent: "Z"},
-  {img, title: '选项-4', parent: "Z"},
-  {img, title: '选项-4', parent: "Z"},
-  {img, title: '选项-4', parent: "Z"},
-  {img, title: '选项-4', parent: "Z"},
-  {img, title: '选项-4', parent: "Z"},
-  {img, title: '选项-4', parent: "Z"},
-  {img, title: '选项-4', parent: "Z"},
-  {img, title: '选项-4', parent: "Z"},
-  {img, title: '选项-4', parent: "Z"},
-  {img, title: '选项-4', parent: "Z"},
-]
+  return {
+    $$id: id, 
+    id: id,
+    data: items,
+    type: {
+      is: 'scroll',
+      "scroll-y": true,
+      "bindscroll": 'onScroll'
+    },
+    created(){
+      this.query = wx.createSelectorQuery().in(this)
+    },
+    ready(){
+      const $$ = this.activePage.getElementsById.bind(this.activePage)
+      const touchbar = $$('touchbar-sidebar')
+      touchbar.selectItem(0)
+      this.xxx = this.query.selectAll('.itemroot').boundingClientRect(ret=>{
+        this.catItems = ret
+      })
+    },
+    methods: {
+      onScroll(e){
+        this.xxx.exec(()=>{
+          this.catItems.forEach((cat, ii)=>{
+            if (cat.top > -20 && cat.top < 20) {
+              const $$ = this.activePage.getElementsById.bind(this.activePage)
+              $$('touchbar-sidebar').selectItem(ii)
+            }
+          })
+        })
+      }
+    },
+    listClass: 'indexlist',
+    itemClass: 'indexlist-item',
+    touchbarData: sorts,
+  }
+}
+
+const indexListConfig = createIndexList({
+  id: 'indexlist-xxx',
+  data: [
+    {idf: 'A', title: 'A'},
+    {img, title: '选项-1', parent: "A" },
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {img, title: '选项-1', parent: "A"},
+    {idf: 'B', title: 'B'},
+    {img, title: '选项-2', parent: "B"},
+    {img, title: '选项-2', parent: "B"},
+    {img, title: '选项-2', parent: "B"},
+    {img, title: '选项-2', parent: "B"},
+    {img, title: '选项-2', parent: "B"},
+    {img, title: '选项-2', parent: "B"},
+    {img, title: '选项-2', parent: "B"},
+    {img, title: '选项-2', parent: "B"},
+    {img, title: '选项-2', parent: "B"},
+    {img, title: '选项-2', parent: "B"},
+    {img, title: '选项-2', parent: "B"},
+    {img, title: '选项-2', parent: "B"},
+    {idf: 'C', title: 'C'},
+    {img, title: '选项-2', parent: "C"},
+    {img, title: '选项-2', parent: "C"},
+    {img, title: '选项-2', parent: "C"},
+    {img, title: '选项-2', parent: "C"},
+    {img, title: '选项-2', parent: "C"},
+    {img, title: '选项-2', parent: "C"},
+    {img, title: '选项-2', parent: "C"},
+    {img, title: '选项-2', parent: "C"},
+    {img, title: '选项-2', parent: "C"},
+    {img, title: '选项-2', parent: "C"},
+    {img, title: '选项-2', parent: "C"},
+    {img, title: '选项-2', parent: "C"},
+    {idf: 'P', title: 'P'},
+    {img, title: '选项-2', parent: "P"},
+    {img, title: '选项-2', parent: "P"},
+    {img, title: '选项-2', parent: "P"},
+    {img, title: '选项-2', parent: "P"},
+    {img, title: '选项-2', parent: "P"},
+    {img, title: '选项-2', parent: "P"},
+    {img, title: '选项-2', parent: "P"},
+    {img, title: '选项-2', parent: "P"},
+    {img, title: '选项-2', parent: "P"},
+    {img, title: '选项-2', parent: "P"},
+    {img, title: '选项-2', parent: "P"},
+    {img, title: '选项-2', parent: "P"},
+    {idf: 'Q', title: 'Q'},
+    {img, title: '选项-2', parent: "Q"},
+    {img, title: '选项-2', parent: "Q"},
+    {img, title: '选项-2', parent: "Q"},
+    {img, title: '选项-2', parent: "Q"},
+    {img, title: '选项-2', parent: "Q"},
+    {img, title: '选项-2', parent: "Q"},
+    {img, title: '选项-2', parent: "Q"},
+    {img, title: '选项-2', parent: "Q"},
+    {img, title: '选项-2', parent: "Q"},
+    {img, title: '选项-2', parent: "Q"},
+    {img, title: '选项-2', parent: "Q"},
+    {img, title: '选项-2', parent: "Q"},
+  ]
+})
+
+const touchbarData = indexListConfig.touchbarData;  delete indexListConfig.touchbarData
+const touchbarConfig = createTouchbar({
+  id: 'touchbar-sidebar',
+  data: touchbarData,
+  tap(e){
+    const $$ = this.activePage.getElementsById.bind(this.activePage)
+    const index = e.touchbarIndex
+    const targetId = 'indexlist-cat-'+index
+    $$('indexlist-xxx') .update({
+      "type.scroll-into-view": targetId
+    })
+  }
+})
 
 Pager({
   data: {
-    indexList: mkIndexList('xxx', mockData, {
-      tap(e, param, inst){
-        inst.update({title: '索引列表项'})
-      }
-    }),
-
-    searchConfig: searchbar({
-      data: [
-        {title: '默认数据'},
-        {title: '广州天河区'},
-        {title: '广州越秀区'},
-        {title: '广州黄埔'},
-      ],
-      bindinput: function(e, board) {
-        let value = e.detail.value
-        if (value === '广州') {
-          board.append([
-            {title: '天河城'},
-            {title: '天心公园'},
-            {title: '黄埔军校'},
-          ])
-        }
-      },
-      bindfocus(e, board){
-        board.append({title: '在搜索框中输入广州'})
-      }
-    }),
-
-    ...source
+    indexList: indexListConfig,
+    touchbar: touchbarConfig
   }
 })

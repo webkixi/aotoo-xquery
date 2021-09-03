@@ -30,22 +30,49 @@ import {
 function mkFind(context, app){
   let that = context
   wx.$$find = function (param, context) {
-    let id, cls, treeid
+    let id, cls, treeid, justit
     let vars = app['_vars']
     if (param||param === 0) {
       if (lib.isString(param)) {
-        let justit = that.getElementsById(param)
-        if (justit) return justit
-        if (vars[param]) return vars[param]  // 直接返回实例
         if (param.charAt(0) === '#') {
           id = param.replace('#', '')
+          cls = undefined
+        } else if (param.indexOf('treeid-index-') > -1) {
+          treeid = param
+          cls = undefined
+        } else if (that.getElementsById(param)) {
+          justit = that.getElementsById(param)
         } else {
           cls = param
-          if (param.indexOf('treeid-index-')>-1) {
-            cls = undefined
-            treeid = param
-          }
+          id = undefined
+          treeid = undefined
         }
+
+        if (id) {
+          justit = that.getElementsById(id)
+        }
+
+        if (justit) {
+          return justit
+        }
+
+        if (treeid) {
+          return listInstDelegate(treeid, context)
+        }
+
+        // let justit = that.getElementsById(param)
+        // if (justit) return justit
+        // if (vars[param]) return vars[param]  // 直接返回实例
+        // if (param.charAt(0) === '#') {
+        //   id = param.replace('#', '')
+        // } else {
+        //   cls = param
+        //   if (param.indexOf('treeid-index-')>-1) {
+        //     cls = undefined
+        //     treeid = param
+        //   }
+        // }
+
       }
 
       let findScope = lib.findChilds(context) || Object.entries(vars).map(item => item[1])
@@ -72,41 +99,38 @@ function mkFind(context, app){
             }
             index = listInst.findIndex(param, bywhat)
             if (index || index === 0) {
-              if (!lib.isArray(index)) index = [index]
-              if (lib.isArray(index)) {
-                let datas = {}
-                index.forEach(idx => {
-                  // let item = listInst.data.$list.data[idx]
-                  let item = listInst.getData().data[idx]
-                  let treeid = item.attr['treeid'] || item.attr['data-treeid']
-                  item.__realIndex = idx
-                  if (item.$$id) {
-                    /** item作为实例来处理 */
-                  } else if (item.isItem) {
-                    /** item作为实例来处理 */
-                  } else {
-                    /** 此处的数据为非实例处理数据，需要封装 */
-                    datas[`data[${idx}]`] = item
-                    findIt = findIt.concat(listInstDelegate(item, listInst))
-                  }
-                })
+              index = [].concat(index)
+              let datas = {}
+              index.forEach(idx => {
+                let item = listInst.getData().data[idx]
+                let treeid = item.attr['treeid'] || item.attr['data-treeid']
+                item.__realIndex = idx
+                if (item.$$id) {
+                  /** item作为实例来处理 */
+                } else if (item.isItem) {
+                  /** item作为实例来处理 */
+                } else {
+                  /** 此处的数据为非实例处理数据，需要封装 */
+                  datas[`data[${idx}]`] = item
+                  findIt = findIt.concat(listInstDelegate(item, listInst))
+                }
+              })
 
-                // index.forEach(idx => {
-                //   let item = listInst.data.$list.data[idx]
-                //   let treeid = item.attr['treeid'] || item.attr['data-treeid']
-                //   item.__realIndex = idx
-                //   if (item.$$id) {
-                //     /** item作为实例来处理 */
-                //   } else if (item.isItem) {
-                //     /** item作为实例来处理 */
-                //   } else {
-                //     /** 此处的数据为非实例处理数据，需要封装 */
-                //     datas[`data[${idx}]`] = item
-                //   }
-                // })
-                // let tmpData = lib.clone(datas)
-                // findIt = findIt.concat(fakeListInstance(tmpData, listInst))
-              }
+              // index.forEach(idx => {
+              //   let item = listInst.data.$list.data[idx]
+              //   let treeid = item.attr['treeid'] || item.attr['data-treeid']
+              //   item.__realIndex = idx
+              //   if (item.$$id) {
+              //     /** item作为实例来处理 */
+              //   } else if (item.isItem) {
+              //     /** item作为实例来处理 */
+              //   } else {
+              //     /** 此处的数据为非实例处理数据，需要封装 */
+              //     datas[`data[${idx}]`] = item
+              //   }
+              // })
+              // let tmpData = lib.clone(datas)
+              // findIt = findIt.concat(fakeListInstance(tmpData, listInst))
             }
           }
 
@@ -136,9 +160,6 @@ function mkFind(context, app){
 
       // 没有考虑form及非item/list的情况
       if (findIt.length) {
-        // if (findIt.length === 1) {
-        //   return findIt[0]
-        // }
         return {
           data: findIt,
           length: findIt.length,
@@ -291,7 +312,7 @@ function core(params, _page) {
       this.getElementsById = function(key) {
         if (key) {
           key = key.replace('#', '')
-          return this.elements[key] || this.selectComponent('#'+key) || this.selectComponent('.'+key)
+          return this.elements[key] || app['_vars'][key] || this.selectComponent('#'+key) || this.selectComponent('.'+key)
         } else {
           return this.elements
         }

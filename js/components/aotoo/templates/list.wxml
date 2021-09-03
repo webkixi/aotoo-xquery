@@ -12,8 +12,14 @@
       }
     }
   }
+  function realMenus(item, typer){
+    var itemMenus = item.menus || []
+    var typeMenus = typer.menus || []
+    return itemMenus.length ?  itemMenus : typeMenus
+  }
   module.exports = {
-    store: store
+    store: store,
+    realMenus: realMenus
   }
 </wxs>
 <import src="./item.wxml" />
@@ -46,54 +52,107 @@
   </block>
 </template>
 
-<template name="listWrap">
-  <slot name="list-top" />
-  <block wx:if="{{ list.type && list.type.is === 'exposed'}}">
-    <block wx:if="{{util.isArray(list.data)}}">
+<template name="listData">
+  <block wx:if="{{util.isArray(list.data)}}">
+    <block wx:if="{{ list.type && list.type.slip}}">
+      <movable-area 
+        wx:if="{{item.show}}"
+        wx:for="{{list.data}}" 
+        wx:key="__key"
+        scale-area="{{list.type.slip['scale-area']||''}}"
+        class="movable-area {{list.type.slip.areaClass||''}}"
+        style="{{item.menuOptions.areaStyle || list.type.slip.areaStyle }}"
+      >
+        <movable-view 
+          x="{{item.x||''}}"
+          y="{{item.y||''}}"
+          direction="{{ (item.menuOptions.direction||'horizontal') }}" 
+          animation="{{true}}"
+          damping="{{200}}"
+          inertia="{{true}}"
+          friction="{{1}}"
+          out-of-bounds="{{ inner.realMenus(item, list.type.slip).length ? true : '' }}" 
+          class="movable-view {{list.type.slip.areaItemClass}}"
+          style="{{list.type.slip.areaItemStyle }}"
+          bindchange="{{list.type&&list.type.slip&&list.type.slip.bindchange ? '_movableMethod' : ''}}"
+          bindscale="{{list.type&&list.type.slip&&list.type.slip.bindscale ? '_movableMethod' : ''}}"
+          htouchmove="{{list.type&&list.type.slip&&list.type.slip.htouchmove ? '_movableMethod' : ''}}"
+          vtouchmove="{{list.type&&list.type.slip&&list.type.slip.vtouchmove ? '_movableMethod' : ''}}"
+          data-treeid="{{item.attr['data-treeid']}}"
+          data-evt="{{util.dataEvt(list.type.slip, ['bindchange', 'bindscale', 'htouchmove', 'vtouchmove'])}}"
+        >
+          <template is="itemContent" data="{{item, type: list.type}}" />
+          <block wx:if="{{ item.menus && item.menus.length }}" >
+            <view class="slip-menus" style="display: flex; position: absolute; top: 0; right: -{{item.menuOptions.totalMenusWidth}}rpx;">
+              <block wx:for="{{ item.menus }}" wx:for-item="it" wx:key="index">
+                <template is="itemContent" data="{{item: {...it, show: true, treeid: util.treeid(item)}, type: {...list.type, isItem: true} }}" />
+              </block>
+            </view>
+          </block>
+        </movable-view>
+      </movable-area>
+
+
+      <!-- <movable-area 
+        scale-area="{{list.type.slip['scale-area']||''}}"
+        class="movable-area {{list.type.slip.areaClass||''}}"
+        style="{{list.type.slip.areaStyle||'width: calc(100vw + '+list.type.slip.totalOffsetDistance+'rpx); height: auto;position: relative;'}}"
+      >
+        <movable-view 
+          wx:for="{{list.data}}" 
+          wx:key="__key"
+          x="{{item.x||''}}"
+          y="{{item.y||''}}"
+          direction="{{ (item.menuOptions.direction||'horizontal') }}" 
+          animation="{{true}}"
+          out-of-bounds="{{ inner.realMenus(item, list.type.slip).length ? true : '' }}" 
+          class="movable-view {{list.type.slip.areaItemClass}}"
+          style="{{list.type.slip.areaItemStyle||'width: 100vw; height: 100rpx; position: relative;'}}"
+        >
+          <template is="itemContent" data="{{item, type: list.type}}" />
+          <block wx:if="{{ inner.realMenus(item, list.type.slip).length }}" >
+            <view class="slip-menus" style="display: flex; position: absolute; top: 0; right: -{{item.menuOptions.totalMenusWidth}}rpx;">
+              <block wx:for="{{ item.menus }}" wx:key="index">
+                <template is="itemContent" data="{{item: {...item, show: true}, type: {...list.type, isItem: true} }}" />
+              </block>
+            </view>
+          </block>
+        </movable-view>
+      </movable-area> -->
+
+
+    </block>
+    <block wx:else>
       <block wx:for="{{list.data}}" wx:key="__key">
         <template is="itemContent" data="{{item, type: list.type}}" />
       </block>
     </block>
+  </block>
+</template>
+
+<template name="listWrap">
+  <slot name="list-top" />
+  <block wx:if="{{ list.type && list.type.is === 'exposed'}}">
+    <template is="listData" data="{{list}}" />
+    <!-- <block wx:if="{{util.isArray(list.data)}}">
+      <block wx:for="{{list.data}}" wx:key="__key">
+        <template is="itemContent" data="{{item, type: list.type}}" />
+      </block>
+    </block> -->
   </block>
   <block wx:else>
     <view id="{{list.id||id}}" 
       class="hlist {{list.listClass||list.class}}" 
       style="{{list.listStyle || list.style || ''}}" 
     >
-      <block wx:if="{{util.isArray(list.data)}}">
-        <block wx:if="{{ list.type && list.type.is === 'slip'}}">
+      <template is="listData" data="{{list}}" />
 
-          <block wx:for="{{list.data}}" wx:key="__key">
-            <movable-area class='movable-area'>
-              <movable-view direction="horizontal" animation="{{true}}" class='movable-view'>
-                <template is="itemContent" data="{{item, type: list.type}}" />
-                <!-- <view class="touch-item {{item.isTouchMove ? 'touch-move-active' : ''}}" data-index="{{index}}" bindtouchstart="touchstart" bindtouchmove="touchmove">
-                  <view class="content" bindtap='goDetail'>{{item.content}}</view>
-                  <view class="del" catchtap="del" data-index="{{index}}">删除</view>
-                </view> -->
-              </movable-view>
-            </movable-area>
-          </block>
-
-
-          <movable-area class="moveArea" wx:for="{{list.data}}" wx:key="__key">
-            <movable-view class="moveView" x="{{item.x}}" direction="horizontal" bindtouchend="touchEnd" bindtouchstart="touchStart" animation="{{true}}" data-id="{{item.id}}">
-              <view class="parent"></view>
-              <view class="delete" catchtap="delete" data-id="{{item.work.id}}">
-                <text>删除</text>
-              </view>
-            </movable-view>
-          </movable-area>
-
+      <!-- <block wx:if="{{util.isArray(list.data)}}">
+        <block wx:for="{{list.data}}" wx:key="__key">
+          <template is="itemContent" data="{{item, type: list.type}}" />
         </block>
+      </block> -->
 
-        <block wx:else>
-          <block wx:for="{{list.data}}" wx:key="__key">
-            <template is="itemContent" data="{{item, type: list.type}}" />
-          </block>
-        </block>
-
-      </block>
     </view>
   </block>
   <slot name="list-bottom" />
@@ -190,9 +249,10 @@
           </view>
         </block>
         <block wx:else>
-          <block wx:for="{{list.data}}" wx:key="__key">
+          <template is="listData" data="{{list}}" />
+          <!-- <block wx:for="{{list.data}}" wx:key="__key">
             <template is="itemContent" data="{{item}}" />
-          </block>
+          </block> -->
         </block>
       </block>
       <slot name="bottom"></slot>
@@ -237,9 +297,10 @@
         </view>
       </block>
       <block wx:else>
-        <block wx:for="{{list.data}}" wx:key="__key">
+        <template is="listData" data="{{list}}" />
+        <!-- <block wx:for="{{list.data}}" wx:key="__key">
           <template is="itemContent" data="{{item}}" />
-        </block>
+        </block> -->
       </block>
     </block>
     <slot name="bottom"></slot>
