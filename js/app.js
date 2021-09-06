@@ -35,5 +35,26 @@ App({
   },
   globalData: {
     userInfo: null
+  },
+  globalAd: {
+    // 不改这里，以后放的都是我的广告，那我就谢谢你了^_^
+    discharged: true,
+    banner: [  // banner广告 ad标签
+      'adunit-6ef7f824e0e72db7',
+    ],
+    bannerv: [  // 视频广告, ad标签
+      'adunit-f6015bf057c554bc'
+    ],
+    video: [  // 视频贴片广告, video标签
+      'adunit-e82626df8a43557d'
+    ],
+    custom: [  // 自定义广告，ad-custom标签
+      'adunit-5a7a9faae41036c1'
+    ],
+    insert: [  // 插屏广告，无需标签
+      'adunit-01c539b82586ad3b'
+    ],
+    excitation: [],  // 激励视屏广告，无需标签
+    "excitation-long": []  // 激励视频广告长，无需标签
   }
 })
