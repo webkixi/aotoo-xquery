@@ -180,13 +180,10 @@ export function insertAD(param={}, cb){
   })
 
   createInsertAd(controler=>{
-    setTimeout(() => {
-      controler.show().catch((err) => {
-        console.error(err)
-        ADHOOKS.emit('INSERT-CLOSE')
-      })
-      
-    }, 20000);
+    controler.show().catch((err) => {
+      console.error(err)
+      ADHOOKS.emit('INSERT-CLOSE')
+    })
   })
 }
 

@@ -322,12 +322,13 @@ export function resetItem(data, context, loop, attrkey) {
       }
     }
     if (!data.parent && !loop) data.itemDataRoot = true // 标识该item是最顶层item，class style用作容器描述
+    
+    if (data['__sort'] && data['__sort'].indexOf('menus')>-1)  {
+      const sortIndex = data['__sort'].indexOf('menus')
+      data['__sort'].splice(sortIndex, 1)
+    }
   }
 
   // menus不做渲染排序，单独处理模板
-  if (data['__sort'] && data['__sort'].indexOf('menus')>-1)  {
-    const sortIndex = data['__sort'].indexOf('menus')
-    data['__sort'].splice(sortIndex, 1)
-  }
   return data
 }
