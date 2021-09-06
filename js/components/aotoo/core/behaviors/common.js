@@ -484,6 +484,8 @@ export function listInstDelegate(treeid, listInst, from){
         }
       },
       remove(cb) {
+        const that = this
+        // this.hide(cb)
         listInst.delete(treeid, cb)
       },
       delete(cb) {
@@ -865,7 +867,7 @@ export const commonBehavior = (app, mytype) => {
       parent(param, ctx){
         if (!ctx) ctx = this
         let res
-
+        
         if (ctx.treeid && ctx.parentInst && ctx.parentInst.$$is === 'list') {
           if (param) {
             res = listInstDelegate(ctx.treeid, ctx.parentInst)

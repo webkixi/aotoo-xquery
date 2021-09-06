@@ -1,14 +1,41 @@
 <wxs src="./aotoo/util.wxs" module="util" />
-<!-- <template name="button">
-  <button disabled="{{props.disabled}}" class="{{props.class||''}}" wx:if="{{props.style}}" style="{{props.style||''}}">{{props.value || props.title}}</button>
-  <block wx:else>
-    <button disabled="{{props.disabled}}" class="{{props.class||''}}">{{props.value || props.title}}</button>
-  </block>
-</template> -->
-
 <template name="@ad">
   <block wx:if="{{util.isObject(props)}}">
-    <block wx:if="{{props.video==='front'}}">
+    <!-- ad 和 ad-custom标签在此处渲染，video广告使用@video标签渲染，插屏，激励视频不需要标签 -->
+    <block wx:if="{{props.type === 'ad'}}">
+      <ad 
+        class="{{props.itemClass||props.class||''}}"
+        style="{{props.itemStyle||props.style||''}}"
+        id="{{props.id||''}}"
+        unit-id="{{props['unit-id']||''}}"
+        ad-type="{{props['ad-type']||''}}" 
+        ad-theme="{{props['ad-theme']||''}}" 
+
+        catch:tap="{{(props.aim||props.tap) ? 'itemMethod' : ''}}"
+        bindload="{{props.bindload ? 'itemMethod' : ''}}"
+        binderror="{{props.binderror ? 'itemMethod' : ''}}"
+        bindclose="{{props.bindclose ? 'itemMethod' : ''}}"
+        data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindload', 'binderror', 'bindclose'])}}"
+      />
+    </block>
+    <block wx:if="{{props.type === 'ad-custom'}}">
+      <ad-custom 
+        class="{{props.itemClass||props.class||''}}"
+        style="{{props.itemStyle||props.style||''}}"
+        id="{{props.id||''}}"
+        unit-id="{{props['unit-id']||''}}"
+
+        catch:tap="{{(props.aim||props.tap) ? 'itemMethod' : ''}}"
+        bindload="{{props.bindload ? 'itemMethod' : ''}}"
+        binderror="{{props.binderror ? 'itemMethod' : ''}}"
+        bindclose="{{props.bindclose ? 'itemMethod' : ''}}"
+        data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindload', 'binderror', 'bindclose'])}}"
+      />
+    </block>
+
+    <!-- video 调用@video模板 -->
+
+    <!-- <block wx:if="{{props.video==='front'}}">
       <video unit-id="{{props['unit-id']||''}}"></video>
     </block>
     <ad 
@@ -27,6 +54,6 @@
       binderror="{{props.binderror ? 'itemMethod' : ''}}"
       bindclose="{{props.bindclose ? 'itemMethod' : ''}}"
       data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindload', 'binderror', 'bindclose'])}}"
-    /> 
+    />  -->
   </block>
 </template>

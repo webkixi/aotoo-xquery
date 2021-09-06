@@ -924,6 +924,7 @@ export const listBehavior = function(app, mytype) {
       delete(){
         this._delete.apply(this, arguments)
       },
+
       _delete: function (params, cb) {
         let $list = this.data.$list
         let $data = $list.data
@@ -1057,6 +1058,13 @@ function listReactFun(app, e, type="list") {
     this.hooks.emit('bindscrolltoupper', e)
     this.hooks.emit('bindscrolltolower', e)
   }
+
+  // if (type == 'movable') {
+  //   this.hooks.emit('bindchange', e)
+  //   this.hooks.emit('bindscale', e)
+  //   this.hooks.emit('htouchmove', e)
+  //   this.hooks.emit('vtouchmove', e)
+  // }
 
   const activePage = this.activePage
   let parentInstance = this.parentInst || this.componentInst

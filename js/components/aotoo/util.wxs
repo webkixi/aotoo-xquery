@@ -753,6 +753,7 @@ function slipMove(e, ins) {
     }
   }
 
+
   listSlip.current = {
     id: id,
     inst: inst,

@@ -123,3 +123,7 @@ export {
   reSetArray,
   reSetList
 } from "./forlist";
+
+export {
+  ad
+} from './ad'

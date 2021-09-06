@@ -198,11 +198,17 @@
 <template name="@url">
   <!-- <block wx:if="{{props && props.url && (props.title||props.value)}}"> -->
   <block wx:if="{{props && (props.title||props.value||props.__isAd)}}">
-    <block wx:if="{{props.value}}">
+    <!-- <block wx:if="{{props.value}}"> -->
+    <block wx:if="{{props.__isButton}}">
       <template is="@button" data="{{props: props}}"/>
     </block>
     <block wx:elif="{{props.__isAd}}">
-      <template is="@ad" data="{{props: props}}"/>
+      <block wx:if="{{props.type === 'video'}}" >
+        <template is="@video" data="{{props: props}}"/>  
+      </block>
+      <block wx:else>
+        <template is="@ad" data="{{props: props}}"/>
+      </block>
     </block>
     <navigator 
       wx:else
@@ -452,64 +458,66 @@
 <template name="@video">
   <block wx:if="{{util.isObject(props)}}">
     <video 
-      id="{{props.id||props['$$id']||''}}" 
-      class="video-class {{props.itemClass}}"
-      style="{{props.itemStyle||''}}"
+        id="{{props.id||props['$$id']||''}}" 
+        class="video-class {{props.itemClass}}"
+        style="{{props.itemStyle||''}}"
+        unit-id="{{props['unit-id']||''}}"
+        ad-unit-id="{{props['ad-unit-id']||''}}"
 
-      src="{{props.src||''}}"
-      title="{{props.title||''}}"
-      duration="{{props.duration||''}}"
-      controls="{{props.controls||'true'}}"
-      danmu-list="{{props['danmu-list']||''}}"
-      danmu-btn="{{props['danmu-btn']|| false }}"
-      enable-danmu="{{props['enable-danmu']|| false }}"
-      autoplay="{{props['autoplay']|| false }}"
-      loop="{{props['loop']|| false }}"
-      muted="{{props['muted']|| false }}"
-      initial-time="{{props['initial-time']||0}}"
-      page-gesture="{{props['page-gesture']|| false }}"
-      direction="{{props['direction']||''}}"
-      show-progress="{{props['show-progress']||true}}"
-      show-fullscreen-btn="{{props['show-fullscreen-btn']||true}}"
-      show-play-btn="{{props['show-play-btn']||true}}"
-      show-center-play-btn="{{props['show-center-play-btn']||true}}"
-      enable-progress-gesture="{{props['enable-progress-gesture']||true}}"
-      object-fit="{{props['object-fit']||'contain'}}"
+        src="{{props.src||''}}"
+        title="{{props['title']||''}}"
+        duration="{{props['duration']||''}}"
+        danmu-list="{{props['danmu-list']||''}}"
+        danmu-btn="{{props['danmu-btn']||''}}"
+        enable-danmu="{{props['enable-danmu']||''}}"
+        loop="{{props['loop']||''}}"
+        muted="{{props['muted']||''}}"
+        initial-time="{{props['initial-time']||''}}"
+        page-gesture="{{props['page-gesture']||''}}"
+        direction="{{props['direction']||''}}"
+        show-progress="{{props['show-progress']||''}}"
+        show-fullscreen-btn="{{props['show-fullscreen-btn']||''}}"
+        show-play-btn="{{props['show-play-btn']||''}}"
+        show-center-play-btn="{{props['show-center-play-btn']||''}}"
+        enable-progress-gesture="{{props['enable-progress-gesture']||''}}"
+        object-fit="{{props['object-fit']||''}}"
+        poster="{{props['poster']||''}}"
+        show-mute-btn="{{props['show-mute-btn']||''}}"
+        play-btn-position="{{props['play-btn-position']||''}}"
+        enable-play-gesture="{{props['enable-play-gesture']||''}}"
+        auto-pause-if-navigate="{{props['auto-pause-if-navigate']||''}}"
+        auto-pause-if-open-native="{{props['auto-pause-if-open-native']||''}}"
+        vslide-gesture="{{props['vslide-gesture']||''}}"
+        vslide-gesture-in-fullscreen="{{props['vslide-gesture-in-fullscreen']||''}}"
+        poster-for-crawler="{{props['poster-for-crawler']||''}}"
+        show-casting-button="{{props['show-casting-button']||''}}"
+        picture-in-picture-mode="{{props['picture-in-picture-mode']||''}}"
+        picture-in-picture-show-progress="{{props['picture-in-picture-show-progress']||''}}"
+        enable-auto-rotation="{{props['enable-auto-rotation']||''}}"
+        show-screen-lock-button="{{props['show-screen-lock-button']||''}}"
+        show-snapshot-button="{{props['show-snapshot-button']||''}}"
+        show-background-playback-button="{{props['show-background-playback-button']||''}}"
+        background-poster="{{props['background-poster']||''}}"
+        is-drm="{{props['is-drm']||''}}"
+        provision-url="{{props['provision-url']||''}}"
+        certificate-url="{{props['certificate-url']||''}}"
+        license-url="{{props['license-url']||''}}"
 
-      poster="{{props['poster']||''}}"
-      show-mute-btn="{{props['show-mute-btn']||false}}"
-      play-btn-position="{{props['play-btn-position']||'bottom'}}"
-      enable-play-gesture="{{props['enable-play-gesture']||false}}"
-      auto-pause-if-navigate="{{props['auto-pause-if-navigate']||true}}"
-      auto-pause-if-open-native="{{props['auto-pause-if-open-native']||true}}"
-      vslide-gesture="{{props['vslide-gesture']||false}}"
-      vslide-gesture-in-fullscreen="{{props['vslide-gesture-in-fullscreen']||true}}"
-      ad-unit-id="{{props['ad-unit-id']||''}}"
-
-      poster-for-crawler="{{props['poster-for-crawler']||''}}"
-      show-casting-button="{{props['show-casting-button']||false}}"
-      picture-in-picture-mode="{{props['picture-in-picture-mode']||''}}"
-      picture-in-picture-show-progress="{{props['picture-in-picture-show-progress']|| false }}"
-      enable-auto-rotation="{{props['enable-auto-rotation']|| false }}"
-      show-screen-lock-button="{{props['show-screen-lock-button']|| false }}"
-      show-snapshot-button="{{props['show-snapshot-button']|| false }}"
-
-      bindplay="{{props['bindplay'] ? 'itemMethod' : ''}}"
-      bindpause="{{props['bindpause'] ? 'itemMethod' : ''}}"
-      bindended="{{props['bindended'] ? 'itemMethod' : ''}}"
-      bindtimeupdate="{{props['bindtimeupdate'] ? 'itemMethod' : ''}}"
-      bindfullscreenchange="{{props['bindfullscreenchange'] ? 'itemMethod' : ''}}"
-      bindwaiting="{{props['bindwaiting'] ? 'itemMethod' : ''}}"
-      binderror="{{props['binderror'] ? 'itemMethod' : ''}}"
-      bindprogress="{{props['bindprogress'] ? 'itemMethod' : ''}}"
-      bindloadedmetadata="{{props['bindloadedmetadata'] ? 'itemMethod' : ''}}"
-      bindcontrolstoggle="{{props['bindcontrolstoggle'] ? 'itemMethod' : ''}}"
-
-      bindenterpictureinpicture="{{props['bindenterpictureinpicture'] ? 'itemMethod' : ''}}"
-      bindleavepictureinpicture="{{props['bindleavepictureinpicture'] ? 'itemMethod' : ''}}"
-      bindseekcomplete="{{props['bindseekcomplete'] ? 'itemMethod' : ''}}"
-      
-      data-evt="{{util.dataEvt(props, ['bindplay', 'bindpause', 'bindended', 'bindtimeupdate', 'bindfullscreenchange', 'bindwaiting', 'binderror', 'bindprogress', 'bindloadedmetadata', 'bindcontrolstoggle', 'bindenterpictureinpicture', 'bindleavepictureinpicture', 'bindseekcomplete', 'tap', 'aim'])}}"
-    />
+        bindplay="{{props['bindplay']||''}}"
+        bindpause="{{props['bindpause']||''}}"
+        bindended="{{props['bindended']||''}}"
+        bindtimeupdate="{{props['bindtimeupdate']||''}}"
+        bindfullscreenchange="{{props['bindfullscreenchange']||''}}"
+        bindwaiting="{{props['bindwaiting']||''}}"
+        binderror="{{props['binderror']||''}}"
+        bindprogress="{{props['bindprogress']||''}}"
+        bindloadedmetadata="{{props['bindloadedmetadata']||''}}"
+        bindcontrolstoggle="{{props['bindcontrolstoggle']||''}}"
+        bindenterpictureinpicture="{{props['bindenterpictureinpicture']||''}}"
+        bindleavepictureinpicture="{{props['bindleavepictureinpicture']||''}}"
+        bindseekcomplete="{{props['bindseekcomplete']||''}}"
+        controls="{{props['controls']||''}}"
+        data-evt="{{util.dataEvt(props, ['bindplay', 'bindpause', 'bindended', 'bindtimeupdate', 'bindfullscreenchange', 'bindwaiting',  'binderror',  'bindprogress',  'bindloadedmetadata',  'bindcontrolstoggle', 'bindenterpictureinpicture', 'bindleavepictureinpicture', 'bindseekcomplete'])}}"
+      />
   </block>
 </template>

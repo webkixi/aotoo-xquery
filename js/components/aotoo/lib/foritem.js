@@ -9,6 +9,8 @@ import {
   resetSuidCount,
 } from './util'
 
+import { ad } from "./ad";
+
 const eventName = ['tap', 'catchtap', 'aim', '_tap', '_aim', 
 'longpress', '_longpress', 'catchlongpress', 'longtap', '_longtap', 'catchlongtap',
 'touchstart', 'touchmove','touchend', 'touchcancel',
@@ -79,68 +81,43 @@ function formatUrl(props) {
     const ary = url.split('#')
     const hash = ary[1] || ''
     url = ary[0]
-    const funName = (()=>{
-      if (isbutton) {
-        return url.replace('button://', '')
-      }
-      if (__isAd) {
-        return url.replace('ad://', '')
-      }
-      if (__isMp) {
-        return url.replace('mp://', '')
-      }
-    })()
     const urlobj = formatQuery(url)
     const hashobj = formatQuery(('?'+hash))
-    // const query = Object.assign({}, urlobj.query, hashobj.query, {__isAd})
-    let   compConfig = Object.assign({}, hashobj.query, {__isAd})
-    if (isbutton || __isAd) {
-      props.url = {tap: funName, ...compConfig}
-      if (isbutton) {
-        props.url.value = props.title
-      }
+    const funName = url.replace(/(button\:\/\/|ad\:\/\/|mp\:\/\/)/ig, '')  // width query
+    const compnentConfig = Object.assign({}, hashobj.query)  // navigater组件|ad组件 的配置参数
+    if (__isAd) {
+      // const adTypes = ['banner', 'bannerv', 'video', 'custom', 'insert', 'excitation', 'excitation-long']
+      const adTypes = ['banner', 'bannerv', 'video', 'custom']
+      const adExecTypes = ['insert', 'excitation', 'excitation-long']
+      if (adTypes.indexOf(funName)>-1) {
+        props.url = Object.assign({}, ad(funName), hashobj.query, {__isAd})
+      } 
+    } else if (isbutton) {
+      props.url = {tap: funName, value: props.title, __isButton: true, ...compnentConfig}
+    } else if (__isMp) {
+      props.url = {target: 'miniProgram', title: props.title, 'app-id': funName, __isMp: true, ...compnentConfig}
     } else {
-      props.url = {title: props.title, url, ...compConfig}
-      if (__isMp) {
-        url = funName
-        compConfig = Object.assign({}, urlobj.query, compConfig)
-        props.url = {target: 'miniProgram', title: props.title, 'app-id': url, ...compConfig}
-      }
+      props.url = {title: props.title, url: funName, ...compnentConfig}
     }
     delete props.title
 
-    
-    // if (ary.length === 1) {
+    // // const query = Object.assign({}, urlobj.query, hashobj.query, {__isAd})
+    // let   compConfig = Object.assign({}, hashobj.query, {__isAd})
+    // if (isbutton || __isAd) {
+    //   props.url = {tap: funName, ...compConfig}
     //   if (isbutton) {
-    //     props.url = {value: props.title, tap: funName}
-    //   } else {
-    //     props.url = {title: props.title, url: url}
+    //     props.url.value = props.title
     //   }
     // } else {
-    //   let obj = formatQuery('?'+ary[1])  // 获取navigate的配置
-    //   if (isbutton) {
-    //     props.url = {value: props.title, tap: funName, ...obj.query}
-    //   } else if(__isAd){
-    //     props.url = {__isAd: true, tap: funName, ...obj.query}
-    //   } else {
-    //     url = ary[0]
-    //     props.url = {title: props.title, url, ...obj.query}
+    //   props.url = {title: props.title, url, ...compConfig}
+    //   if (__isMp) {
+    //     url = funName
+    //     compConfig = Object.assign({}, urlobj.query, compConfig)
+    //     props.url = {target: 'miniProgram', title: props.title, 'app-id': url, ...compConfig}
     //   }
-      
-    //   // let tmp = {}
-    //   // let param = ary[1]
-    //   // tmp.url = ary[0]
-    //   // let paramAry = param.split('&')
-    //   // for (let ii = 0; ii < paramAry.length; ii++) {
-    //   //   let val = paramAry[ii]
-    //   //   let kv = val.split('=')
-    //   //   if (!kv[1]) kv[1] = true
-    //   //   if (kv[1]==='false' || kv[1]==='true') kv[1] = JSON.parse(kv[1])
-    //   //   tmp[kv[0]] = kv[1]
-    //   // }
-    //   // props.url = {...tmp}
     // }
     // delete props.title
+    
   }
   return props
 }
