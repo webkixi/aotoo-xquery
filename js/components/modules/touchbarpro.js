@@ -73,11 +73,11 @@ module.exports = function createTouchbar(params={}){
       }
     },
     itemMethod: {
-      touchstart(e, param, inst){
+      catchtouchstart(e, param, inst){
         const changedTouches = e.changedTouches[0]
         this.activeItem(e, changedTouches)
       },
-      touchmove(e, param, inst){
+      catchtouchmove(e, param, inst){
         const changedTouches = e.changedTouches[0]
         this.activeItem(e, changedTouches)
       },
