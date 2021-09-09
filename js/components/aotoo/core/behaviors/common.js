@@ -1,5 +1,6 @@
 const lib = require('../../lib/index')
 const getmyApp = require('../getapp')
+const {vibrateShort, vibrateLong} = lib
 
 let storeEvts = {}
 export function resetStoreEvts(params) {
@@ -1308,6 +1309,7 @@ export function reactFun(app, e, prefix) {
     return false
   }
   const that = this
+  let   enableTik = true
   const activePage = this.activePage
   const oType = e.__type || e.type
 
@@ -1377,8 +1379,16 @@ export function reactFun(app, e, prefix) {
       else {
         if (isEvt) evtFun.call(activePage, e, param, context)
         else {
+          enableTik = false
           console.warn(`找不到定义的${fun}方法`)
         }
+      }
+    }
+
+    if (enableTik && is === 'item') {
+      const $data = this.getData()
+      if ($data.tik === true) {
+        vibrateShort()
       }
     }
   }

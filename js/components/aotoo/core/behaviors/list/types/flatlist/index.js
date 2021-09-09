@@ -149,6 +149,7 @@ export function initFlatList(params) {
 
   const oldReady = this.customLifeCycle.ready
   this.customLifeCycle.ready = function(){
+    clearShowStat()
     // 避免挂载多个回调方法，queryAll 需要在ready时定义
     this.query.select('#'+flatListId).boundingClientRect().exec(ret=>{
       const flatlistContainerRect = ret[0]
@@ -156,9 +157,9 @@ export function initFlatList(params) {
         const queryAll = this.query.selectAll('.flatlist-item').boundingClientRect((ret) => {
           let rect = this._tempRect
           if (ret && ret.length) {
-            if (this.flatItems.length && (ret.length !== this.flatItems.length)) {
-              clearShowStat()
-            }
+            // if (this.flatItems.length && (ret.length !== this.flatItems.length)) {
+            //   clearShowStat()
+            // }
             this.flatItems = ret
             if (rect && (rect.current || rect.current === 0)) {
               rect = ret[rect.current]
