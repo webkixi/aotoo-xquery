@@ -29,6 +29,16 @@ import {
 
 import { fillMonth } from './common/fillmonth'
 
+export {
+  getFestival,
+  getLunarFestival,
+  setFestival,
+  setLunarFestival,
+  getMonthData,
+  getYmd,
+  rightDate
+}
+
 const defaultWeekStr = '一二三四五六日';
 function weeksTils(weekStr) {
   const weekdefine = weekStr || defaultWeekStr
@@ -354,9 +364,7 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
         that.reset(function(){
           if (current === that.swiperCurrent) {
             const currentItemId = screens[current].id
-            const screenId = currentItemId.replace('box-', '')
-            const monthStr = $$(screenId).getData()['@list'].id
-            that.changeCalendarHeader(currentItemId, {title: monthStr})
+            that.changeCalendarHeader(currentItemId)
           }
         })
       })
@@ -368,24 +376,25 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
       changeCalendarHeader(screenId, params={}){
         const title = params.title
         clearTimeout(timmer_change_month)
-        if (title) {
-          screenId = screenId.replace('box-', '')
-          const $$ = this.activePage.getElementsById.bind(this.activePage)
-          const monthStr = $$(screenId).getData()['@list'].id
-          const header = $$('calendar-weektils-header')
-          this.currentTimepoint = getYmd(monthStr+'-1')
-          timmer_change_month = setTimeout(() => {
+        screenId = screenId.replace('box-', '')
+        const $$ = this.activePage.getElementsById.bind(this.activePage)
+        const monthStr = $$(screenId).getData()['@list'].id
+        const header = $$('calendar-weektils-header')
+        this.currentTimepoint = getYmd(monthStr+'-1')
+        timmer_change_month = setTimeout(() => {
+          if (lib.isFunction(options.bindchange)) {
+            const result = options.bindchange.call(header, {title: monthStr}) || {title: monthStr}
+            header.update(result)
+          } else {
             header.update({title: monthStr})
-          }, 50);
-        }
+          }
+          
+        }, 50);
       },
       swiperChange(e){
         const detail = e.detail
         const currentItemId = detail.currentItemId
-        const screenId = currentItemId.replace('box-', '')
-        const $$ = this.activePage.getElementsById.bind(this.activePage)
-        const monthStr = $$(screenId).getData()['@list'].id
-        this.changeCalendarHeader(currentItemId, {title: monthStr})
+        this.changeCalendarHeader(currentItemId)
       },
       onDateSelect(e, param, inst){
         if (inst.hasClass('invalid')) return
