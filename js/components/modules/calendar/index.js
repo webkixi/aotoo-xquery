@@ -388,7 +388,6 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
           } else {
             header.update({title: monthStr})
           }
-          
         }, 50);
       },
       swiperChange(e){
