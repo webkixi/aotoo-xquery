@@ -10,12 +10,16 @@ Pager({
       listClass: 'card-it',
       content: `
 ## 关于本项目    
-本项目是一个精简小程序项目，专为演示demo使用，我们会不定期更新，欢迎关注并在github上点赞我们  
+本项目使用 queryui 开发，queryui 是我们基于小程序原生开发的核心库,UI库，可高效的开发各种组件，本项目作为示例使用，会不定期更新  
 
-> github中搜索 aotoo-xquery  
+## 免费/有偿组件  
+首页灰色按钮为开源示例项目，源码在\`github/gitee\`的\`aotoo-xquery\`项目中，蓝色按钮源码需要支持我们获得\`(以星巴克大杯卡布奇洛价格为单位)\`。联系VX: kkndyyralf
+
+## 详细文档  
+访问 \`http://www.agzgz.com/minip\` 查看详细文档及使用说明
 
 ## 如何引入queryUI  
-\`queryUI\`基于微信小程序的原生库，不影响小程序原生开发使用，引入核心库文件后就能方便的引入queryUI的组件  
+\`queryui\`基于微信小程序的原生库，不影响小程序原生开发使用，引入核心库文件后就能方便的引入queryUI的组件  
 
 ### 方式一
 在 aotoo-hub 环境中使用远程方式安装、搭建 queryui 的使用环境(webpack环境)，查看 agzgz.com 了解详细
@@ -38,61 +42,6 @@ Pager({
       "ui-markit": "/components/markit/index"
     }
 
-### 内置组件  
-核心文件包含的默认组件，内置组件具有很强的扩展性  
-
-1. markdown
-2. html
-4. item
-5. list
-6. tree
-7. img
-
-
-### 内嵌组件  
-有些结构非常复杂，需要多个组件组合完成。内嵌组件支持在组件中嵌入使用(通过配置)。默认的内置组件均可作为内嵌组件。我们也可以自定义内嵌组件
-
-1. @item
-2. @list
-3. @tree
-4. @url
-5. @md
-6. @html
-
-看下面的例子
-
-#### item中嵌入list组件
-
-    Pager({
-      data: {
-        itemConfig: {
-          title: '列表标题',
-          "@list": {
-            listClass: 'list-class-name'
-            data: [...]
-          }
-        }
-      }
-    })
-
-
-#### item中嵌入markdown文档
-
-    Pager({
-      data: {
-        itemConfig: {
-          title: '列表标题',
-          "@md": {
-            content: '...'
-          }
-        }
-      }
-    })
-
-
-### 更多文档请参考  
-
-## http://www.agzgz.com
 `
     },
   }

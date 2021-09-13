@@ -1,0 +1,58 @@
+@import "../common/source.wxss";
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
+}
+
+page {
+  /* background-color: #fafafa; */
+  background-color: #fff;
+  --save-top: 20px;
+}
+
+.container {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  --screen-height: calc(100vh - var(--safe-top));
+}
+
+.swloop-list {
+  width: 100vw;
+  height: var(--screen-height);
+}
+
+.swloop-list-item {
+  width: 100vw;
+  height: var(--screen-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 内容部分 */
+.swloop-list-item .flatlist-unit .htitle {
+  width: 200rpx;
+  height: 200rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 100rpx;
+  font-weight: 700;
+  border: 20rpx solid red;
+  position: relative;
+  z-index: -1;
+}
+
+.swloop-list-item .flatlist-unit .htitle::before {
+  content: "";
+  position: absolute;
+  width: 100rpx;
+  height: 100rpx;
+  top: -80rpx;
+  right: -80rpx;
+  background-color: #fff;
+  z-index: 1;
+}
