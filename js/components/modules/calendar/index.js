@@ -145,28 +145,26 @@ export function getValidMonth(startPoint, total=30, options={}, $value) {
   return validMonth
 }
 
-const defaultConfig = {
-  $$id: 'calendar',
-  date: null,  // Object|Function
-  data: [],    // [{date: 'xxxx-xx-x', content: {title: '???'}}]
-  lunar: false,
-  festival: false,
-  type: 'single',  // single, range, multiple
-  rangeCount: 30,
-  rangeTip: [],  // rangeTip: ['开始', {title: '结束'}]  用于range事件点击 开始提示，结束提示
-  mode: 1,
-  tap: null,
-  value: [],   // value: ['2021-9-23', '2021-9-25'],
-  header: {'@list': weeksTils(), itemClass: 'week-box'},
-  monthHeader: null
-  // start, 
-
-
-  // 兼容之前的写法
-  // toolbox: {monthHeader}   
-}
-
 function mkCalendarConfigs(timestart, total=30, opts={}){
+  const defaultConfig = {
+    $$id: lib.uuid('calendar_', 12),
+    date: null,  // Object|Function
+    data: [],    // [{date: 'xxxx-xx-x', content: {title: '???'}}]
+    lunar: false,
+    festival: false,
+    type: 'single',  // single, range, multiple
+    rangeCount: 30,
+    rangeTip: [],  // rangeTip: ['开始', {title: '结束'}]  用于range事件点击 开始提示，结束提示
+    mode: 1,
+    tap: null,
+    value: [],   // value: ['2021-9-23', '2021-9-25'],
+    header: {'@list': weeksTils(), itemClass: 'week-box'},
+    monthHeader: null
+    // start, 
+    // 兼容之前的写法
+    // toolbox: {monthHeader}   
+  }
+
   if (total === 99999) total = 0
   const day = 24*60*60*1000
   let   startPoint = getYmd(timestart)
@@ -242,7 +240,7 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
       autoHide: false,
       bindchange: 'swiperChange',
       current: 0,
-      type: 'single',
+      // type: 'single',
       duration: 300,
       appendItems(util){
         const instack = util.instack
@@ -388,6 +386,7 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
           } else {
             header.update({title: monthStr})
           }
+          
         }, 50);
       },
       swiperChange(e){

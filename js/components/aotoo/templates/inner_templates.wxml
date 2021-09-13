@@ -231,8 +231,9 @@
       style="{{props.itemStyle||props.style||''}}"
     >
       <block wx:if="{{util.isString(props.title)}}"><text>{{props.title}}</text></block>
+      <ui-item wx:elif="{{util.isArray(props.title)}}" item="{{ {title: props.title} }}" class="ui-item {{props.containerClass}}" style="{{props.containerStyle||''}}" />
       <block wx:else>
-        <ui-item item="{{props.title}}" class="ui-item {{props.containerClass}}" style="{{props.containerStyle||''}}" />
+        <ui-item item="{{ props.title }}" class="ui-item {{props.containerClass}}" style="{{props.containerStyle||''}}" />
       </block>
     </navigator>
   </block>

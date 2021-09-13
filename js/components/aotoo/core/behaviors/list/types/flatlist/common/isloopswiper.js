@@ -61,7 +61,7 @@ export function isLoopSwiper(customType, params){
     const firstEdge = (middleIndex - screens[1]) - 1 < 0 ? 0 : (middleIndex - screens[1]) - 1
     const lastEdge = firstEdge === 0 ? (middleIndex + screens[1]*2 + 1) : (middleIndex + screens[1]) 
     this.outstack = fullstack.slice(0, firstEdge).map(unit=>unit["@item"])
-    this.instack = fullstack.slice(lastEdge)
+    this.instack = firstEdge === 0 ? fullstack.slice(lastEdge-screens[1]) : fullstack.slice(lastEdge)
     params.screens = fullstack.slice(firstEdge, lastEdge)
     this.screens = params.screens
   }
@@ -74,6 +74,7 @@ export function isLoopSwiper(customType, params){
       circular: true,
       scope: 1,
       current: currentIndex,
+      duration: 300,
       bindchange: '_flatlistBindEvent?eventtype=swiper_loop',
     }, 
     customType,
@@ -143,7 +144,7 @@ function attachData(type, {lib, customType, action}) {
         }
         const tmpdata = []
         data.forEach(item=>{
-          if (typeof item === 'string') item = {title: item}
+          if (typeof item === 'string' || typeof item === 'number') item = {title: item}
           if (lib.isObject(item)) tmpdata.push({ "@item": item })
         })
         that.instack = that.instack.concat(tmpdata)
@@ -159,7 +160,7 @@ function attachData(type, {lib, customType, action}) {
         }
         const tmpdata = []
         data.forEach((item, ii)=>{
-          if (typeof item === 'string') item = {title: item}
+          if (typeof item === 'string' || typeof item === 'number') item = {title: item}
           if (lib.isObject(item)) {
             tmpdata.push(item)
           }
@@ -176,6 +177,32 @@ function attachData(type, {lib, customType, action}) {
     } else if (typeof appendItems === 'string') {
       if (typeof this[appendItems] === 'function') {
         this[appendItems](util)
+      }
+    }
+    if (this.instack.length < 2) {
+      /** 由外部不能补充新鲜数据，加入outstack的随机内容 */
+      if (this.outstack.length) {
+        const len = this.outstack.length
+        if (len > 1) {
+          let indexs = []
+          function randomIndex(){
+            if (indexs.length === 2) return
+            const index = Math.floor(Math.random()*(len+1));
+            if (indexs.includes(index)) {
+              randomIndex()
+            } else {
+              indexs.push(index)
+              if (indexs.length < 2) {
+                randomIndex()
+              }
+            }
+          }
+          randomIndex()
+          indexs.forEach(index=>{
+            const targetData = this.outstack[index]
+            this.instack.unshift({"@item": targetData})
+          })
+        }
       }
     }
   }
@@ -278,7 +305,8 @@ export function presetEvent_loop({
 
   if (targetScreenIndex > -1) {
     targetScreen = params.screens[targetScreenIndex]
-    const targetId = targetScreen['@item'].id
+    // const targetId = targetScreen['@item'].id
+    const targetId = targetScreen['attr'].id
     targetScreenInst = $$(targetId)
     targetScreenData = targetScreenInst.getData()
   }
@@ -302,11 +330,15 @@ export function presetEvent_loop({
       delete targetData['$$id']
       delete targetData['id']
       delete targetData['__key']
-      delete targetData['itemClass']
+      // delete targetData['itemClass']
       delete targetData['show']
       delete targetData['__fromParent']
       delete targetData['__relationId']
       delete targetData['treeid']
+
+      const itemClass = targetData['itemClass'] || ''
+      const hasUnitClass = itemClass.indexOf('flatlist-unit') > -1 ? true : false
+      targetData['itemClass'] = hasUnitClass ? itemClass : 'flatlist-unit ' + itemClass
       targetScreenInst.reset(targetData)
     }
   }

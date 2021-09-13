@@ -148,7 +148,7 @@ export function initFlatList(params) {
   }
 
   const oldReady = this.customLifeCycle.ready
-  this.customLifeCycle.ready = function(){
+  const _ready = function(){
     clearShowStat()
     // 避免挂载多个回调方法，queryAll 需要在ready时定义
     this.query.select('#'+flatListId).boundingClientRect().exec(ret=>{
@@ -175,6 +175,11 @@ export function initFlatList(params) {
       }
     })
     if (lib.isFunction(oldReady)) oldReady.call(this)
+  }
+  this.customLifeCycle.ready = function () {
+    setTimeout(() => {
+      _ready.call(this)
+    }, 100);
   }
 
   const oldDetached = this.customLifeCycle.detached
