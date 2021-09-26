@@ -12,6 +12,7 @@ Pager({
       itemClass: 'slip-item-class',
       type: {
         is: 'flatlist',   // 高性能列表； list/scroll/swiper/flatlist/flatswiper/sweper-loop
+        autoHide: false,
         slip: {
           width: '100vw',
           height: '180rpx',

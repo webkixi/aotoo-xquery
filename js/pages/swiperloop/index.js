@@ -17,10 +17,8 @@ Pager({
         is: 'swiper-loop',
         vertical: true,
         autoHide: false,
-        bindchange: 'swiperChange',
         current: 0,
         duration: 300,
-        current: 0,
         appendItems(context){
           const oriData = [8,9,10]
           const targetData = []

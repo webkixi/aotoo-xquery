@@ -40,7 +40,7 @@
     "useApiHostProcess": true
   },
   "compileType": "miniprogram",
-  "libVersion": "2.19.3",
+  "libVersion": "2.19.5",
   "appid": "???",
   "projectname": "miaoUI",
   "debugOptions": {
