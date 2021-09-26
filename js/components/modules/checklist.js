@@ -671,6 +671,11 @@ function mkCheckList(params, init) {
     footer: footer,
     show: opts.show,
     mode: opts.mode,
+    created(){
+      if (opts.id && this.activePage) {
+        this.activePage[opts.id] = this
+      }
+    },
     itemMethod: {
       aim(e, param, inst) {
         if (opts.isSwitch && opts.checkedType === 2) return // 启用switch，则使tap无效

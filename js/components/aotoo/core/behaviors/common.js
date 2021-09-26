@@ -744,11 +744,11 @@ export const commonBehavior = (app, mytype) => {
             didUpdate: ds.didUpdate
           };
 
-          delete ds.created; 
-          delete ds.attached;
-          delete ds.ready;
-          delete ds.moved;
-          delete ds.detached;
+          // delete ds.created; 
+          // delete ds.attached;
+          // delete ds.ready;
+          // delete ds.moved;
+          // delete ds.detached;
 
           if (typeof this.customLifeCycle.created === 'function') {
             this.customLifeCycle.created.call(this)
@@ -769,8 +769,8 @@ export const commonBehavior = (app, mytype) => {
                 }
               })
             }
-            delete ds.methods
-            delete this.originalDataSource.methods
+            // delete ds.methods
+            // delete this.originalDataSource.methods
           }
         }
 

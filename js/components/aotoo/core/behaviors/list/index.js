@@ -490,12 +490,12 @@ export const listBehavior = function(app, mytype) {
                 }
               })
             }
-            delete param.methods
+            // delete param.methods
 
             let itemMethod = null
             if (param.itemMethod) {
               itemMethod = param.itemMethod
-              delete param.itemMethod
+              // delete param.itemMethod
             }
 
             let $list = this.data.$list

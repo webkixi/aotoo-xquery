@@ -22,6 +22,10 @@ export function isFlatSwiper(customType, params){
       const customBindChangeFun = params.type.bindchange
       params.type.bindchange = '_flatlistBindEvent?eventtype=swiper&customswiperChange='+customBindChangeFun
     }
+    if (typeof params.type.bindchange === 'function') {
+      params.type.custombindEvent = params.type.bindchange
+      params.type.bindchange = '_flatlistBindEvent?eventtype=swiper'
+    }
   }
 
   return {showInVp, params}

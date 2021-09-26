@@ -24,23 +24,30 @@ export function showInScrollViewPort(
     const itemTop = item.top
     const showState = itemInst.getData().show
     if (itemTop >= (containerRect.top - containerRect.height * scope) && itemTop <= (containerRect.bottom + containerRect.height * scope)) {
-      if (!showState && !Yshowing[uniqId]) {
-        YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
+      if (!showState || !Yshowing[uniqId]) {
+        // YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
         Yshowing[uniqId] = true
         YshowTimmer[uniqId] = setTimeout(() => {
           itemInst.show()
         }, 100);
       }
     } else {
-      if (showState) {
-        YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
-        Yshowing[uniqId] = false
-        if (autoHide) {
-          YshowTimmer[uniqId] = setTimeout(() => {
-            itemInst.hide()
-          }, 100);
-        }
+      YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
+      Yshowing[uniqId] = false
+      if (autoHide) {
+        YshowTimmer[uniqId] = setTimeout(() => {
+          itemInst.hide()
+        }, 100);
       }
+      // if (showState) {
+      //   YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
+      //   Yshowing[uniqId] = false
+      //   if (autoHide) {
+      //     YshowTimmer[uniqId] = setTimeout(() => {
+      //       itemInst.hide()
+      //     }, 100);
+      //   }
+      // }
     }
   })
 }
@@ -67,19 +74,20 @@ export function showInScrollViewPortX(
     const itemLeft = item.left
     const showState = itemInst.getData().show
     if (itemLeft >= (containerRect.left - containerRect.width * scope) && itemLeft <= (containerRect.right + containerRect.width * scope)) {
-      if (!showState && !Xshowing[uniqId]) {
+      if (!showState || !Xshowing[uniqId]) {
+        XshowTimmer[uniqId] && clearTimeout(XshowTimmer[uniqId])
         Xshowing[uniqId] = true
         XshowTimmer[uniqId] = setTimeout(() => {
           itemInst.show()
         }, 100);
       }
     } else {
-      if (showState) {
-        XshowTimmer[uniqId] && clearTimeout(XshowTimmer[uniqId])
-        Xshowing[uniqId] = false
-        if (autoHide) {
+      XshowTimmer[uniqId] && clearTimeout(XshowTimmer[uniqId])
+      Xshowing[uniqId] = false
+      if (autoHide) {
+        XshowTimmer[uniqId] = setTimeout(() => {
           itemInst.hide()
-        }
+        }, 100);
       }
     }
   })

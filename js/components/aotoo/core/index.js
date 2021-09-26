@@ -274,6 +274,7 @@ core.getElementsById = function (id) {
 }
 
 function core(params, _page) {
+  let doreadyTimmer = null
   if (lib.isObject(params)) {
     let app = getmyApp(params.appConfig, true)
     app.hooks = lib.hooks('aotoo')
@@ -318,13 +319,16 @@ function core(params, _page) {
         }
       }
       this.doReady = (pageReady) => {
-        if (this.__rendered || pageReady) {
-          if (this.__READY && this.__READY.length) {
-            this.hooks.actions['__READY'] = (this.hooks.actions['__READY'] || []).concat(this.__READY)
-            this.__READY = []
+        clearTimeout(doreadyTimmer)
+        doreadyTimmer = setTimeout(() => {
+          if (this.__rendered || pageReady) {
+            if (this.__READY && this.__READY.length) {
+              this.hooks.actions['__READY'] = (this.hooks.actions['__READY'] || []).concat(this.__READY)
+              this.__READY = []
+            }
+            this.hooks.fire('__READY')
           }
-          this.hooks.fire('__READY')
-        }
+        }, 50);
       }
 
 

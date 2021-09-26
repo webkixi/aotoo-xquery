@@ -93,6 +93,10 @@ export function initFlatList(params) {
       const customBindScrollFun = params.type.bindscroll
       params.type.bindscroll = '_flatlistBindEvent?custombindScroll='+customBindScrollFun
     }
+    if (typeof params.type.bindscroll === 'function') {
+      params.type.custombindEvent = params.type.bindscroll
+      params.type.bindscroll = '_flatlistBindEvent'
+    }
   }
 
   if (customTypeIs === 'flatswiper') {
@@ -113,8 +117,8 @@ export function initFlatList(params) {
   }
 
   // 响应scroll-view的bindscroll事件 和 swiper-view的bindchange事件
-  this._flatlistBindEvent = function(e, param={}){
-    const custombindEvent = param.custombindScroll || param.customswiperChange
+  this._flatlistBindEvent = function(e, param={}, inst){
+    const custombindEvent = params.type.custombindEvent || param.custombindScroll || param.customswiperChange
 
     let rect = {
       top: e.detail.scrollTop,
@@ -135,9 +139,19 @@ export function initFlatList(params) {
     }
 
     if (this.flatlistContainerRect) {
+      let targetInst = inst
+      if (['swiper', 'swiper_loop'].indexOf(param.eventtype) > -1) {
+        targetInst = inst.children[rect.current]
+        this.currentInst = targetInst
+      }
       flatlistReady.call(this, rect)
-      if (lib.isFunction(this[custombindEvent]) ) {
-        this[custombindEvent](e)
+      if (lib.isFunction(custombindEvent)) {
+        custombindEvent.call(this, e, {}, targetInst)
+      }
+      if (lib.isString(custombindEvent)) {
+        if (lib.isFunction(this[custombindEvent]) ) {
+          this[custombindEvent](e, {}, targetInst)
+        }
       }
     }
   }
@@ -177,6 +191,7 @@ export function initFlatList(params) {
     if (lib.isFunction(oldReady)) oldReady.call(this)
   }
   this.customLifeCycle.ready = function () {
+    this.currentInst = this.children[params.type.current]
     setTimeout(() => {
       _ready.call(this)
     }, 100);

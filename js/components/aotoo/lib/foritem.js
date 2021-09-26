@@ -247,20 +247,8 @@ export function resetItem(data, context, loop, attrkey) {
               context[key] = fun
             }
           })
-          delete data.methods
-          delete data.itemMethod
-          // if (loop !== 'itemSubArray') { // 数据(dot, body...)数组的子数据
-          //   const methods = data.methods
-          //   Object.keys(methods).forEach(key=>{
-          //     let fun = methods[key]
-          //     if (isFunction(fun)) {
-          //       fun = fun.bind(context)
-          //       context[key] = fun
-          //     }
-          //   })
-          //   delete data.methods
-          //   delete data.itemMethod
-          // }
+          // delete data.methods
+          // delete data.itemMethod
         }
       }
 
@@ -293,7 +281,7 @@ export function resetItem(data, context, loop, attrkey) {
             let val = data[key]
             if (isFunction(val)) {
               let fun = val.bind(context)
-              let funKey = suid('__on_') + key
+              let funKey = suid('__on') + key
               data[key] = funKey
               context[funKey] = fun
             }

@@ -91,6 +91,10 @@ export function isLoopSwiper(customType, params){
       const customBindChangeFun = params.type.bindchange
       params.type.bindchange = '_flatlistBindEvent?eventtype=swiper_loop&customswiperChange='+customBindChangeFun
     }
+    if (typeof params.type.bindchange === 'function') {
+      params.type.custombindEvent = params.type.bindchange
+      params.type.bindchange = '_flatlistBindEvent?eventtype=swiper_loop'
+    }
   }
   
   this.swiperCurrent = params.type.current
@@ -199,8 +203,11 @@ function attachData(type, {lib, customType, action}) {
           }
           randomIndex()
           indexs.forEach(index=>{
+            if (index === this.outstack.length) index--
             const targetData = this.outstack[index]
-            this.instack.unshift({"@item": targetData})
+            if (targetData) {
+              this.instack.unshift({"@item": targetData})
+            }
           })
         }
       }

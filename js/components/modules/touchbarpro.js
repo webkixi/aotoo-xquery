@@ -10,6 +10,9 @@ module.exports = function createTouchbar(params={}){
   const data = params.data||[]
   const tap = params.tap
   const id = params.id || lib.suid('touchbar-')
+  const listClass = 'touchbar '+ (params.listClass || '')
+  const itemClass = 'touchbar-item '+ (params.itemClass || '')
+  const current = params.current
   const menus = []
   data.forEach((item, ii)=>{
     if (lib.isString(item) || lib.isNumber(item)){} {
@@ -27,40 +30,54 @@ module.exports = function createTouchbar(params={}){
     $$id: id,
     id: id,
     data: menus,
-    listClass: 'touchbar',
-    itemClass: 'touchbar-item', 
+    listClass: listClass,
+    itemClass: itemClass, 
     created(){
       this.activeTimmer = null
       this.query = wx.createSelectorQuery().in(this)
     },
     ready(){
-      this.query.selectAll(`#${id} >>> .touchbar-item`).boundingClientRect().exec(ret=>{
-        this.touchbarItems = ret[0]
-        // console.log(ret);
+      this.positionItems(()=>{
+        if (params.current || params.current === 0) {
+          if (lib.isNumber(params.current)) {
+            this.currentInstance = this.children[params.current]
+            this.selectItem(params.current, {})
+          }
+        }
       })
     },
     methods: {
+      positionItems(cb){
+        const query = wx.createSelectorQuery().in(this)
+        query.selectAll(`#${id} >>> .touchbar-item`).boundingClientRect().exec(ret=>{
+          this.touchbarItems = ret[0]
+          if (typeof cb === 'function') cb.call(this)
+        })
+      },
       selectItem(index, e){
         clearTimeout(this.activeTimmer);
+        const that = this
         const targetId = 'touchbar-'+id+'-'+index
-        const $$ = this.activePage.getElementsById.bind(this.activePage)
-        const targetInst = $$(targetId)
+        // const parent = this.currentInstance.parent()
+        // const targetInst = parent.children[index]
+        const targetInst = this.children[index]
+        
         if (targetInst.hasClass('active')) return
         if (e) {
           e.touchbarIndex = index
         }
+
         targetInst.addClass('active', function(){
           if (e && lib.isFunction(tap)) {
-            tap.call(targetInst, e)
+            tap.call(that, e, {}, targetInst)
           }
           this.activeTimmer = setTimeout(() => {
             targetInst.siblings().removeClass('active')
           }, 50);
         })
+
       },
       activeItem(e, {pageX, pageY}){
-        const that = this
-        const $$ = this.activePage.getElementsById.bind(this.activePage)
         this.touchbarItems.forEach((item, ii)=>{
           if (
             (pageY > item.top && pageY < item.bottom) && 
@@ -74,10 +91,17 @@ module.exports = function createTouchbar(params={}){
     },
     itemMethod: {
       catchtouchstart(e, param, inst){
+        const that = this
         const changedTouches = e.changedTouches[0]
-        this.activeItem(e, changedTouches)
+        this.currentInstance = inst
+        this.touchstartStat = true
+        this.positionItems(function(){
+          that.touchstartStat = false
+          that.activeItem(e, changedTouches)
+        })
       },
       catchtouchmove(e, param, inst){
+        if (this.touchstartStat) return
         const changedTouches = e.changedTouches[0]
         this.activeItem(e, changedTouches)
       },
