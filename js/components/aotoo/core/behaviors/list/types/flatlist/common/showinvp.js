@@ -1,4 +1,5 @@
 let YshowTimmer = {}
+let YhideTimmer = {}
 let Yshowing = {}
 export function showInScrollViewPort(
   containerRect, 
@@ -25,7 +26,8 @@ export function showInScrollViewPort(
     const showState = itemInst.getData().show
     if (itemTop >= (containerRect.top - containerRect.height * scope) && itemTop <= (containerRect.bottom + containerRect.height * scope)) {
       if (!showState || !Yshowing[uniqId]) {
-        YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
+        // YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
+        YhideTimmer[uniqId] && clearTimeout(YhideTimmer[uniqId])
         Yshowing[uniqId] = true
         YshowTimmer[uniqId] = setTimeout(() => {
           itemInst.show()
@@ -35,7 +37,8 @@ export function showInScrollViewPort(
       YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
       Yshowing[uniqId] = false
       if (autoHide) {
-        YshowTimmer[uniqId] = setTimeout(() => {
+        // YshowTimmer[uniqId] = setTimeout(() => {
+        YhideTimmer[uniqId] = setTimeout(() => {
           itemInst.hide()
         }, 100);
       }
@@ -53,6 +56,7 @@ export function showInScrollViewPort(
 }
 
 const XshowTimmer = {}
+const XhideTimmer = {}
 const Xshowing = {}
 export function showInScrollViewPortX(
   containerRect, 
@@ -75,7 +79,7 @@ export function showInScrollViewPortX(
     const showState = itemInst.getData().show
     if (itemLeft >= (containerRect.left - containerRect.width * scope) && itemLeft <= (containerRect.right + containerRect.width * scope)) {
       if (!showState || !Xshowing[uniqId]) {
-        XshowTimmer[uniqId] && clearTimeout(XshowTimmer[uniqId])
+        XhideTimmer[uniqId] && clearTimeout(XhideTimmer[uniqId])
         Xshowing[uniqId] = true
         XshowTimmer[uniqId] = setTimeout(() => {
           itemInst.show()
@@ -85,7 +89,8 @@ export function showInScrollViewPortX(
       XshowTimmer[uniqId] && clearTimeout(XshowTimmer[uniqId])
       Xshowing[uniqId] = false
       if (autoHide) {
-        XshowTimmer[uniqId] = setTimeout(() => {
+        // XshowTimmer[uniqId] = setTimeout(() => {
+        XhideTimmer[uniqId] = setTimeout(() => {
           itemInst.hide()
         }, 100);
       }
