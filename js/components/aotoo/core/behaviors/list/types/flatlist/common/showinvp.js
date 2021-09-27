@@ -25,7 +25,7 @@ export function showInScrollViewPort(
     const showState = itemInst.getData().show
     if (itemTop >= (containerRect.top - containerRect.height * scope) && itemTop <= (containerRect.bottom + containerRect.height * scope)) {
       if (!showState || !Yshowing[uniqId]) {
-        // YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
+        YshowTimmer[uniqId] && clearTimeout(YshowTimmer[uniqId])
         Yshowing[uniqId] = true
         YshowTimmer[uniqId] = setTimeout(() => {
           itemInst.show()
