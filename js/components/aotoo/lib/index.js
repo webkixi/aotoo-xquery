@@ -105,10 +105,20 @@ export {
   listToTree
 } from './tree'
 
-export {
+import {
   vibrateLong,
   vibrateShort
 } from './vibrate'
+
+const tik = vibrateShort
+const tiker = vibrateLong
+
+export {
+  tik,
+  tiker,
+  vibrateShort,
+  vibrateLong
+}
 
 export {
   hooks

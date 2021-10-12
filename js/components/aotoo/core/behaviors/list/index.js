@@ -345,28 +345,38 @@ export const listBehavior = function(app, mytype) {
           param = undefined
         }
 
-        this.setData({'$list.data': []})
-        let oriData = lib.clone(this.originalDataSource)
-        param = param || oriData.data
-
-
-        if (lib.isArray(param)) {
-          oriData.data = param
-        }
-
-        oriData = presetType.call(this, oriData, true)
-        oriData = reSetArray.call(this, oriData.data, this.data.props)
-        this.setData({$list: oriData}, cb)
+        this.children = []
+        this.setData({'$list': {}}, ()=>{
+          let oriData = lib.clone(this.originalDataSource)
+          if (lib.isArray(param)) {
+            oriData.data = param
+          }
+          if (lib.isObject(param)) {
+            if (param.data && lib.isArray(param.data)) {
+              oriData.data = []
+            }
+            oriData = Object.assign({}, oriData, param)
+          }
+          oriData = presetType.call(this, oriData, true)
+          oriData = reSetArray.call(this, oriData.data, oriData)
+          this.setData({$list: oriData}, cb)
+        })
         return this
 
+        // this.setData({'$list.data': []})
+        // let oriData = lib.clone(this.originalDataSource)
+        // param = param || oriData.data
 
         // if (lib.isArray(param)) {
-        //   const list = presetType.call(this, {data: param, ...this.data.props}, true)
-        //   let tmp = reSetArray.call(this, list.data, this.data.props)
-        //   oriData.data = tmp.data
+        //   oriData.data = param
         // }
+
+        // oriData = presetType.call(this, oriData, true)
+        // oriData = reSetArray.call(this, oriData.data, this.data.props)
         // this.setData({$list: oriData}, cb)
         // return this
+
+
       },
       reset(){
         return this._reset.apply(this, arguments)

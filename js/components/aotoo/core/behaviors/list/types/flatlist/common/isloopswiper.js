@@ -25,9 +25,9 @@ function initializeLoopSwiper(params) {
       const content = $item
       
       const targetData = {attr: {...content.attr}, '@list': {...content['@list']}, options}
-      wx.showLoading({
-        title: '更新数据...'
-      })
+      // wx.showLoading({
+      //   title: '更新数据...'
+      // })
       setTimeout(() => {
         contentInst.reset(targetData, function(){
           if (ii === (screens.length - 1)) {
@@ -36,7 +36,7 @@ function initializeLoopSwiper(params) {
                 if (typeof cb === 'function') {
                   cb()
                 }
-                wx.hideLoading()
+                // wx.hideLoading()
                 that.reseting = false
               })
             }, 100);
@@ -140,7 +140,6 @@ function attachData(type, {lib, customType, action}) {
   const util = {
     instack: that.instack,
     outstack: that.outstack,
-    action,
     add(data=[]){
       if (data) {
         if (!lib.isArray(data)) {
@@ -157,6 +156,8 @@ function attachData(type, {lib, customType, action}) {
   }
 
   const backUtil = Object.assign({}, util, { 
+    instack: that.instack,
+    outstack: that.outstack,
     add(data=[]){
       if (data) {
         if (!lib.isArray(data)) {
@@ -175,16 +176,9 @@ function attachData(type, {lib, customType, action}) {
     }
   })
 
-  if (type === 'isForward') {
-    if (lib.isFunction(appendItems)) {
-      appendItems.call(this, util)
-    } else if (typeof appendItems === 'string') {
-      if (typeof this[appendItems] === 'function') {
-        this[appendItems](util)
-      }
-    }
+  function randomAppend(){
+    /** 由外部不能补充新鲜数据，加入outstack的随机内容 */
     if (this.instack.length < 2) {
-      /** 由外部不能补充新鲜数据，加入outstack的随机内容 */
       if (this.outstack.length) {
         const len = this.outstack.length
         if (len > 1) {
@@ -214,12 +208,49 @@ function attachData(type, {lib, customType, action}) {
     }
   }
 
+  if (type === 'isForward') {
+    let res = null
+    if (lib.isFunction(appendItems)) {
+      res = appendItems.call(this, util)
+    } else if (typeof appendItems === 'string') {
+      if (typeof this[appendItems] === 'function') {
+        res = this[appendItems](util)
+      }
+    }
+
+    if (res) {
+      if (res.then) {
+        res.then(result=>{
+          if (result && lib.isArray(result)) {
+            util.add(result)
+          }
+          randomAppend.call(this)
+        })
+      } else {
+        randomAppend.call(this)
+      }
+    } else {
+      randomAppend.call(this)
+    }
+  }
+
   if (type === 'isBackwards') {
+    let res = null
     if (lib.isFunction(prependItems)) {
-      prependItems.call(this, backUtil)
+      res = prependItems.call(this, backUtil)
     } if (typeof prependItems === 'string') {
       if (typeof this[prependItems] === 'function') {
-        this[prependItems](util)
+        res = this[prependItems](backUtil)
+      }
+    }
+
+    if (res) {
+      if (res.then) {
+        res.then(result=>{
+          if (result && lib.isArray(result)) {
+            backUtil.add(result)
+          }
+        })
       }
     }
   }
@@ -287,13 +318,14 @@ export function presetEvent_loop({
   const current = detail.current
   const $$ = this.activePage.getElementsById.bind(this.activePage)
   let   {isBackwards, isForward, historyCount} = swiperStep.call(this, e)
-  
+  const customType = params.type
+
   if (isForward && this.instack.length === 1) {
-    attachData.call(this, 'isForward', {lib, customType: params.type, action: true})
+    attachData.call(this, 'isForward', {lib, customType, action: true})
   }
   
   if (isBackwards && this.outstack.length === 1) {
-    attachData.call(this, 'isBackwards', {lib, customType: params.type, action: true})
+    attachData.call(this, 'isBackwards', {lib, customType, action: true})
   }
 
   let targetScreenIndex = -1

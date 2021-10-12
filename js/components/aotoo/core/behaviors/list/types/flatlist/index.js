@@ -142,7 +142,7 @@ export function initFlatList(params) {
       let targetInst = inst
       if (['swiper', 'swiper_loop'].indexOf(param.eventtype) > -1) {
         targetInst = inst.children[rect.current]
-        this.currentInst = targetInst
+        this.currentInstance = targetInst
       }
       flatlistReady.call(this, rect)
       if (lib.isFunction(custombindEvent)) {
@@ -190,8 +190,11 @@ export function initFlatList(params) {
     })
     if (lib.isFunction(oldReady)) oldReady.call(this)
   }
+  
   this.customLifeCycle.ready = function () {
-    this.currentInst = this.children[params.type.current]
+    if (['swiper', 'swiper_loop'].indexOf(params.type.is) > -1) {
+      this.currentInstance = this.children[(params.type.current||0)]
+    }
     setTimeout(() => {
       _ready.call(this)
     }, 100);

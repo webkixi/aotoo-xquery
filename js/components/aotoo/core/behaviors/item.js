@@ -104,12 +104,27 @@ export const itemBehavior = function(app, mytype) {
           cb = param
           param = undefined
         }
-        if (lib.isObject(param)) {
-          this.setData({$item: _resetItem(param, this)}, cb)
-        } else {
-          this.setData({$item: {}})
-          this.setData({$item: _resetItem(lib.clone(this.originalDataSource), this)}, cb)
-        }
+        
+        this.children = []
+        this.setData({$item: {}}, ()=>{
+          let targetData = null
+          if (lib.isObject(param)) {
+            targetData = param
+          } else {
+            targetData = lib.clone(this.originalDataSource)
+          }
+          
+          if (targetData) {
+            targetData = _resetItem(targetData, this)
+            this.setData({$item: targetData}, cb)
+          }
+
+          // if (lib.isObject(param)) {
+          //   this.setData({$item: _resetItem(param, this)}, cb)
+          // } else {
+          //   this.setData({$item: _resetItem(lib.clone(this.originalDataSource), this)}, cb)
+          // }
+        })
         return this
       },
       reset(){
