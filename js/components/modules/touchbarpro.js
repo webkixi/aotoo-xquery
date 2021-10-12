@@ -26,6 +26,7 @@ module.exports = function createTouchbar(params={}){
     }
   })
 
+  const hasInitChecked = []
   return {
     $$id: id,
     id: id,
@@ -34,16 +35,37 @@ module.exports = function createTouchbar(params={}){
     itemClass: itemClass, 
     created(){
       this.activeTimmer = null
-      this.query = wx.createSelectorQuery().in(this)
+      if (lib.isFunction(params.created)) {
+        params.created.call(this)
+      } 
     },
+
+    attached(){
+      if (lib.isFunction(params.attached)) {
+        params.attached.call(this)
+      } 
+    },
+
+    detached(){
+      if (lib.isFunction(params.detached)) {
+        params.detached.call(this)
+      } 
+    },
+
     ready(){
       this.positionItems(()=>{
-        if (params.current || params.current === 0) {
-          if (lib.isNumber(params.current)) {
-            this.currentInstance = this.children[params.current]
-            this.selectItem(params.current, {})
-          }
+        this.currentInstance = this.children[(params.current||0)]
+        this.touchbarIndex = (params.current||0)
+        if ((params.current || params.current === 0) && !hasInitChecked.includes(id)) {
+          // if (lib.isNumber(params.current)) {
+          //   this.selectItem(params.current, {})
+          // }
+          hasInitChecked.push(id)
         }
+        if (lib.isFunction(params.ready)) {
+          params.ready.call(this)
+        }
+        this.hooks.emit('ready', this)
       })
     },
     methods: {
@@ -54,37 +76,59 @@ module.exports = function createTouchbar(params={}){
           if (typeof cb === 'function') cb.call(this)
         })
       },
-      selectItem(index, e){
+      reSelectItem(){
+        if (!hasInitChecked.includes(id)) return
+        this.selectItem((this.touchbarIndex||params.current||0), {})
+      },
+      selectItem(index, e, fromMove){
         clearTimeout(this.activeTimmer);
         const that = this
         const targetId = 'touchbar-'+id+'-'+index
-        // const parent = this.currentInstance.parent()
-        // const targetInst = parent.children[index]
         const targetInst = this.children[index]
         
-        if (targetInst.hasClass('active')) return
-        if (e) {
-          e.touchbarIndex = index
-        }
+        if (targetInst) {
+          if (fromMove) {
+            if (targetInst.uniqId === this.currentInstance.uniqId) return
+          }
+          if (targetInst.hasClass('active')) return
 
-        targetInst.addClass('active', function(){
+          this.currentInstance = targetInst
+
+          if (e) {
+            e.touchbarIndex = index
+            this.touchbarIndex = index
+          }
+  
           if (e && lib.isFunction(tap)) {
             tap.call(that, e, {}, targetInst)
           }
-          this.activeTimmer = setTimeout(() => {
+  
+          targetInst.addClass('active', function(){
+            params.current = index
             targetInst.siblings().removeClass('active')
-          }, 50);
-        })
+          })
+  
+          // this.activeTimmer = setTimeout(() => {
+          //   if (e && lib.isFunction(tap)) {
+          //     tap.call(that, e, {}, targetInst)
+          //   }
+          //   targetInst.addClass('active', function(){
+          //     params.current = index
+          //     targetInst.siblings().removeClass('active')
+          //   })
+          // }, 30);
+        }
+
 
       },
-      activeItem(e, {pageX, pageY}){
+      activeItem(e, {pageX, pageY}, fromMove){
         this.touchbarItems.forEach((item, ii)=>{
           if (
             (pageY > item.top && pageY < item.bottom) && 
             (pageX > item.left && pageX < item.right)
           ) {
             /** 渲染item */
-            this.selectItem(ii, e)
+            this.selectItem(ii, e, fromMove)
           }
         })
       }
@@ -103,7 +147,7 @@ module.exports = function createTouchbar(params={}){
       catchtouchmove(e, param, inst){
         if (this.touchstartStat) return
         const changedTouches = e.changedTouches[0]
-        this.activeItem(e, changedTouches)
+        this.activeItem(e, changedTouches, true)
       },
     }
   }
