@@ -281,8 +281,8 @@ function uploader(options, cb){
         if (uploadType === 'image') {
           wx.chooseImage({
             count: limit,
-            sizeType: options.sizeType,
-            sourceType: options.sourceType,
+            sizeType: options.sizeType || ['original', 'compressed'],
+            sourceType: options.sourceType || ['album', 'camera'],
             success(res){
               const newTempFiles = []
               const {tempFiles} = res
@@ -363,7 +363,7 @@ function uploader(options, cb){
           wx.chooseMessageFile({
             count: limit,
             type: 'file',
-            extension: options.extension||undefined,
+            extension: options.extension||'',
             success(res){
               that.chooseResult = res
               that.preview()
