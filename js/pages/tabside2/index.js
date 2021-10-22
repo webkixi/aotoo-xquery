@@ -29,7 +29,7 @@ Pager({
           img: {src: '/images/mk1.jpeg', mode: 'widthFix', itemStyle: 'width: 200rpx;'}
         }},
       ],
-      mode: 1,  // mode=1 swiper, mode=2 scroll
+      mode: 2,  // mode=1 swiper, mode=2 scroll
       tap(e){
         /** 菜单栏点击时触发 */
       },

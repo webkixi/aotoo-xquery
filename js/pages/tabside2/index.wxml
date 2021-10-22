@@ -1,0 +1,5 @@
+<view class="container">
+  <ui-item item="{{tabConfig}}" class="tab-boxer" />
+</view>
+<ui-item wx:if="{{codeButton}}" item="{{codeButton}}" />
+<ui-pop wx:if="{{readme}}" item="{{readme}}" />
