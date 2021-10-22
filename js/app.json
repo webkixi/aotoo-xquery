@@ -75,8 +75,7 @@
     "ui-tree": "/components/aotoo/tree/index",
     "ui-pop": "/components/actionSide/index",
     "ui-form": "/components/form/index",
-    "ui-markit": "/components/markit/index",
-    "ui-calendar": "/components/calendar/index"
+    "ui-markit": "/components/markit/index"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"
