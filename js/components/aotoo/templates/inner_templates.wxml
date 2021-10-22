@@ -126,10 +126,6 @@
   </block>
 </template>
 
-<template name="@slip">
-  <ui-slip id="{{props.id||props['$$id']||''}}" class="ui-slip" dataSource="{{props}}" />
-</template>
-
 <template name="@html">
   <block wx:if="{{util.isString(props)}}">
     <ui-markit id="{{props.id||props['$$id']||''}}" dataSource="{{ {content: props} }}" class="ui-markit" textType="html" />
@@ -520,5 +516,76 @@
         controls="{{props['controls']||''}}"
         data-evt="{{util.dataEvt(props, ['bindplay', 'bindpause', 'bindended', 'bindtimeupdate', 'bindfullscreenchange', 'bindwaiting',  'binderror',  'bindprogress',  'bindloadedmetadata',  'bindcontrolstoggle', 'bindenterpictureinpicture', 'bindleavepictureinpicture', 'bindseekcomplete'])}}"
       />
+  </block>
+</template>
+
+<template name="@canvas">
+  <block wx:if="{{util.isObject(props)}}">
+    <canvas 
+      id="{{props.id||props['$$id']||'myCanvas'}}" 
+      class="video-class {{props.itemClass}}"
+      style="{{props.itemStyle||''}}"
+
+      type="{{props.type||'2d'}}" 
+      disable-scroll="{{props['disable-scroll']||''}}"
+
+      bindtouchstart="{{props['bindtouchstart']||''}}"
+      bindtouchmove="{{props['bindtouchmove']||''}}"
+      bindtouchend="{{props['bindtouchend']||''}}"
+      bindtimeupdate="{{props['bindtimeupdate']||''}}"
+      bindtouchcancel="{{props['bindtouchcancel']||''}}"
+      bindlongtap="{{props['bindlongtap']||''}}"
+      binderror="{{props['binderror']||''}}"
+      data-evt="{{util.dataEvt(props, ['bindtouchstart', 'bindtouchmove', 'bindtouchend', 'bindtimeupdate', 'bindtouchcancel', 'bindlongtap',  'binderror'])}}"
+    />
+  </block>
+</template>
+
+<template name="@map">
+  <block wx:if="{{util.isObject(props) && props.longitude && props.latitude}}">
+    <canvas 
+      id="{{props.id||props['$$id']||'myCanvas'}}" 
+      class="video-class {{props.itemClass}}"
+      style="{{props.itemStyle||''}}"
+
+      longitude="{{props.longitude}}" 
+      latitude="{{props.latitude}}" 
+      scale="{{props.scale||''}}" 
+      min-scale="{{props['min-scale']||''}}" 
+      max-scale="{{props['max-scale']||''}}" 
+      markers="{{props['markers']||''}}" 
+      polyline="{{props['polyline']||''}}" 
+      circles="{{props['circles']||''}}" 
+      include-points="{{props['include-points']||''}}" 
+      show-location="{{props['show-location']||''}}" 
+      polygons="{{props['polygons']||''}}" 
+      subkey="{{props['subkey']||''}}" 
+      layer-style="{{props['layer-style']||''}}" 
+      rotate="{{props['rotate']||''}}" 
+      enable-3D="{{props['enable-3D']||''}}" 
+      show-compass="{{props['show-compass']||''}}" 
+      show-scale="{{props['show-scale']||''}}" 
+      enable-overlooking="{{props['enable-overlooking']||''}}" 
+      enable-zoom="{{props['enable-zoom']||''}}" 
+      enable-scroll="{{props['enable-scroll']||''}}" 
+      enable-rotate="{{props['enable-rotate']||''}}" 
+      enable-satellite="{{props['enable-satellite']||''}}" 
+      enable-traffic="{{props['enable-traffic']||''}}" 
+      enable-poi="{{props['enable-poi']||''}}" 
+      enable-building="{{props['enable-building']||''}}" 
+      setting="{{props['setting']||''}}" 
+
+      bindtap="{{props['bindtap']||''}}"
+      bindmarkertap="{{props['bindmarkertap']||''}}"
+      bindlabeltap="{{props['bindlabeltap']||''}}"
+      bindcontroltap="{{props['bindcontroltap']||''}}"
+      bindcallouttap="{{props['bindcallouttap']||''}}"
+      bindupdated="{{props['bindupdated']||''}}"
+      bindregionchange="{{props['bindregionchange']||''}}"
+      bindpoitap="{{props['bindpoitap']||''}}"
+      bindanchorpointtap="{{props['bindanchorpointtap']||''}}"
+
+      data-evt="{{util.dataEvt(props, ['bindtap', 'bindmarkertap', 'bindlabeltap', 'bindcontroltap','bindcallouttap', 'bindupdated',  'bindregionchange', 'bindpoitap', 'bindanchorpointtap'])}}"
+    />
   </block>
 </template>
