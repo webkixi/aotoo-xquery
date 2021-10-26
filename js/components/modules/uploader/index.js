@@ -225,7 +225,7 @@ function uploader(options, cb){
         
         const realIndex = this.findIndex({uindex})
         const realItem = data[realIndex]
-        if (lib.isFunction(onDelete)) onDelete(realItem)
+        if (lib.isFunction(onDelete)) onDelete.call(that, realItem)
 
         if (options.count === 1 && limit > 1) {  // 删除元素
           if (data.length === 1) {
@@ -411,7 +411,7 @@ function uploader(options, cb){
                 wx.uploadFile({
                   url,
                   filePath: tempFilePath,
-                  name: 'xcxfile',  // 后端接收到文件的字段
+                  name: options.name || 'xcxfile',  // 后端接收到文件的字段
                   success: function(res){
                     if (typeof successCb === 'function') successCb.call(that, res)
                     if (typeof onUploaded === 'function') onUploaded.call(that, res)
@@ -428,7 +428,7 @@ function uploader(options, cb){
                   wx.uploadFile({
                     url,
                     filePath: path,
-                    name: 'xcxfile',
+                    name: options.name || 'xcxfile',
                     success: function(res){
                       if (typeof successCb === 'function') successCb.call(that, res, ii)
                       if (typeof onUploaded === 'function') onUploaded.call(that, res, ii)
