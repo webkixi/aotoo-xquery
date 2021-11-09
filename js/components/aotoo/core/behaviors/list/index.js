@@ -80,7 +80,10 @@ function presetType(properties, isDidUpdate){
   // 左滑菜单
   if (type.slip && !isDidUpdate) {
     if (typeof type.slip === 'boolean') {
-      type.slip = {}  // areaClass, areaItemClass, menus, menuWidth, width, height, menuOptions, autoClose, slipChange
+      type.slip = {
+        // width: '100vw'
+        width: '100%'
+      } 
     }
     const autoClose = type.slip.autoClose === false ? false : true
     const slipChange = type.slip.slipChange
@@ -156,7 +159,8 @@ function presetType(properties, isDidUpdate){
         totalWidth+=width
         return width
       })
-      type.slip.width = type.slip.width || '100vw'   // movable-view的宽，movable-area的宽以此计算
+      // type.slip.width = type.slip.width || '100vw'   // movable-view的宽，movable-area的宽以此计算
+      type.slip.width = type.slip.width || '100%'   // movable-view的宽，movable-area的宽以此计算
       type.slip.height = type.slip.height || '200rpx' // movable-view的高, movable-area的高设置为auto
       type.slip.menuWidth = menuWidth
       type.slip.totalOffsetDistance = totalWidth
@@ -164,7 +168,7 @@ function presetType(properties, isDidUpdate){
 
       const areaWidth = `calc(${(type.slip.width)} + ${totalWidth}rpx)`
       type.slip.areaStyle = `width: ${areaWidth}; height: auto; position: relative; left: -${totalWidth}rpx;`
-      type.slip.areaItemStyle = `position: relative; width: ${type.slip.width};height: ${type.slip.height};`,
+      type.slip.areaItemStyle = `position: relative; width: calc(${type.slip.width} - ${totalWidth}rpx); height: ${type.slip.height};`,
       ds.type = type
     }
 
@@ -175,9 +179,8 @@ function presetType(properties, isDidUpdate){
       if (lib.isString(item)) {
         item = {title: item}
       }
-      const itemMenus = item.menus || []
-      const slipMenus = type.slip.menus || []
-      const tmpmenus = Object.assign([], slipMenus, itemMenus )
+      const tmpmenus = item.menus || type.slip.menus || []
+      const menuWidth = item.menuWidth || type.slip.menuWidth || [120]
       const menus = []
       let   totalWidth = 0
       tmpmenus.forEach((menu, ii)=>{
@@ -185,7 +188,7 @@ function presetType(properties, isDidUpdate){
           menu = {title: menu}
         }
         if (lib.isObject(menu)) {
-          const mWidth = parseInt((type.slip.menuWidth[ii]||120))
+          const mWidth = parseInt((menuWidth[ii] || menuWidth[0] || 120))
           totalWidth+=mWidth
           menu.itemClass = 'slip-menus-item '+ (menu.itemClass||'')
           menu.itemStyle = (menu.itemStyle||'')+`;width: ${mWidth}rpx;`
@@ -196,11 +199,13 @@ function presetType(properties, isDidUpdate){
       item.x = totalWidth || type.slip.totalOffsetDistance
       item.menus = menus
       const areaWidth = `calc(${(type.slip.width)} + ${totalWidth}rpx)`
-      item.menuOptions = {
+      item.slipOptions = Object.assign({}, type.slip, {
+        bindchange: menus.length ? 'onSlipchange?gap='+totalWidth : type.slip.bindchange,
         areaStyle: `width: ${areaWidth}; height: auto; position: relative; ${totalWidth ? 'left: -'+totalWidth+'rpx' : ''}`,
+        areaItemStyle: `${type.slip.areaItemStyle};width: calc(${areaWidth} - ${2* totalWidth}rpx)`,
         direction: totalWidth ? type.slip.direction : 'none',
         totalMenusWidth: totalWidth
-      }
+      }, item.slipOptions)
       return item
     })
   }

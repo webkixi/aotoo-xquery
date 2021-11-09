@@ -22,7 +22,7 @@ export function adapterDataFlatList(data, flatListId, from){
       val['itemClass'] = 'flatlist-unit ' + (val['itemClass']||'')
       val['show'] = false
       const menus = val['menus']
-      const menuOptions = val['menuOptions']
+      const slipOptions = val['slipOptions']
       const wrapitem = {
         attr: {"id": flatListItemId},
         id: `box-${flatListItemId}`,
@@ -30,7 +30,7 @@ export function adapterDataFlatList(data, flatListId, from){
         parent: val['parent'],
         "@item": val,
         menus,
-        menuOptions
+        slipOptions
       }
       val['idf'] ? (delete val['idf']) : (delete wrapitem['idf'])
       val['parent'] ? (delete val['parent']) : (delete wrapitem['parent'])

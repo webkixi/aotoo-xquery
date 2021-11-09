@@ -56,40 +56,47 @@
   <block wx:if="{{util.isArray(list.data)}}">
     <block wx:if="{{ list.type && list.type.slip}}">
       <movable-area 
-        wx:if="{{item.show}}"
         wx:for="{{list.data}}" 
+        wx:if="{{item.show}}"
         wx:key="__key"
         scale-area="{{list.type.slip['scale-area']||''}}"
-        class="movable-area {{list.type.slip.areaClass||''}}"
-        style="{{item.menuOptions.areaStyle || list.type.slip.areaStyle }}"
+        class="movable-area {{item.slipOptions.areaClass || list.type.slip.areaClass||''}}"
+        style="{{item.slipOptions.areaStyle || list.type.slip.areaStyle }}"
       >
         <movable-view 
           x="{{item.x||''}}"
           y="{{item.y||''}}"
-          direction="{{ (item.menuOptions.direction||'horizontal') }}" 
+          direction="{{ (item.slipOptions.direction||'horizontal') }}" 
           animation="{{true}}"
           damping="{{200}}"
           inertia="{{true}}"
           friction="{{1}}"
-          out-of-bounds="{{ inner.realMenus(item, list.type.slip).length ? true : '' }}" 
-          class="movable-view {{list.type.slip.areaItemClass}}"
-          style="{{list.type.slip.areaItemStyle }}"
-          bindchange="{{list.type&&list.type.slip&&list.type.slip.bindchange ? '_movableMethod' : ''}}"
+          out-of-bounds="{{ inner.realMenus(item, item.slipOptions).length ? true : '' }}" 
+
+          disabled="{{item.slipOptions.disabled ||  list.type.disabled||false}}"
+          scale="{{item.slipOptions.scale || list.type.scale||false}}"
+          scale-min="{{item.slipOptions['scale-min'] || list.type['scale-min'] ||0.5}}"
+          scale-max="{{item.slipOptions['scale-max'] || list.type['scale-max'] ||10}}"
+          scale-value="{{item.slipOptions['scale-value'] || list.type['scale-value'] ||1}}"
+          class="movable-view {{item.slipOptions.areaClass || ''}}"
+          style="z-index: 2; background-color: #fff; {{item.slipOptions.areaItemStyle}};"
+          bindchange="{{item.slipOptions.bindchange ? '_movableMethod' : ''}}"
           bindscale="{{list.type&&list.type.slip&&list.type.slip.bindscale ? '_movableMethod' : ''}}"
           htouchmove="{{list.type&&list.type.slip&&list.type.slip.htouchmove ? '_movableMethod' : ''}}"
           vtouchmove="{{list.type&&list.type.slip&&list.type.slip.vtouchmove ? '_movableMethod' : ''}}"
           data-treeid="{{item.attr['data-treeid']}}"
-          data-evt="{{util.dataEvt(list.type.slip, ['bindchange', 'bindscale', 'htouchmove', 'vtouchmove'])}}"
+          data-evt="{{util.dataEvt(item.slipOptions, ['bindchange', 'bindscale', 'htouchmove', 'vtouchmove'])}}"
         >
           <template is="itemContent" data="{{item, type: list.type}}" />
-          <block wx:if="{{ item.menus && item.menus.length }}" >
-            <view class="slip-menus" style="display: flex; position: absolute; top: 0; right: -{{item.menuOptions.totalMenusWidth}}rpx;">
-              <block wx:for="{{ item.menus }}" wx:for-item="it" wx:key="index">
-                <template is="itemContent" data="{{item: {...it, show: true, treeid: util.treeid(item)}, type: {...list.type, isItem: true} }}" />
-              </block>
-            </view>
-          </block>
         </movable-view>
+        <block wx:if="{{ item.menus && item.menus.length }}" >
+          <!-- <view class="slip-menus" style="display: flex; position: absolute; top: 0; right: -{{item.slipOptions.totalMenusWidth}}rpx;"> -->
+          <view class="slip-menus" style="display: flex; position: absolute; top: 0; right: 0; z-index: 1">
+            <block wx:for="{{ item.menus }}" wx:for-item="it" wx:key="index">
+              <template is="itemContent" data="{{item: {...it, show: true, treeid: util.treeid(item)}, type: {...list.type, isItem: true} }}" />
+            </block>
+          </view>
+        </block>
       </movable-area>
 
 
@@ -103,7 +110,7 @@
           wx:key="__key"
           x="{{item.x||''}}"
           y="{{item.y||''}}"
-          direction="{{ (item.menuOptions.direction||'horizontal') }}" 
+          direction="{{ (item.slipOptions.direction||'horizontal') }}" 
           animation="{{true}}"
           out-of-bounds="{{ inner.realMenus(item, list.type.slip).length ? true : '' }}" 
           class="movable-view {{list.type.slip.areaItemClass}}"
@@ -111,7 +118,7 @@
         >
           <template is="itemContent" data="{{item, type: list.type}}" />
           <block wx:if="{{ inner.realMenus(item, list.type.slip).length }}" >
-            <view class="slip-menus" style="display: flex; position: absolute; top: 0; right: -{{item.menuOptions.totalMenusWidth}}rpx;">
+            <view class="slip-menus" style="display: flex; position: absolute; top: 0; right: -{{item.slipOptions.totalMenusWidth}}rpx;">
               <block wx:for="{{ item.menus }}" wx:key="index">
                 <template is="itemContent" data="{{item: {...item, show: true}, type: {...list.type, isItem: true} }}" />
               </block>
@@ -121,6 +128,42 @@
       </movable-area> -->
 
 
+    </block>
+    <block wx:elif="{{ list.type && list.type.scrollbar}}">
+      <movable-area 
+        wx:if="{{list.show}}"
+        scale-area="{{list.type.scrollbar['scale-area']||''}}"
+        class="movable-area {{list.type.scrollbar.areaClass||''}}"
+        style="{{list.type.scrollbar.areaStyle }}"
+      >
+        <movable-view 
+          x="{{list.type.scrollbar.x||0}}"
+          y="{{list.type.scrollbar.y||0}}"
+          direction="{{ (list.type.scrollbar.direction||'horizontal') }}" 
+          animation="{{true}}"
+          damping="{{200}}"
+          inertia="{{true}}"
+          friction="{{1}}"
+          out-of-bounds="{{  list.type.scrollbar['out-of-bounds'] === false ? false : true }}" 
+          class="movable-view {{list.type.scrollbar.viewClass || ''}}"
+          style="{{list.type.scrollbar.viewStyle}};"
+
+          disabled="{{list.type.scrollbar.disabled||false}}"
+          scale="{{list.type.scrollbar.scale||false}}"
+          scale-min="{{list.type.scrollbar['scale-min'] ||0.5}}"
+          scale-max="{{list.type.scrollbar['scale-max'] ||10}}"
+          scale-value="{{list.type.scrollbar['scale-value'] ||1}}"
+          bindchange="{{list.type.scrollbar.bindchange ? '_movableMethod' : ''}}"
+          bindscale="{{list.type.scrollbar.bindscale ? '_movableMethod' : ''}}"
+          htouchmove="{{list.type.scrollbar.htouchmove ? '_movableMethod' : ''}}"
+          vtouchmove="{{list.type.scrollbar.vtouchmove ? '_movableMethod' : ''}}"
+          data-evt="{{util.dataEvt(list.type.scrollbar, ['bindchange', 'bindscale', 'htouchmove', 'vtouchmove'])}}"
+        >
+          <block wx:for="{{list.data}}" wx:key="__key">
+            <template is="itemContent" data="{{item, type: list.type}}" />
+          </block>
+        </movable-view>
+      </movable-area>
     </block>
     <block wx:else>
       <block wx:for="{{list.data}}" wx:key="__key">
