@@ -14,23 +14,16 @@ module.exports = {
       onTap(e, param, inst) {
         let $pop = this.find('pop-readme')
         $pop.pop({
-          title: '查看说明请关注小程序',
+          title: '更多说明请浏览官方网站',
           img: [
             {
-              src: '/images/wxzan.jpg',
-              itemStyle: 'margin-top: 20px',
-              mode: 'scaleToFill'
+              src: '/images/agzgzlogo.jpg',
+              mode: 'aspectFit'
             },
-            {
-              src: '/images/xquery.png',
-              itemStyle: 'margin-top: 20px',
-              mode: 'scaleToFill'
-            },
-            
           ],
           enableMask: true,
           closeBtn: true,
-          itemStyle: 'width: 90vw; height: 70vh; top: -100px; overflow: auto'
+          itemStyle: 'width: 90vw; height: 50vh; top: -100px; overflow: auto'
         })
       }
     }

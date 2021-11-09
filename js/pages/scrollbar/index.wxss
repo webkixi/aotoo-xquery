@@ -1,0 +1,73 @@
+@import "../common/source.wxss";
+
+
+.button {
+  width: 100px;
+  height: 50px;
+  background-color: blue;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  margin-top: 2em;
+  margin-left: 3em;
+}
+
+.screen {
+  width: 80vw;
+  height: 30vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.scrollbar{
+  width: 96vw;
+  height: 100px;
+  box-sizing: border-box;
+  border: 1px solid blue;
+  position: absolute;
+  bottom: 70px;
+  left: 0;
+  left: 50%;
+  margin-left: -48vw;
+}
+
+.scrollbar:before {
+  content: '';
+  width: 1px;
+  height: 100%;
+  background: red;
+  position: absolute;
+  left: calc(50% - 0.5px)
+}
+
+.scrollbar-item{
+  width: 60px;
+  height: 60px;
+  margin-right: 5px;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  border: 1px solid red;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .2s;
+}
+
+.scrollbar-item.active{
+  border-width: 3px;
+  transform: scale(1.2);
+  background:#fff;
+  position: relative;
+  z-index: 2;
+}
+
+.scrollbar-item:last-child {
+  margin-right: 0;
+}

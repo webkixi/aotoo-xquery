@@ -1,0 +1,12 @@
+<view class="container">
+  <ui-list list="{{listConfig}}" />
+</view>
+<block wx:if="{{content.image}}">
+  <image src="{{content.image}}" mode="aspectFit" style="width: 100%;"/>
+</block>
+<block wx:else>
+  <view class="screen">{{content}}</view>
+</block>
+<view bind:tap="onTap" class="button">按钮</view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />
