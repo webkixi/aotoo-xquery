@@ -1,6 +1,13 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/slip1/index",
+    "pages/scrollbar/index",
+    "pages/uploader/index",
+    "pages/basecolor/index",
+    "pages/slip/index",
+    "pages/swiperloop/index",
+    "pages/touchbar/index",
     "pages/calendar/index",
     "pages/test/index",
     "pages/markdown/index",
