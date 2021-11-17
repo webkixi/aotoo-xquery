@@ -240,11 +240,21 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
       autoHide: false,
       bindchange: 'swiperChange',
       current: 0,
+      screens: [5, 2],
       // type: 'single',
       duration: 300,
       appendItems(util){
+        const screens = calendarMode.screens
+        const action = util.action
         const instack = util.instack
         const lastItem = instack[instack.length - 1]
+
+        if (action && this.historyCount === screens[1]) {
+          instack.splice(1, screens[1])
+        }
+
+        if (instack.length > 1) return
+
         let   timepoint = endPoint
         if (lastItem) {
           const monthStr = lastItem['@item']['@list'].id
@@ -261,18 +271,50 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
         util.add(appends)
       },
       prependItems(util){
+        const screens = calendarMode.screens
+        const prevCurrent = this.prevCurrent
         const action = util.action
         const outstack = util.outstack
         const lastItem = outstack[outstack.length-1]
-        const timepoint = (lastItem && getYmd(lastItem['@list'].id+'-'+1)) || startPoint
         const appends = []
-        for (let ii=1; ii<3; ii++) {
+        if (outstack.length > 1) return
+
+        let   timepoint = (lastItem && getYmd(lastItem['@list'].id+'-'+1)) || startPoint
+        let   count = 3
+        if (!action) {
+          count = 5
+        }
+        for (let ii=1; ii<count; ii++) {
           const targetPoint = rightDate(timepoint, -(ii))
           const timestr = `${targetPoint.year}-${targetPoint.month}-${targetPoint.day}`
           const monthConfig = getOneMonthConfig(timestr, options, [])
           appends.push(monthConfig)
         }
+
         util.add(appends)
+
+        if (action === false) {
+          if (this.outstack.length) {
+            const myoutstack = this.outstack.splice(0, screens[1])
+            const tmpary = []
+            myoutstack.forEach((item, ii)=>{
+              if (ii < (screens[1])) {
+                const index = screens[0] - ii - 1
+                delete item['$$id']
+                delete item['id']
+                delete item['__key']
+                delete item['attr']
+                delete item['show']
+                
+                const oldItem = this.screens[index]['@item']
+                this.screens[index]['@item'] = Object.assign({}, this.screens[index]['@item'], item)
+                tmpary.push({"@item": oldItem})
+              }
+            })
+            this.instack = tmpary.reverse().concat(this.instack)
+          }
+        }
+
       }
     }
     options.data = []
@@ -299,18 +341,18 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
     calendarMode = Object.assign(calendarMode, options.mode)
   }
 
-  if ([3, '3'].includes(calendarMode.is)){
-    calendarMode.is = 'swiper-loop'
-    options.mode = 3
-  }
-  if ([2, '2'].includes(calendarMode.is)){
-    calendarMode.is = 'flatswiper'
-    options.mode = 2
-  }
-  if ([1, '1'].includes(calendarMode.is)){
-    calendarMode.is = 'flatlist'
-    options.mode = 1
-  }
+  // if ([3, '3'].includes(calendarMode.is)){
+  //   calendarMode.is = 'swiper-loop'
+  //   options.mode = 3
+  // }
+  // if ([2, '2'].includes(calendarMode.is)){
+  //   calendarMode.is = 'flatswiper'
+  //   options.mode = 2
+  // }
+  // if ([1, '1'].includes(calendarMode.is)){
+  //   calendarMode.is = 'flatlist'
+  //   options.mode = 1
+  // }
 
   // 设置滚动到指定位置
   if ($value.length) {
@@ -392,7 +434,9 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
       swiperChange(e){
         const detail = e.detail
         const currentItemId = detail.currentItemId
-        this.changeCalendarHeader(currentItemId)
+        setTimeout(() => {
+          this.changeCalendarHeader(currentItemId)
+        }, 100);
       },
       onDateSelect(e, param, inst){
         if (inst.hasClass('invalid')) return
