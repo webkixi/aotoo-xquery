@@ -5,6 +5,7 @@ function initializeLoopSwiper(params) {
   const that = this
   const screens = this.screens
   const oriData = this.validMonth
+  const customType = params.type
   const current = params.type.current
   const instack = lib.clone(this.instack)
   const outstack = lib.clone(this.outstack)
@@ -16,18 +17,18 @@ function initializeLoopSwiper(params) {
     const $$ = this.activePage.getElementsById.bind(this.activePage)
     this.reseting = true
     this.historyCount = current
+    this.swiperCurrent = current
     this.instack = lib.clone(instack)
     this.outstack = lib.clone(outstack)
+
+    wx.showLoading()
     screens.forEach((item, ii)=>{
       const $item = item['@item']
-      const contentId = $item.id
+      const contentId = (item.attr && item.attr.id) || $item.id
       const contentInst = $$(contentId)
       const content = $item
       
       const targetData = {attr: {...content.attr}, '@list': {...content['@list']}, options}
-      // wx.showLoading({
-      //   title: '更新数据...'
-      // })
       setTimeout(() => {
         contentInst.reset(targetData, function(){
           if (ii === (screens.length - 1)) {
@@ -36,13 +37,13 @@ function initializeLoopSwiper(params) {
                 if (typeof cb === 'function') {
                   cb()
                 }
-                // wx.hideLoading()
+                wx.hideLoading()
                 that.reseting = false
               })
             }, 100);
           }
         })
-      }, 300);
+      }, 100);
     })
   }
 }
@@ -107,39 +108,48 @@ export function isLoopSwiper(customType, params){
 
   if (!this.outstack.length) {
     attachData.call(this, 'isBackwards', {lib, customType, action: false})
-    if (this.outstack.length) {
-      const tmpary = []
-      this.outstack.forEach((item, ii)=>{
-        if (ii < (screens[1])) {
-          const index = screens[0] - ii - 1
-          delete item['$$id']
-          delete item['id']
-          delete item['__key']
-          delete item['attr']
-          delete item['show']
-          
-          const oldItem = this.screens[index]['@item']
-          this.screens[index]['@item'] = Object.assign({}, this.screens[index]['@item'], item)
-          tmpary.push({"@item": oldItem})
-        }
-      })
-      this.instack = tmpary.reverse().concat(this.instack)
-    }
-    attachData.call(this, 'isBackwards', {lib, customType, action: false})
-    this.outstack.splice(0, screens[1])
+    // attachData.call(this, 'isBackwards', {lib, customType, action: false}, ()=>{
+    //   if (this.outstack.length) {
+    //     const tmpary = []
+    //     this.outstack.forEach((item, ii)=>{
+    //       if (ii < (screens[1])) {
+    //         const index = screens[0] - ii - 1
+    //         delete item['$$id']
+    //         delete item['id']
+    //         delete item['__key']
+    //         delete item['attr']
+    //         delete item['show']
+            
+    //         const oldItem = this.screens[index]['@item']
+    //         // this.screens[index]['@item'] = Object.assign({}, this.screens[index]['@item'], item)
+    //         tmpary.push({"@item": oldItem})
+    //       }
+    //     })
+    //     // this.instack = tmpary.reverse().concat(this.instack)
+    //   }
+    // })
+
+    // ??? 废掉 ???
+    // attachData.call(this, 'isBackwards', {lib, customType, action: false})
+    // this.outstack.splice(0, screens[1])
   }
+  // console.log(this.screens);
+  // console.log(this.instack);
+  // console.log(this.outstack);
+  // return
 
   this.reset = initializeLoopSwiper.call(this, params).bind(this)
   return {showInVp, params}
 }
 
-function attachData(type, {lib, customType, action}) {
+function attachData(type, {lib, customType, action}, cb) {
   const that = this
   const appendItems = customType.appendItems
   const prependItems = customType.prependItems
   const util = {
     instack: that.instack,
     outstack: that.outstack,
+    action,
     add(data=[]){
       if (data) {
         if (!lib.isArray(data)) {
@@ -151,6 +161,7 @@ function attachData(type, {lib, customType, action}) {
           if (lib.isObject(item)) tmpdata.push({ "@item": item })
         })
         that.instack = that.instack.concat(tmpdata)
+        if (lib.isFunction(cb)) cb.call(that)
       }
     }
   }
@@ -158,6 +169,7 @@ function attachData(type, {lib, customType, action}) {
   const backUtil = Object.assign({}, util, { 
     instack: that.instack,
     outstack: that.outstack,
+    action,
     add(data=[]){
       if (data) {
         if (!lib.isArray(data)) {
@@ -172,8 +184,9 @@ function attachData(type, {lib, customType, action}) {
         })
         // that.outstack = tmpdata.concat(that.outstack)
         that.outstack = that.outstack.concat(tmpdata)
+        if (lib.isFunction(cb)) cb.call(that)
       }
-    }
+    },
   })
 
   function randomAppend(){
@@ -227,6 +240,9 @@ function attachData(type, {lib, customType, action}) {
           randomAppend.call(this)
         })
       } else {
+        if (lib.isArray(res)) {
+          util.add(res)
+        }
         randomAppend.call(this)
       }
     } else {
@@ -251,6 +267,10 @@ function attachData(type, {lib, customType, action}) {
             backUtil.add(result)
           }
         })
+      } else {
+        if (lib.isArray(res)) {
+          backUtil.add(res)
+        }
       }
     }
   }
@@ -260,6 +280,7 @@ function attachData(type, {lib, customType, action}) {
 function swiperStep(e){
   const detail = e.detail
   const current = detail.current
+  this.prevCurrent = (this.swiperCurrent || this.swiperCurrent === 0) ? this.swiperCurrent : -1
 
   let isForward = false
   let isBackwards = false
@@ -287,6 +308,7 @@ function swiperStep(e){
   }
 
   this.swiperCurrent = current
+  this.swiperForward = isForward ? 1 : isBackwards ? 0 : 0
 
 
   if (isForward) {
@@ -304,7 +326,6 @@ function swiperStep(e){
   }
 }
 
-
 export function presetEvent_loop({
   e, 
   params, 
@@ -317,17 +338,33 @@ export function presetEvent_loop({
   const detail = e.detail
   const current = detail.current
   const $$ = this.activePage.getElementsById.bind(this.activePage)
-  let   {isBackwards, isForward, historyCount} = swiperStep.call(this, e)
+  let   {isBackwards, isForward} = swiperStep.call(this, e)
   const customType = params.type
 
-  if (isForward && this.instack.length === 1) {
+  if (isForward) {
     attachData.call(this, 'isForward', {lib, customType, action: true})
   }
-  
-  if (isBackwards && this.outstack.length === 1) {
+
+  if (isBackwards) {
     attachData.call(this, 'isBackwards', {lib, customType, action: true})
   }
 
+  // if (isForward && this.instack.length === 1) {
+  //   attachData.call(this, 'isForward', {lib, customType, action: true})
+  // }
+  
+  // if (isBackwards && this.outstack.length === 1) {
+  //   attachData.call(this, 'isBackwards', {lib, customType, action: true})
+  // }
+
+  fillMonthToBoxer.call(this, {isForward, isBackwards, params})
+}
+
+
+// 填充月份数据到容器
+export function fillMonthToBoxer({isForward, isBackwards, params}){
+  const $$ = this.activePage.getElementsById.bind(this.activePage)
+  let historyCount = this.historyCount
   let targetScreenIndex = -1
   let targetScreen = null
   let targetScreenInst = null
