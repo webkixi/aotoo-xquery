@@ -105,7 +105,7 @@
 </wxs>
 
 
-<template name="@input">
+<template name="@form-input">
   <block wx:if="{{tmp.isDropdown(input) && input.mode==='view'}}">
     <view 
       type="{{input.type||'text'}}" 
@@ -118,35 +118,45 @@
       data-evt="{{util.dataEvt(input, ['bindinput', 'bindfocus', 'bindblur', 'bindconfirm' ])}}"
     >{{(util.isObject(input.value) ? (input.value.title||input.value.text) : input.value)||''}}</view>
   </block>
-  <input 
+  <block wx:else>
+    <template is="@myinput" data="{{props: input, uniqId, inputStyle: 'z-index: 639;'+(inputStyle||'') }}"/>
+  </block>
+  <!-- <input 
     wx:else
-    type="{{input.type||'text'}}" 
-    password="{{input.type === 'password' ? true : ''}}"
-    id="{{input.id||''}}"
-    data-address="{{input.uAddress}}"
-    data-eye = "{{input.type === 'dropdown' ? true : ''}}"
-    
-    value="{{(util.isObject(input.value) ? (input.value.title||input.value.text) : input.value)||''}}"
-    placeholder="{{input.placeholder||''}}"
-    placeholder-class="{{input['placeholder-class']||''}}"
-
-    disabled="{{input.disabled}}"
-    maxlength="{{input.maxlength||20}}"
-    cursor-spacing	="{{input['cursor-spacing']||''}}"
-    confirm-type ="{{input['confirm-type']||''}}"
-    confirm-hold ="{{input['confirm-hold']||''}}"
-    adjust-position ="{{input['adjust-position']||true}}"
-    
     class="{{tmp.isDropdown(input) ? 'item-input-dropdown' : input.eye ? 'input-item-input input-item-eye' :  'input-item-input' }} {{input.itemClass||input.class}}"
     style="z-index: 639; {{inputStyle||''}} {{input.itemStyle||input.style||''}}"
+    id="{{input.id||''}}"
 
-    catch:tap = "{{ (input.tap||input.aim) ? 'inputItemMethod' : ''}}"
+    value="{{(util.isObject(input.value) ? (input.value.title||input.value.text) : input.value)||''}}"
+    type="{{input.type||'text'}}" 
+    password="{{input.type === 'password' ? true : ''}}"
+    placeholder="{{input.placeholder||''}}"
+    placeholder-style="{{input['placeholder-style']||''}}"
+    placeholder-class="{{input['placeholder-class']||''}}"
+    disabled="{{input.disabled}}"
+    cursor-spacing	="{{input['cursor-spacing']||''}}"
+    maxlength="{{input.maxlength||20}}"
+    focus="{{input.focus||''}}"
+    confirm-type ="{{input['confirm-type']||''}}"
+    confirm-hold ="{{input['confirm-hold']||''}}"
+    cursor="{{input.cursor||''}}"
+    selection-start="{{input['selection-start']||''}}"
+    selection-end="{{input['selection-end']||''}}"
+    adjust-position="{{input['adjust-position']||true}}"
+    hold-keyboard="{{input['hold-keyboard']||''}}"
+
+    data-address="{{input.uAddress}}"
+    data-eye = "{{input.type === 'dropdown' ? true : ''}}"
+
+    catch:tap = "{{ (input.tap||input.aim||input.catchtap) ? 'inputItemMethod' : ''}}"
     bindinput = "{{ input.bindinput ? 'inputItemMethod' : 'inputItemMethod'}}"
     bindfocus = "{{ input.bindfocus ? 'inputItemMethod' : tmp.isDropdown(input) ? 'inputItemMethod' : '' }}"
     bindblur = "{{ input.bindblur ? 'inputItemMethod' : ''}}"
     bindconfirm = "{{ input.bindconfirm ? 'inputItemMethod' : ''}}"
-    data-evt="{{util.dataEvt(input, ['tap', 'aim', 'bindinput', 'bindfocus', 'bindblur', 'bindconfirm' ])}}"
-  />
+    bindkeyboardheightchange="{{input.bindkeyboardheightchange ? 'itemMethod' : ''}}"
+
+    data-evt="{{util.dataEvt(input, ['tap', 'aim', 'bindinput', 'bindfocus', 'bindblur', 'bindconfirm', 'bindkeyboardheightchange' ])}}"
+  /> -->
 </template>
 
 <!-- <template name="@button">
@@ -416,7 +426,7 @@
       data-address="{{input.uAddress}}"
       data-masker='true'
     />
-    <template is="@input" data="{{uniqId, input, inputStyle}}" />
+    <template is="@form-input" data="{{uniqId, input, inputStyle}}" />
     <block wx:if="{{input.type=='dropdown'}}">
       <ui-list list="{{input.options || input.titles}}"  fromComponent="{{uniqId}}"/>
     </block>

@@ -55,6 +55,17 @@ class _hooks {
     return this.storage ? wx.getStorageInfoSync() : this.storeData
   }
 
+  getList(){
+    const target = this.storeData
+    const infoList = []
+    Object.entries(target).forEach(ary=>{
+      if (ary[1]) {
+        infoList.push({key: ary[0], value: ary[1]['$$value'], createtime: ary[1]['$$timestamp']})
+      }
+    })
+    return infoList
+  }
+
   setItem(key, val, expire) {
     if (!key) return
 
@@ -141,7 +152,7 @@ class _hooks {
       this.syncTimmer = setTimeout(() => {
         wx.setStorageSync(this.namespace, this.storeData)
         wx.setStorageSync(this.expireDataKey, this.expireData)
-      }, 1000);
+      }, 300);
     }
   }
 
@@ -226,6 +237,10 @@ class _hooks {
       }
       this.syncData(key, 'delete')
     }
+  }
+
+  removeItem(key){
+    this.delete(key)
   }
   
   clear(){
@@ -369,4 +384,14 @@ export function hooks(namespace, storage) {
     }
     return myhooks[namespace]
   }
+}
+
+// 在内存操作
+export function memoryHooks(namespace) {
+  return hooks(namespace)
+}
+
+// memory and sync localstorage
+export function storageHooks(namespace) {
+  return hooks(namespace, true)
 }

@@ -14,6 +14,7 @@ import {
 
 import { 
   getYmd,
+  lunar,
   rightDate,
   formatDate,
   newDate,
@@ -36,7 +37,8 @@ export {
   setLunarFestival,
   getMonthData,
   getYmd,
-  rightDate
+  rightDate,
+  lunar
 }
 
 const defaultWeekStr = '一二三四五六日';
@@ -171,6 +173,11 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
   let   endTime = startPoint.timestamp + (total*day)
   let   endPoint = getYmd(endTime)
   const options = Object.assign({}, defaultConfig, opts)
+  const optionsReady = options.ready
+  const optionsCreated = options.created
+  const optionsAttached = options.attached
+  const optionsMoved = options.moved
+  const optionsDetached = options.detached
 
   // 通过 data 数据计算开始/结束时间点
   if (options.data.length) {
@@ -354,6 +361,9 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
   //   options.mode = 1
   // }
 
+  let timmer_change_month = null
+  let validMonth = getValidMonth.call(this, startPoint, total, options, $value)
+
   // 设置滚动到指定位置
   if ($value.length) {
     const startPoint = $value[0]
@@ -373,9 +383,6 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
     }
   }
 
-  let validMonth = getValidMonth.call(this, startPoint, total, options, $value)
-
-  let timmer_change_month = null
   return {
     $$id: options.$$id,
     header: options.header,  // week til bar
@@ -393,12 +400,18 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
         return this.value
       }
       parentContext = this
+      if (lib.isFunction(optionsCreated)) {
+        optionsCreated.call(this)
+      }
     },
     ready(){
       const that = this
       const screens = this.screens
       const current = calendarMode.current
       const $$ = this.activePage.getElementsById.bind(this.activePage)
+      if (lib.isFunction(optionsReady)) {
+        optionsReady.call(this)
+      }
 
       app.hooks.once('goto-today', function(){
         that.reset(function(){

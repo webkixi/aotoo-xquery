@@ -16,7 +16,23 @@ Component({
   properties: {
     dataSource: {
       type: Object,
-      optionalTypes: [String]
+      optionalTypes: [String],
+      observer: function (params) { 
+        let type = this.properties.textType || 'html'
+        if (this.mounted && !this.init) {
+          if (params && params.content) {
+            const cnt = params.content
+            const props = {...params, content: null, type: null}
+            if (type === 'html') {
+              this.html(cnt, props)
+            }
+
+            if (type === 'md' || type === 'markdown') {
+              this.md(cnt, props)
+            }
+          }
+        }
+      }
     },
     textType: {
       type: String,
