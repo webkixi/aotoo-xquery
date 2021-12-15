@@ -1,6 +1,11 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/calendar/longcalendar",
+    "pages/calendar/multipy",
+    "pages/calendar/single",
+    "pages/calendar/rangeswiper",
+    "pages/calendar/index",
     "pages/slip1/index",
     "pages/scrollbar/index",
     "pages/uploader/index",
@@ -8,7 +13,6 @@
     "pages/slip/index",
     "pages/swiperloop/index",
     "pages/touchbar/index",
-    "pages/calendar/index",
     "pages/test/index",
     "pages/markdown/index",
     "pages/button/index",

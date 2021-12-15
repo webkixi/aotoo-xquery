@@ -15,14 +15,14 @@ const endDay = `${today.year}-${today.month}-${today.day+7}`
 Pager({
   data: {
     calendarConfig: createCalendar({
-      mode: 1,  // 使用scroll-view展示日历
+      mode: 2,  // 使用scroll-view展示日历
       type: 'range',  // 区间选择
       value: [startDay, endDay], 
       rangeTip: ['入住', '离店'],  // 默认区选的头、尾提示
       total: 180,  // 展示天数
       tap(e, param, inst){  // 点击后的回调方法
         console.log(param);
-      }, 
+      },
     }),
     ...source
   }
