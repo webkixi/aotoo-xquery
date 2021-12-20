@@ -1,0 +1,26 @@
+<view class="container">
+  <text>modal强化版</text>
+  <text>支持textarea编辑</text>
+  <text>参数99%与官网一致</text>
+  <ui-list list="{{modalConfig}}" />
+  <button class="btn" type="primary" loading="{{loading}}" disabled="{{disabled}}" bindtap="onTap">
+    普通
+  </button>
+  <button class="btn" type="primary" loading="{{loading}}" disabled="{{disabled}}" bindtap="onTap1">
+    !cancel
+  </button>
+  <button class="btn" type="primary" loading="{{loading}}" disabled="{{disabled}}" bindtap="onTap2">
+    !cancel,!confirm
+  </button>
+  <button class="btn" type="primary" loading="{{loading}}" disabled="{{disabled}}" bindtap="onTap3">
+    自定义宽高
+  </button>
+  <button class="btn" type="primary" loading="{{loading}}" disabled="{{disabled}}" bindtap="onTap4">
+    可编辑
+  </button>
+  <button class="btn" type="primary" loading="{{loading}}" disabled="{{disabled}}" bindtap="onTap5">
+    textarea编辑框
+  </button>
+</view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />

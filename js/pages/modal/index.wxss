@@ -1,0 +1,11 @@
+@import "../../components/modules/modal.wxss";
+@import "../common/source.wxss";
+
+.btn{
+  margin-top: 1em;
+}
+
+.anyClassName {
+  font-size: 40rpx;
+  font-weight: bold;
+}
