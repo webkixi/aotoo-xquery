@@ -6,7 +6,7 @@
   <block wx:for="{{item.li}}" wx:key="__key" wx:for-item="son">
     <block wx:if="{{util.isString(son)}}">
       <view class="li-item">
-        <text class="hli-item">{{son}}</text>
+        <text user-select="{{util.strlen(son) > 50}}" class="hli-item">{{son}}</text>
       </view>
     </block>
     <block wx:elif="{{son.data && util.isArray(son.data)}}">

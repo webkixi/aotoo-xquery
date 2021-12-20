@@ -72,7 +72,7 @@
 
 <template name="parse-part">
   <block wx:if="{{util.isString(item)}}">
-    <text class="htitle">{{item}}</text>
+    <text user-select="{{util.strlen(item) > 50}}" class="htitle">{{item}}</text>
   </block>
   <block wx:else>
     <block wx:if="{{item['__sort']}}">

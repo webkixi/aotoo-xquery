@@ -151,7 +151,7 @@
   <text 
     wx:if="{{item.itemDataRoot}}" 
     class="htitle" 
-    user-select="{{ item['user-select'] || item['selectable'] || '' }}"
+    user-select="{{ item['user-select'] || item['selectable'] || util.strlen(item.title) > 50 || '' }}"
   >{{item.title}}</text>
   <block wx:else>
     <template is="make-title" data="{{item}}" />

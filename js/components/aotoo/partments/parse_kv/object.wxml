@@ -4,12 +4,12 @@
 
 <view class="hkv {{item.kvClass||''}}" style="{{item.kvStyle||''}}">
   <block wx:if="{{item.v}}">
-    <text wx:if="{{util.isString(item.k)}}">{{item.k}}</text>
+    <text wx:if="{{util.isString(item.k)}}" user-select="{{util.strlen(item.k) > 50}}">{{item.k}}</text>
     <block wx:elif="{{util.isObject(item.k)}}">
       <template is="@item" data="{{ props: {...item.k, treeid: util.treeid(item)} }}" />
       <!-- <template is="@ti" data="{{item: item.k, exclude: ['k', 'v'] }}" /> -->
     </block>
-    <text wx:if="{{util.isString(item.v)}}">{{item.v}}</text>
+    <text wx:if="{{util.isString(item.v)}}" user-select="{{util.strlen(item.v) > 50}}">{{item.v}}</text>
     <block wx:elif="{{util.isObject(item.v)}}">
       <template is="@item" data="{{ props: {...item.v, treeid: util.treeid(item)} }}" />
       <!-- <template is="@ti" data="{{item: item.v, exclude: ['k', 'v'] }}" /> -->
@@ -18,9 +18,9 @@
 
   <block wx:else>
     <block wx:if="{{util.isString(item.k)}}">
-      <text wx:if="{{item.itemStyle || item.style}}" style="{{item.style || item.itemStyle}}" class="{{item.itemClass || item.class}}">{{item.k}}</text>
+      <text user-select="{{util.strlen(item.k) > 50}}" wx:if="{{item.itemStyle || item.style}}" style="{{item.style || item.itemStyle}}" class="{{item.itemClass || item.class}}">{{item.k}}</text>
       <block wx:else>
-        <text class="{{item.itemClass || item.class}}">{{item.k}}</text>
+        <text user-select="{{util.strlen(item.k) > 50}}" class="{{item.itemClass || item.class}}">{{item.k}}</text>
       </block>
     </block>
     <block wx:elif="{{util.isObject(item.k)}}">

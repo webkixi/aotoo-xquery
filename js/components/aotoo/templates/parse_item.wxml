@@ -11,7 +11,7 @@
     id="{{item.id||''}}" 
     data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid']||item.attr['treeid']||'')}}"
     data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
-    user-select="{{ item['user-select'] || item['selectable'] || '' }}"
+    user-select="{{ item['user-select'] || item['selectable'] || util.strlen(item.text) > 50 || '' }}"
     space="{{item.space||''}}"
     decode="{{item.decode||''}}"
   >{{item.text}}</text>

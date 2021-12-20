@@ -17,7 +17,7 @@
   <block wx:for="{{item.title}}" wx:key="__key" wx:for-item="son">
     <block wx:if="{{util.isString(son)}}">
       <view class="t-item">
-        <text class="htitle">{{son}}</text>
+        <text user-select="{{util.strlen(son) > 50}}" class="htitle">{{son}}</text>
       </view>
     </block>
     <block wx:elif="{{son.data && util.isArray(son.data)}}">

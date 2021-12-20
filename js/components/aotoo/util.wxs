@@ -85,6 +85,14 @@ function equal(item, equalwhat){
   }
 }
 
+function strlen(words){
+  var len = 0;
+  if (typeof words === 'string') {
+    len = words.length
+  }
+  return len
+}
+
 function getItemClass(item) {
   // var cItemClass = (item.itemClass || item.class || item.className || 'class-name')
   var cItemClass = (item.itemClass || item.class || item.className)
@@ -1334,6 +1342,7 @@ module.exports = {
   dataEvt: dataEvt,
   getClass: getClass,
 
+  strlen: strlen,
   isString: isString,
   isObject: isObject,
   isArray: isArray,

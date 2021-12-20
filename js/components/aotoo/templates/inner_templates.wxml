@@ -64,7 +64,7 @@
         id="{{props.id||props['$$id']||''}}" 
         data-treeid="{{props && util.isObject(props.attr) && (props.attr['data-treeid']||props.attr['treeid']||'')}}"
         data-id="{{(props && util.isObject(props.attr) && (props.attr['id'] || props.attr['data-id']) || '')}}"
-        user-select="{{ props['user-select'] || props['selectable'] || '' }}"
+        user-select="{{ props['user-select'] || props['selectable'] || util.strlen(props.text) > 50 || '' }}"
         space="{{props.space||''}}"
         decode="{{props.decode||''}}"
       >{{props.text}}</text>
@@ -226,7 +226,9 @@
       class="navigator {{props.itemClass||props.class||''}}"
       style="{{props.itemStyle||props.style||''}}"
     >
-      <block wx:if="{{util.isString(props.title)}}"><text>{{props.title}}</text></block>
+      <block wx:if="{{util.isString(props.title)}}">
+        <text user-select="{{util.strlen(props.title) > 50}}">{{props.title}}</text>
+      </block>
       <ui-item wx:elif="{{util.isArray(props.title)}}" item="{{ {title: props.title} }}" class="ui-item {{props.containerClass}}" style="{{props.containerStyle||''}}" />
       <block wx:else>
         <ui-item item="{{ props.title }}" class="ui-item {{props.containerClass}}" style="{{props.containerStyle||''}}" />
@@ -294,14 +296,12 @@
     placeholder-style="{{props['placeholder-style']||''}}"
     placeholder-class="{{props['placeholder-class']||''}}"
     disabled="{{props.disabled||''}}"
-    cursor-spacing="{{props['cursor-spacing']||''}}"
     maxlength="{{props.maxlength||''}}"
     auto-focus="{{props['auto-focus']||''}}"
     focus="{{props.focus||''}}"
     auto-height="{{props['auto-height']||''}}"
     fixed="{{props.fixed||''}}"
-    confirm-type="{{props['confirm-type']||''}}"
-    confirm-hold="{{props['confirm-hold']||''}}"
+    cursor-spacing="{{props['cursor-spacing']||''}}"
     cursor="{{props.cursor||''}}"
     show-confirm-bar="{{props['show-confirm-bar']||''}}"
     selection-start="{{props['selection-start']||''}}"
@@ -309,13 +309,15 @@
     adjust-position="{{props['adjust-position']||true}}"
     hold-keyboard="{{props['hold-keyboard']||''}}"
     disable-default-padding="{{props['disable-default-padding']||''}}"
+    confirm-type="{{props['confirm-type']||''}}"
+    confirm-hold="{{props['confirm-hold']||''}}"
 
     catchtap="{{props.tap||props.aim||props.catchtap ? 'itemMethod' : ''}}"
 
-    bindlinechange="{{props.bindlinechange ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    bindinput="{{props.__form ? 'inputItemMethod' : props.bindinput ? 'itemMethod' : ''}}"
     bindfocus="{{props.bindfocus ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
     bindblur="{{props.bindblur ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindlinechange="{{props.bindlinechange ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindinput="{{props.__form ? 'inputItemMethod' : props.bindinput ? 'itemMethod' : ''}}"
     bindconfirm="{{props.bindconfirm ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
     bindkeyboardheightchange="{{props.bindkeyboardheightchange ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
     data-isform="{{true}}"

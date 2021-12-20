@@ -4,7 +4,7 @@
 
 <template name="hb-content">
   <block wx:if="{{util.isString(item)}}">
-    <text>{{item}}</text>
+    <text user-select="{{util.strlen(item) > 50}}">{{item}}</text>
   </block>
 
   <block wx:elif="{{util.isObject(item)}}">
@@ -17,7 +17,7 @@
   <block wx:for="{{item.body}}" wx:key="__key" wx:for-item="son">
     <block wx:if="{{util.isString(son)}}">
       <view class="hb-item">
-        <text>{{son}}</text>
+        <text user-select="{{util.strlen(son) > 50}}">{{son}}</text>
       </view>
     </block>
     <block wx:elif="{{son.data && util.isArray(son.data)}}">
