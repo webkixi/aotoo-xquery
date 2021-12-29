@@ -270,7 +270,7 @@
     bindconfirm="{{props.bindconfirm ? 'itemMethod' : ''}}"
     bindkeyboardheightchange="{{props.bindkeyboardheightchange ? 'itemMethod' : ''}}"
     data-isform="{{true}}"
-    data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap','bindinput', 'bindfocus', 'bindblur', 'bindconfirm', 'bindkeyboardheightchange'])}}"
+    data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap','bindinput', 'bindchange', 'bindfocus', 'bindblur', 'bindconfirm', 'bindkeyboardheightchange'])}}"
   />
 </template>
 
@@ -339,7 +339,7 @@
     color="{{props.color||''}}"
 
     catch:tap="{{props.tap||props.aim||props.catchtap ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    bindchange="{{props.bindchange ? props.__form ? 'rcChange' : 'itemMethod' : ''}}"
+    bindchange="{{props.__form ? 'rcChange' : 'itemMethod'}}"
 
     data-isform="{{true}}"
     data-address="{{props.uAddress}}" 
@@ -589,5 +589,92 @@
 
       data-evt="{{util.dataEvt(props, ['bindtap', 'bindmarkertap', 'bindlabeltap', 'bindcontroltap','bindcallouttap', 'bindupdated',  'bindregionchange', 'bindpoitap', 'bindanchorpointtap'])}}"
     />
+  </block>
+</template>
+
+
+<template name="@picker">
+  <block wx:if="{{props.values && util.isArray(props.values)}}">
+    <picker mode="multiSelector" 
+      id="{{props.id}}"
+      bindcolumnchange="{{props.__form ? 'pickersChange' : (props['bindcolumnchange']||'')}}" 
+      bindchange="{{props.__form ? 'pickersChange' : (props['bindchange']||'')}}" 
+      bindcancel="{{props.__form ? 'pickersChange' : (props['bindcancel']||'')}}" 
+      value="{{props.value||[0]}}" 
+      range="{{props.titles||[[]]}}" 
+      class="{{props.itemClass}} input-item-picker"
+      style="{{props.itemStyle||''}}"
+      disabled="{{props.disabled||''}}"
+      data-address="{{props.uAddress}}" 
+      data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel', 'bindcolumnchange'])}}"
+    >
+      <view class="picker">
+        <block wx:for="{{props.value}}" wx:key="index" wx:for-item="val">
+          <block wx:if="{{index===(props.value.length-1)}}">
+            {{props.titles[index][val]}}
+          </block>
+          <block wx:else>
+            {{props.titles[index][val]}}, 
+          </block>
+        </block>
+      </view>
+    </picker>
+  </block>
+  <block wx:else>
+    <block wx:if="{{props.mode == 'time' || props.mode == 'date' }}">
+      <picker 
+        id="{{props.id||''}}"
+        bindchange="{{props.__form ? 'pickersChange' : (props['bindchange']||'')}}" 
+        bindcancel="{{props.__form ? 'pickersChange' : (props['bindcancel']||'')}}" 
+        mode="{{props.mode}}"
+        value="{{props.value||''}}" 
+        start="{{props.start||''}}"
+        end="{{props.end||''}}"
+        class="{{props.itemClass}} input-item-picker input-item-picker-time"
+        style="{{props.itemStyle||''}}"
+        disabled="{{props.disabled||''}}"
+        data-address="{{props.uAddress}}"
+        data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel'])}}"
+      >
+        <view class="picker">
+          {{props.value}}
+        </view>
+      </picker>
+    </block>
+    <block wx:elif="{{props.mode == 'region'}}">
+      <picker 
+        id="{{props.id||''}}"
+        bindchange="{{props.__form ? 'pickersChange' : (props['bindchange']||'')}}" 
+        bindcancel="{{props.__form ? 'pickersChange' : (props['bindcancel']||'')}}" 
+        mode="region"
+        value="{{props.value||[]}}" 
+        custom-item="{{props['custom-item']||''}}"
+        class="{{props.itemClass}} input-item-picker input-item-picker-region"
+        style="{{props.itemStyle||''}}"
+        disabled="{{props.disabled||''}}"
+        data-address="{{props.uAddress}}"
+        data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel'])}}"
+      >
+        <view class="picker">
+          {{props.value}}
+        </view>
+      </picker>
+    </block>
+    <block wx:else>
+      <picker 
+        bindchange="{{props.__form ? 'pickersChange' : (props['bindchange']||'')}}" 
+        bindcancel="{{props.__form ? 'pickersChange' : (props['bindcancel']||'')}}" 
+        value="{{props.value||0}}" 
+        range="{{props.titles||[]}}" 
+        class="input-item-picker {{props.itemClass}}"
+        disabled="{{props.disabled||''}}"
+        data-address="{{props.uAddress}}"
+        data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel'])}}"
+      >
+        <view class="picker">
+          {{props.value}}
+        </view>
+      </picker>
+    </block>
   </block>
 </template>
