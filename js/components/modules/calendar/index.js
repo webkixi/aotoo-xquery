@@ -100,7 +100,8 @@ function getOneMonthConfig(timestr, options, $value=[]){
       header: monthHeader,
       data: monthData,
       itemMethod: {
-        aim: 'onDateSelect'
+        tap: 'onDateSelect',
+        longpress: 'onDateSelect'
       },
       itemClass: 'date-item',
       listClass: 'date-list '+scaleItemHeightClass,
@@ -159,6 +160,7 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
     rangeTip: [],  // rangeTip: ['开始', {title: '结束'}]  用于range事件点击 开始提示，结束提示
     mode: 1,
     tap: null,
+    longpress: null,
     value: [],   // value: ['2021-9-23', '2021-9-25'],
     header: {'@list': weeksTils(), itemClass: 'week-box'},
     monthHeader: null
@@ -361,9 +363,6 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
   //   options.mode = 1
   // }
 
-  let timmer_change_month = null
-  let validMonth = getValidMonth.call(this, startPoint, total, options, $value)
-
   // 设置滚动到指定位置
   if ($value.length) {
     const startPoint = $value[0]
@@ -383,6 +382,9 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
     }
   }
 
+  let validMonth = getValidMonth.call(this, startPoint, total, options, $value)
+
+  let timmer_change_month = null
   return {
     $$id: options.$$id,
     header: options.header,  // week til bar

@@ -119,7 +119,7 @@
     >{{(util.isObject(input.value) ? (input.value.title||input.value.text) : input.value)||''}}</view>
   </block>
   <block wx:else>
-    <template is="@myinput" data="{{props: input, uniqId, inputStyle: 'z-index: 639;'+(inputStyle||'') }}"/>
+    <template is="@myinput" data="{{props: input, uniqId, __form: true, inputStyle: 'z-index: 639;'+(inputStyle||'') }}"/>
   </block>
   <!-- <input 
     wx:else
@@ -287,89 +287,8 @@
     ></view>
 </template>
 
-<template name="@picker">
-  <block wx:if="{{input.values && util.isArray(input.values)}}">
-    <!-- <picker mode="multiSelector" bindcolumnchange="{{input.bindcolumnchange ? 'pickersChange': ''}}" bindchange="{{input.bindcolumnchange ? '': 'rcChange'}}" value="{{input.value||[0]}}" range="{{input.titles||[[]]}}" data-address="{{input.uAddress}}"> -->
-    <!-- <picker mode="multiSelector" bindcolumnchange="{{input.value.length > 1 ? 'pickersChange' : undefined}}" /> -->
-    <picker mode="multiSelector" 
-      id="{{input.id}}"
-      bindcolumnchange="{{input['bindcolumnchange'] ? 'pickersChange' : ''}}" 
-      bindchange="pickersChange"
-      bindcancel="pickersChange" 
-      value="{{input.value||[0]}}" 
-      range="{{input.titles||[[]]}}" 
-      class="{{input.itemClass}} input-item-picker"
-      style="{{input.itemStyle||''}}"
-      disabled="{{input.disabled||''}}"
-      data-address="{{input.uAddress}}" 
-      data-evt="{{util.dataEvt(input, ['bindchange', 'bindcancel', 'bindcolumnchange'])}}"
-    >
-      <view class="picker">
-        <block wx:for="{{input.value}}" wx:key="index" wx:for-item="val">
-          <block wx:if="{{index===(input.value.length-1)}}">
-            {{input.titles[index][val]}}
-          </block>
-          <block wx:else>
-            {{input.titles[index][val]}}, 
-          </block>
-        </block>
-      </view>
-    </picker>
-  </block>
-  <block wx:else>
-    <block wx:if="{{input.mode == 'time' || input.mode == 'date' }}">
-      <picker 
-        id="{{input.id||''}}"
-        bindchange="pickersChange" 
-        mode="{{input.mode}}"
-        value="{{input.value||''}}" 
-        start="{{input.start||''}}"
-        end="{{input.end||''}}"
-        class="{{input.itemClass}} input-item-picker input-item-picker-time"
-        style="{{item.itemStyle||''}}"
-        disabled="{{input.disabled||''}}"
-        data-address="{{input.uAddress}}"
-        data-evt="{{util.dataEvt(input, ['bindchange', 'bindcancel'])}}"
-      >
-        <view class="picker">
-          {{input.value}}
-        </view>
-      </picker>
-    </block>
-    <block wx:elif="{{input.mode == 'region'}}">
-      <picker 
-        id="{{input.id||''}}"
-        bindchange="pickersChange" 
-        mode="region"
-        value="{{input.value||[]}}" 
-        custom-item="{{input['custom-item']||''}}"
-        class="{{input.itemClass}} input-item-picker input-item-picker-region"
-        style="{{item.itemStyle||''}}"
-        disabled="{{input.disabled||''}}"
-        data-address="{{input.uAddress}}"
-        data-evt="{{util.dataEvt(input, ['bindchange', 'bindcancel'])}}"
-      >
-        <view class="picker">
-          {{input.value}}
-        </view>
-      </picker>
-    </block>
-    <block wx:else>
-      <picker 
-        bindchange="pickersChange" 
-        value="{{input.value||0}}" 
-        range="{{input.titles||[]}}" 
-        class="input-item-picker {{input.itemClass}}"
-        disabled="{{input.disabled||''}}"
-        data-address="{{input.uAddress}}"
-        data-evt="{{util.dataEvt(input, ['bindchange', 'bindcancel'])}}"
-      >
-        <view class="picker">
-          {{input.value}}
-        </view>
-      </picker>
-    </block>
-  </block>
+<template name="@mypicker">
+  <template is="@picker" data="{{props: {__form: true, ...input}, uniqId }}"/>
 </template>
 
 <template name="@picker-view">
@@ -453,7 +372,10 @@
       <template is="{{'@'+input.type}}" data="{{ props: {__form: true, ...input} }}" />
     </block>
     <block wx:else>
-      <template is="{{'@'+input.type}}" data="{{uniqId, props, profile, input}}" />
+      <block wx:if="{{input.type==='picker'}}" >
+        <template is="{{'@my'+input.type}}" data="{{uniqId, props, profile, input}}" />
+      </block>
+      <template wx:else is="{{'@'+input.type}}" data="{{uniqId, props, profile, input}}" />
     </block>
   </block>
 </template>

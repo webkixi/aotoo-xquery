@@ -43,10 +43,24 @@ export function eventIndex(e, {
     })
   }
 
-  if (typeof options.tap === 'function' && deliverCustomCallback) {
-    if (typeof deliverCustomCallback === 'object') {
-      params = Object.assign({}, params, deliverCustomCallback)
+  if (deliverCustomCallback) {
+    if (e.type === 'tap') {
+      if (typeof options.tap === 'function') {
+        if (typeof deliverCustomCallback === 'object') {
+          params = Object.assign({}, params, deliverCustomCallback)
+        }
+        options.tap.call(this, e, params, inst)
+      }
     }
-    options.tap.call(this, e, params, inst)
+
+    if (e.type === 'longpress') {
+      if (typeof options.longpress === 'function') {
+        if (typeof deliverCustomCallback === 'object') {
+          params = Object.assign({}, params, deliverCustomCallback)
+        }
+        options.longpress.call(this, e, params, inst)
+      }
+    }
   }
+
 }

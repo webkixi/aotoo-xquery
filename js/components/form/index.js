@@ -535,7 +535,7 @@ Component({
     ready: function() {
       const ds = this.data.$dataSource
       // if (ds.$$id) this.mount((ds.$$id))
-      this.mount((ds.$$id))
+      this.mount(ds.$$id)
       this.parentInstance = this._getAppVars(ds.fromComponent)
       this.componentInst = this.parentInstance
       if (lib.isEmpty(this.parentInstance)) {
@@ -1353,10 +1353,12 @@ Component({
       if (res) {
         const type = res.inputData.type
         res.inputData.value = detail.value
-        setAllocation.call(this, res, {value: detail.value})
-        // this.setData({[res.address]: res.inputData})
-        runFormBindFun.call(this, 'bindchange', res, e)
-        runFormBindFun.call(this, 'bindchanging', res, e)
+        setAllocation.call(this, res, {value: detail.value, checked: detail.value})
+
+        res.inputData.bindchange && runFormBindFun.call(this, 'bindchange', res, e)
+        if (type !== 'switch') {
+          res.inputData.bindchanging && runFormBindFun.call(this, 'bindchanging', res, e)
+        }
       }
     },
 
@@ -1424,11 +1426,12 @@ Component({
 function setAllocation(res, val) {
   var id = res.inputData.id || res.inputData.name
   let itemInput = this.allocation[id]
+  const itemInputValue = itemInput.value
   if (itemInput) {
     if (lib.isObject(val)) {
       this.allocation[id] = Object.assign({}, itemInput, val)
       if (val.value) {
-        if (itemInput.value != val.value) {
+        if (itemInputValue != val.value) {
           if (itemInput.type === 'dropdown') {
             this.allocation[id].value = {title: val.text, value: val.value}
           }
