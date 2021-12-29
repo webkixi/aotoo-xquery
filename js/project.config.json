@@ -1,155 +1,158 @@
 {
-  "description": "项目配置文件",
-  "cloudfunctionRoot": "cloudfunctions/",
-  "packOptions": {
-    "ignore": []
-  },
-  "setting": {
-    "urlCheck": false,
-    "es6": true,
-    "enhance": true,
-    "postcss": true,
-    "preloadBackgroundData": false,
-    "minified": true,
-    "newFeature": true,
-    "coverView": true,
-    "nodeModules": false,
-    "autoAudits": false,
-    "showShadowRootInWxmlPanel": false,
-    "scopeDataCheck": false,
-    "uglifyFileName": true,
-    "checkInvalidKey": true,
-    "checkSiteMap": true,
-    "uploadWithSourceMap": true,
-    "compileHotReLoad": true,
-    "useMultiFrameRuntime": true,
-    "useApiHook": true,
-    "babelSetting": {
-      "ignore": [],
-      "disablePlugins": [],
-      "outputPath": ""
+    "description": "项目配置文件",
+    "cloudfunctionRoot": "cloudfunctions/",
+    "packOptions": {
+        "ignore": []
     },
-    "bundle": false,
-    "useIsolateContext": true,
-    "useCompilerModule": true,
-    "userConfirmedUseCompilerModuleSwitch": true,
-    "userConfirmedBundleSwitch": false,
-    "packNpmManually": false,
-    "packNpmRelationList": [],
-    "minifyWXSS": true,
-    "useApiHostProcess": true
-  },
-  "compileType": "miniprogram",
-  "libVersion": "2.21.1",
-  "appid": "???",
-  "projectname": "miaoUI",
-  "debugOptions": {
-    "hidedInDevtools": []
-  },
-  "isGameTourist": false,
-  "simulatorType": "wechat",
-  "simulatorPluginLibVersion": {},
-  "cloudfunctionTemplateRoot": "cloudfunctionTemplate",
-  "condition": {
-    "search": {
-      "list": []
+    "setting": {
+        "urlCheck": false,
+        "es6": true,
+        "enhance": true,
+        "postcss": true,
+        "preloadBackgroundData": false,
+        "minified": true,
+        "newFeature": true,
+        "coverView": true,
+        "nodeModules": false,
+        "autoAudits": false,
+        "showShadowRootInWxmlPanel": false,
+        "scopeDataCheck": false,
+        "uglifyFileName": true,
+        "checkInvalidKey": true,
+        "checkSiteMap": true,
+        "uploadWithSourceMap": true,
+        "compileHotReLoad": true,
+        "lazyloadPlaceholderEnable": false,
+        "useMultiFrameRuntime": true,
+        "useApiHook": true,
+        "useApiHostProcess": true,
+        "babelSetting": {
+            "ignore": [],
+            "disablePlugins": [],
+            "outputPath": ""
+        },
+        "enableEngineNative": false,
+        "useIsolateContext": true,
+        "userConfirmedBundleSwitch": false,
+        "packNpmManually": false,
+        "packNpmRelationList": [],
+        "minifyWXSS": true,
+        "disableUseStrict": false,
+        "showES6CompileOption": false,
+        "useCompilerPlugins": false,
+        "minifyWXML": true
     },
-    "conversation": {
-      "list": []
+    "compileType": "miniprogram",
+    "libVersion": "2.21.1",
+    "appid": "wxf3ea6bf81c6ef85a",
+    "projectname": "miaoUI",
+    "debugOptions": {
+        "hidedInDevtools": []
     },
-    "plugin": {
-      "list": []
-    },
-    "game": {
-      "currentL": -1,
-      "list": []
-    },
-    "gamePlugin": {
-      "list": []
-    },
-    "miniprogram": {
-      "list": [
-        {
-          "id": 0,
-          "name": "pages/markdown/index",
-          "pathName": "pages/markdown/index",
-          "query": "is=aaa",
-          "scene": 1037,
-          "referrerInfo": {
-            "appId": "wxa57a87d303a63c7d",
-            "extraData": "{\"a\": 1}"
-          }
+    "isGameTourist": false,
+    "simulatorType": "wechat",
+    "simulatorPluginLibVersion": {},
+    "cloudfunctionTemplateRoot": "cloudfunctionTemplate",
+    "condition": {
+        "search": {
+            "list": []
         },
-        {
-          "id": -1,
-          "name": "demos/b05/index",
-          "pathName": "demos/b05/index",
-          "query": "",
-          "scene": null
+        "conversation": {
+            "list": []
         },
-        {
-          "id": -1,
-          "name": "demos/i01/index",
-          "pathName": "demos/i01/index",
-          "query": "",
-          "scene": null
+        "plugin": {
+            "list": []
         },
-        {
-          "id": -1,
-          "name": "demos/list02/index",
-          "pathName": "demos/list02/index",
-          "query": "",
-          "scene": null
+        "game": {
+            "currentL": -1,
+            "list": []
         },
-        {
-          "id": -1,
-          "name": "demos/list03/index",
-          "pathName": "demos/list03/index",
-          "query": "",
-          "scene": null
+        "gamePlugin": {
+            "list": []
         },
-        {
-          "id": -1,
-          "name": "demos/list04/index",
-          "pathName": "demos/list04/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "id": -1,
-          "name": "demos/list05/index",
-          "pathName": "demos/list05/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "id": -1,
-          "name": "demos/list07/index",
-          "pathName": "demos/list07/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "id": -1,
-          "name": "demos/b01/index",
-          "pathName": "demos/b01/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "id": -1,
-          "name": "demos/b02/index",
-          "pathName": "demos/b02/index",
-          "query": "",
-          "scene": null
-        },
-        {
-          "id": -1,
-          "name": "demos/list08/index",
-          "pathName": "demos/list08/index",
-          "scene": null
+        "miniprogram": {
+            "list": [
+                {
+                    "id": 0,
+                    "name": "pages/markdown/index",
+                    "pathName": "pages/markdown/index",
+                    "query": "is=aaa",
+                    "scene": 1037,
+                    "referrerInfo": {
+                        "appId": "wxa57a87d303a63c7d",
+                        "extraData": "{\"a\": 1}"
+                    }
+                },
+                {
+                    "id": -1,
+                    "name": "demos/b05/index",
+                    "pathName": "demos/b05/index",
+                    "query": "",
+                    "scene": null
+                },
+                {
+                    "id": -1,
+                    "name": "demos/i01/index",
+                    "pathName": "demos/i01/index",
+                    "query": "",
+                    "scene": null
+                },
+                {
+                    "id": -1,
+                    "name": "demos/list02/index",
+                    "pathName": "demos/list02/index",
+                    "query": "",
+                    "scene": null
+                },
+                {
+                    "id": -1,
+                    "name": "demos/list03/index",
+                    "pathName": "demos/list03/index",
+                    "query": "",
+                    "scene": null
+                },
+                {
+                    "id": -1,
+                    "name": "demos/list04/index",
+                    "pathName": "demos/list04/index",
+                    "query": "",
+                    "scene": null
+                },
+                {
+                    "id": -1,
+                    "name": "demos/list05/index",
+                    "pathName": "demos/list05/index",
+                    "query": "",
+                    "scene": null
+                },
+                {
+                    "id": -1,
+                    "name": "demos/list07/index",
+                    "pathName": "demos/list07/index",
+                    "query": "",
+                    "scene": null
+                },
+                {
+                    "id": -1,
+                    "name": "demos/b01/index",
+                    "pathName": "demos/b01/index",
+                    "query": "",
+                    "scene": null
+                },
+                {
+                    "id": -1,
+                    "name": "demos/b02/index",
+                    "pathName": "demos/b02/index",
+                    "query": "",
+                    "scene": null
+                },
+                {
+                    "id": -1,
+                    "name": "demos/list08/index",
+                    "pathName": "demos/list08/index",
+                    "scene": null
+                }
+            ]
         }
-      ]
     }
-  }
 }

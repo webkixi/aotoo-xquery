@@ -363,6 +363,8 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
   //   options.mode = 1
   // }
 
+  let validMonth = getValidMonth.call(this, startPoint, total, options, $value)
+
   // 设置滚动到指定位置
   if ($value.length) {
     const startPoint = $value[0]
@@ -381,8 +383,6 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
       calendarMode['current'] = index
     }
   }
-
-  let validMonth = getValidMonth.call(this, startPoint, total, options, $value)
 
   let timmer_change_month = null
   return {
