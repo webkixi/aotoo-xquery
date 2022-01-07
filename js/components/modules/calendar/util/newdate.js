@@ -12,7 +12,7 @@ export function newDate(timepoint) {
         timepoint += '-1'
       }
       timepoint = timepoint.replace(/\-/g, '/')
-      timepoint = timepoint.replace(/\:/g, '/')
+      // timepoint = timepoint.replace(/\:/g, '/')
       return new Date(timepoint)
     }
   } else {

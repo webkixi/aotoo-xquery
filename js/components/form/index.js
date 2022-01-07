@@ -18,7 +18,7 @@ const lib = Core.lib
  *      value,
  *      disabled,
  *      type,
- *      attr
+ *      attr: {}
  *    ], 
  *    desc, 
  *    itemClass, 
@@ -206,7 +206,7 @@ function resetPickersValues(params, e) {
         break;
       }
       let _titles = []
-      let _select = 0
+      let _select = -1
       columnVals.forEach((item, jj) => {
         if (item.select) _select = jj
         if (typeof item == 'string' || typeof item == 'number') {
@@ -216,13 +216,19 @@ function resetPickersValues(params, e) {
           _titles.push(item.title)
         }
       })
-      if (e && (value[ii] || value[ii]===0)) {
-        if ((column || column === 0) && ii <= column) {
+      if (value[ii] || value[ii]===0) {
+        if (e) {
+          if ((column || column === 0) && ii <= column) {
+            _select = value[ii]
+          }
+        } else {
           _select = value[ii]
         }
       }
-      value[ii] = _select
-      titles[ii] = _titles
+      if (_select > -1) {
+        value[ii] = _select;
+        titles[ii] = _titles;
+      }
     }
     params.value = value
     params.titles = titles

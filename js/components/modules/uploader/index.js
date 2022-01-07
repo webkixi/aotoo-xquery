@@ -65,6 +65,7 @@ export function uploadFiles(param={}){
 function adapterUploader(data, options) {
   const rightData = []
   const guideImages = options.guideImages || ['+']  // 引导图
+  const deleteButton = options.deleteButton // 删除按钮
   let   myData = []
   let   count = options.count || 1  // 页面显示上传按钮个数
   let   isMultiUpload = false
@@ -72,6 +73,15 @@ function adapterUploader(data, options) {
   if (options.limit > count && count === 1) {
     isMultiUpload = true
     count = data.length
+  }
+
+  if (guideImages.length<count) {
+    const lastGuidItem = guideImages[(guideImages.length-1)]
+    for(let ii=0; ii<count; ii++) {
+      if (ii >= guideImages.length) {
+        guideImages.push(lastGuidItem)
+      }
+    }
   }
 
   for (let ii=0; ii < count; ii++) {
@@ -90,20 +100,26 @@ function adapterUploader(data, options) {
       myData.push(guideImages[0])
     }
   }
-  
-
 
   myData.forEach((item, ii)=>{
     const uindex = lib.suid('up-item-')
-    if (item === '+') {
-      item = {title: item}
+    if (item === guideImages[ii] || item === guideImages[0]) {
+      item = {title: item, itemClass: 'upload-guid-item'}
     } else {
       if (lib.isString(item)) {
         item = {img: {src: item, mode: 'aspectFill'}}
       }
-      item.dot = [
-        {title: 'x', itemClass: 'uploader-delete-item-button', aim: `onDeleteSelf?uindex=${uindex}&index=${ii}`}  // 删除当前图片，并保留当前栅格
-      ]
+      let deleteDot = {title: 'x', itemClass: 'uploader-delete-item-button', aim: `onDeleteSelf?uindex=${uindex}&index=${ii}`}  // 删除当前图片，并保留当前栅格
+      if (deleteButton) {
+        if (lib.isString(deleteButton)) {
+          deleteButton = {title: deleteButton}
+        }
+        if (lib.isObject(deleteButton)) {
+          deleteDot = Object.assign({}, deleteDot, deleteButton, {aim: `onDeleteSelf?uindex=${uindex}&index=${ii}`})
+        }
+      }
+      item.dot = [deleteDot]
+      item.attr = {uindex}
     }
     if (typeof item === 'object') {
       item.uindex = uindex
@@ -115,6 +131,7 @@ function adapterUploader(data, options) {
 }
 
 function _preview(options) {
+  const onPreview = options.onPreview
   const res = this.chooseResult
   const {tempFiles} = res
   const data = this.getData().data
@@ -132,12 +149,16 @@ function _preview(options) {
     // uploadType==='file'的预览图没有处理 ???
     tempFiles.forEach((file, ii)=>{
       const {previewPath, path, size} = file
+      let   previewContent = previewPath || {title: file.name}
+      if (lib.isFunction(onPreview)) {
+        previewContent = onPreview.call(this, file) || previewContent
+      }
       if (options.count !== 1) {  // 限制了预览图片数及可上传图片数
         if (selectIndex < data.length) {
-          data[selectIndex] = previewPath
+          data[selectIndex] = previewContent
         }
       } else {
-        data[selectIndex] = previewPath  // count=1 & limit=1，只能预览并选择一张图片，limit没指定,count=1，表示可预览并选择多个图片
+        data[selectIndex] = previewContent  // count=1 & limit=1，只能预览并选择一张图片，limit没指定,count=1，表示可预览并选择多个图片
       }
       selectIndex++
     })
@@ -177,7 +198,7 @@ uploader({
 activePage.uploader = context
 */
 
-function uploader(options, cb){
+export function uploader(options, cb){
   options.count = options.count || 1
   options.limit = options.limit || 1
   const uploadType = options.type || 'image'
@@ -245,35 +266,36 @@ function uploader(options, cb){
         }
       },
       preview(){
-        const that = this
-        if (lib.isFunction(onPreview)) {
-          const tmp = onPreview.call(this, this.chooseResult)
-          if (tmp) {
-            if (tmp.then) {
-              tmp.then(res=>{
-                if (lib.isArray(tmp)) {
-                  this.chooseResult['tempFiles'] = tmp
-                }
-                if (lib.isObject(tmp) && lib.isArray(tmp.tempFiles)) {
-                  this.chooseResult = tmp
-                }
-                _preview.call(this, options)
-              })
-            } else {
-              if (lib.isArray(tmp)) {
-                this.chooseResult['tempFiles'] = tmp
-              }
-              if (lib.isObject(tmp) && lib.isArray(tmp.tempFiles)) {
-                this.chooseResult = tmp
-              }
-              _preview.call(this, options)
-            }
-          } else {
-            _preview.call(this, options)
-          }
-        } else {
-          _preview.call(this, options)
-        }
+        // const that = this
+        // if (lib.isFunction(onPreview)) {
+        //   const tmp = onPreview.call(this, this.chooseResult)
+        //   if (tmp) {
+        //     if (tmp.then) {
+        //       tmp.then(res=>{
+        //         if (lib.isArray(tmp)) {
+        //           this.chooseResult['tempFiles'] = tmp
+        //         }
+        //         if (lib.isObject(tmp) && lib.isArray(tmp.tempFiles)) {
+        //           this.chooseResult = tmp
+        //         }
+        //         _preview.call(this, options)
+        //       })
+        //     } else {
+        //       if (lib.isArray(tmp)) {
+        //         this.chooseResult['tempFiles'] = tmp
+        //       }
+        //       if (lib.isObject(tmp) && lib.isArray(tmp.tempFiles)) {
+        //         this.chooseResult = tmp
+        //       }
+        //       _preview.call(this, options)
+        //     }
+        //   } else {
+        //     _preview.call(this, options)
+        //   }
+        // } else {
+        //   _preview.call(this, options)
+        // }
+        _preview.call(this, options)
       },
       onChooseMedia(e, param, inst){
         const that = this
@@ -312,7 +334,7 @@ function uploader(options, cb){
           })
         }
 
-        if (uploadType === 'video') {
+        else if (uploadType === 'video') {
           //  不带缩略图
           // wx.chooseVideo({
           //   compressed: options.compressed||true,
@@ -339,7 +361,6 @@ function uploader(options, cb){
             sourceType: options.sourceType||['album', 'camera'],
             success(_res){
               let res = _res.tempFiles[0]
-              console.log(res.tempFilePath);
               wx.getVideoInfo({
                 src: res.tempFilePath,
                 success: function(infoRes){
@@ -359,11 +380,11 @@ function uploader(options, cb){
           })
         }
 
-        if (uploadType === 'file') {
+        else if (uploadType === 'file') {
           wx.chooseMessageFile({
             count: limit,
             type: 'file',
-            extension: options.extension||'',
+            extension: options.extension||['.txt'],
             success(res){
               that.chooseResult = res
               that.preview()
@@ -374,7 +395,19 @@ function uploader(options, cb){
           })
         }
 
-        
+        else {
+          wx.chooseMessageFile({
+            count: limit,
+            type: 'all',
+            success(res){
+              that.chooseResult = res
+              that.preview()
+            },
+            fail(err){
+              console.log(err);
+            }
+          })
+        }
       },
 
       compress(){},
