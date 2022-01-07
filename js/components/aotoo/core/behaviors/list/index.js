@@ -519,7 +519,7 @@ export const listBehavior = function(app, mytype) {
             }
 
             if (param.data) {
-              let tmp = presetType.call(this, {...$list, data: param.data}, true)
+              let tmp = presetType.call(this, {...$list, data: param.data, itemClass: param.itemClass}, true)
               tmp = reSetArray.call(this, tmp.data, $list)
               param.data = tmp.data
               if (this.$$type === 'tree') {

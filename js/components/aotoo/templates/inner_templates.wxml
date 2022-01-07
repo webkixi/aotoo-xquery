@@ -594,13 +594,13 @@
 
 
 <template name="@picker">
-  <block wx:if="{{props.values && util.isArray(props.values)}}">
+  <block wx:if="{{props.values && util.isArray(props.values) && util.isArray(props.values[0])}}">
     <picker mode="multiSelector" 
       id="{{props.id}}"
       bindcolumnchange="{{props.__form ? 'pickersChange' : (props['bindcolumnchange']||'')}}" 
       bindchange="{{props.__form ? 'pickersChange' : (props['bindchange']||'')}}" 
       bindcancel="{{props.__form ? 'pickersChange' : (props['bindcancel']||'')}}" 
-      value="{{props.value||[0]}}" 
+      value="{{props.value}}" 
       range="{{props.titles||[[]]}}" 
       class="{{props.itemClass}} input-item-picker"
       style="{{props.itemStyle||''}}"
@@ -608,7 +608,8 @@
       data-address="{{props.uAddress}}" 
       data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel', 'bindcolumnchange'])}}"
     >
-      <view class="picker">
+      <view wx:if="{{!props.value.length}}" class='place-holder'>{{props.placeholder||'请选择'}}</view>
+      <view wx:else class="picker">
         <block wx:for="{{props.value}}" wx:key="index" wx:for-item="val">
           <block wx:if="{{index===(props.value.length-1)}}">
             {{props.titles[index][val]}}
@@ -636,9 +637,10 @@
         data-address="{{props.uAddress}}"
         data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel'])}}"
       >
-        <view class="picker">
+        <view wx:if="{{!props.value}}" class='place-holder'>{{props.placeholder||'请选择'}}</view>
+        <block wx:else>
           {{props.value}}
-        </view>
+        </block>
       </picker>
     </block>
     <block wx:elif="{{props.mode == 'region'}}">
@@ -655,25 +657,27 @@
         data-address="{{props.uAddress}}"
         data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel'])}}"
       >
-        <view class="picker">
+        <view wx:if="{{!props.value.length}}" class='place-holder'>{{props.placeholder||'请选择'}}</view>
+        <block wx:else>
           {{props.value}}
-        </view>
+        </block>
       </picker>
     </block>
     <block wx:else>
       <picker 
         bindchange="{{props.__form ? 'pickersChange' : (props['bindchange']||'')}}" 
         bindcancel="{{props.__form ? 'pickersChange' : (props['bindcancel']||'')}}" 
-        value="{{props.value||0}}" 
-        range="{{props.titles||[]}}" 
+        value="{{props.value||[0]}}" 
+        range="{{props.values || props.titles||[]}}" 
         class="input-item-picker {{props.itemClass}}"
         disabled="{{props.disabled||''}}"
         data-address="{{props.uAddress}}"
         data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel'])}}"
       >
-        <view class="picker">
-          {{props.value}}
-        </view>
+        <view wx:if="{{!props.value.length}}" class='place-holder'>{{props.placeholder||'请选择'}}</view>
+        <block wx:else>
+          {{ (props.values && props.values[props.value]) || (props.titles && props.titles[props.value]) }}
+        </block>
       </picker>
     </block>
   </block>
