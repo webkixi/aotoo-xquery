@@ -156,7 +156,7 @@
     type="{{props.typeset||'default'}}" 
     size="{{props.size||''}}"
     plain="{{props.plain||''}}"
-    disabled="{{props.disabled||''}}"
+    disabled="{{props.readonly || props.disabled||''}}"
     loading="{{props.loading||''}}"    
     lang="{{props.lang||'en'}}"
 
@@ -249,10 +249,10 @@
     passsword="{{props.passsword||''}}"
     placeholder="{{props.placeholder||''}}"
     placeholder-style="{{props['placeholder-style']||''}}"
-    placeholder-class="{{props['placeholder-class']||''}}"
-    disabled="{{props.disabled||''}}"
+    placeholder-class="input-placeholder {{props['placeholder-class']||''}}"
+    disabled="{{props.readonly || props.disabled||''}}"
     cursor-spacing="{{props['cursor-spacing']||''}}"
-    maxlength="{{props.maxlength||''}}"
+    maxlength="{{props.maxlength||140}}"
     focus="{{props.focus||''}}"
     confirm-type="{{props['confirm-type']||''}}"
     confirm-hold="{{props['confirm-hold']||''}}"
@@ -262,14 +262,15 @@
     adjust-position="{{props['adjust-position']||true}}"
     hold-keyboard="{{props['hold-keyboard']||''}}"
 
-    catch:tap="{{props.tap||props.aim||props.catchtap ? 'itemMethod' : ''}}"
+    catch:tap="{{props.tap||props.aim||props.catchtap ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindinput="{{props.__form ? 'inputItemMethod' : props.bindinput ? 'itemMethod' : ''}}"
+    bindfocus="{{props.__form ? 'inputItemMethod' : props.bindfocus ? 'itemMethod' : ''}}"
+    bindblur="{{props.__form ? 'inputItemMethod' : props.bindblur ? 'itemMethod' : ''}}"
+    bindconfirm="{{props.__form ? 'inputItemMethod' : props.bindconfirm ? 'itemMethod' : ''}}"
+    bindkeyboardheightchange="{{props.__form ? 'inputItemMethod' : props.bindkeyboardheightchange ? 'itemMethod' : ''}}"
 
-    bindinput="{{props.bindinput ? 'itemMethod' : ''}}"
-    bindfocus="{{props.bindfocus ? 'itemMethod' : ''}}"
-    bindblur="{{props.bindblur ? 'itemMethod' : ''}}"
-    bindconfirm="{{props.bindconfirm ? 'itemMethod' : ''}}"
-    bindkeyboardheightchange="{{props.bindkeyboardheightchange ? 'itemMethod' : ''}}"
-    data-isform="{{true}}"
+    data-isform="{{props.__form ? true : false}}"
+    data-address="{{props.uAddress}}"
     data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap','bindinput', 'bindchange', 'bindfocus', 'bindblur', 'bindconfirm', 'bindkeyboardheightchange'])}}"
   />
 </template>
@@ -295,8 +296,8 @@
     placeholder="{{props.placeholder||''}}"
     placeholder-style="{{props['placeholder-style']||''}}"
     placeholder-class="{{props['placeholder-class']||''}}"
-    disabled="{{props.disabled||''}}"
-    maxlength="{{props.maxlength||''}}"
+    disabled="{{props.readonly || props.disabled || ''}}"
+    maxlength="{{props.maxlength||140}}"
     auto-focus="{{props['auto-focus']||''}}"
     focus="{{props.focus||''}}"
     auto-height="{{props['auto-height']||''}}"
@@ -312,15 +313,15 @@
     confirm-type="{{props['confirm-type']||''}}"
     confirm-hold="{{props['confirm-hold']||''}}"
 
-    catchtap="{{props.tap||props.aim||props.catchtap ? 'itemMethod' : ''}}"
-
-    bindfocus="{{props.bindfocus ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    bindblur="{{props.bindblur ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    bindlinechange="{{props.bindlinechange ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    catch:tap="{{props.tap||props.aim||props.catchtap ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindfocus="{{props.__form ? 'inputItemMethod' : props.bindfocus ? 'itemMethod' : ''}}"
+    bindblur="{{props.__form ? 'inputItemMethod' : props.bindblur ? 'itemMethod' : ''}}"
+    bindlinechange="{{props.__form ? 'inputItemMethod' : props.bindlinechange ? 'itemMethod' : ''}}"
     bindinput="{{props.__form ? 'inputItemMethod' : props.bindinput ? 'itemMethod' : ''}}"
-    bindconfirm="{{props.bindconfirm ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    bindkeyboardheightchange="{{props.bindkeyboardheightchange ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    data-isform="{{true}}"
+    bindconfirm="{{props.__form ? 'inputItemMethod' : props.bindconfirm ? 'itemMethod' : ''}}"
+    bindkeyboardheightchange="{{props.__form ? 'inputItemMethod' : props.bindkeyboardheightchange ? 'itemMethod' : ''}}"
+
+    data-isform="{{props.__form ? true : false}}"
     data-address="{{props.__form ? props.uAddress : ''}}"
     data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindinput', 'bindfocus', 'bindblur', 'bindconfirm', 'bindkeyboardheightchange'])}}"
   >
@@ -334,15 +335,15 @@
     style="{{props.itemStyle||''}}"
 
     checked="{{props.value||props.checked||''}}" 
-    disabled="{{props.disabled}}" 
+    disabled="{{props.readonly || props.disabled}}" 
     type="{{props.type||''}}"
     color="{{props.color||''}}"
 
     catch:tap="{{props.tap||props.aim||props.catchtap ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    bindchange="{{props.__form ? 'rcChange' : 'itemMethod'}}"
+    bindchange="{{props.__form ? 'rcChange' : props.bindchange ? 'itemMethod' : ''}}"
 
-    data-isform="{{true}}"
-    data-address="{{props.uAddress}}" 
+    data-isform="{{props.__form ? true : false}}"
+    data-address="{{props.__form ? props.uAddress : ''}}"
     data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindchange'])}}" 
   />
 </template>
@@ -354,7 +355,7 @@
     style="{{props.itemStyle||''}}"
 
     value="{{props.value||''}}"
-    disabled="{{props.disabled||''}}"
+    disabled="{{props.readonly || props.disabled||''}}"
     min="{{props.min||0}}"
     max="{{props.max||100}}"
     step="{{props.step||1}}"
@@ -367,11 +368,11 @@
     show-value="{{props['show-value']||''}}"
 
     catch:tap="{{props.tap||props.aim||props.catchtap ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    bindchange="{{props.bindchange ? props.__form ? 'rcChange' : 'itemMethod' : ''}}"
-    bindchanging="{{props.bindchanging ? props.__form ? 'rcChange' : 'itemMethod' : ''}}"
+    bindchange="{{props.__form ? 'rcChange' : props.bindchange ? 'itemMethod' : ''}}"
+    bindchanging="{{props.__form ? 'rcChange' : props.bindchanging ? 'itemMethod' : ''}}"
 
-    data-isform="{{true}}"
-    data-address="{{props.uAddress||''}}"
+    data-isform="{{props.__form ? true : false}}"
+    data-address="{{props.__form ? props.uAddress : ''}}"
     data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindchange', 'bindchanging'])}}"
 
   />
@@ -389,14 +390,14 @@
     show-img-resize="{{props['show-img-resize']||''}}"
 
     catch:tap="{{props.tap||props.aim||props.catchtap ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    bindready="{{props.bindready ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    bindfocus="{{props.bindfocus ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    bindblur="{{props.bindblur ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
-    bindstatuschange="{{props.bindstatuschange ? props.__form ? 'inputItemMethod' : 'itemMethod' : ''}}"
+    bindready="{{props.__form ? 'inputItemMethod' : props.bindready ? 'itemMethod' : ''}}"
+    bindfocus="{{props.__form ? 'inputItemMethod' : props.bindfocus ? 'itemMethod' : ''}}"
+    bindblur="{{props.__form ? 'inputItemMethod' : props.bindblur ? 'itemMethod' : ''}}"
+    bindstatuschange="{{props.__form ? 'inputItemMethod' : props.bindstatuschange ? 'itemMethod' : ''}}"
     bindinput="{{props.__form ? 'inputItemMethod' : props.bindinput ? 'itemMethod' : ''}}"
 
-    data-isform="{{true}}"
-    data-address="{{props.uAddress||''}}"
+    data-isform="{{props.__form ? true : false}}"
+    data-address="{{props.__form ? props.uAddress : ''}}"
     data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindready', 'bindfocus', 'bindblur', 'bindstatuschange', 'bindinput'])}}"
   />
 </template>
@@ -604,7 +605,7 @@
       range="{{props.titles||[[]]}}" 
       class="{{props.itemClass}} input-item-picker"
       style="{{props.itemStyle||''}}"
-      disabled="{{props.disabled||''}}"
+      disabled="{{props.readonly || props.disabled||''}}"
       data-address="{{props.uAddress}}" 
       data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel', 'bindcolumnchange'])}}"
     >
@@ -612,10 +613,10 @@
       <view wx:else class="picker">
         <block wx:for="{{props.value}}" wx:key="index" wx:for-item="val">
           <block wx:if="{{index===(props.value.length-1)}}">
-            {{props.titles[index][val]}}
+            {{props.titles[index][(val||0)]}}
           </block>
           <block wx:else>
-            {{props.titles[index][val]}}, 
+            {{props.titles[index][(val||0)]}}{{props['value-separator']||', '}}
           </block>
         </block>
       </view>
@@ -633,7 +634,7 @@
         end="{{props.end||''}}"
         class="{{props.itemClass}} input-item-picker input-item-picker-time"
         style="{{props.itemStyle||''}}"
-        disabled="{{props.disabled||''}}"
+        disabled="{{props.readonly || props.disabled||''}}"
         data-address="{{props.uAddress}}"
         data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel'])}}"
       >
@@ -653,7 +654,7 @@
         custom-item="{{props['custom-item']||''}}"
         class="{{props.itemClass}} input-item-picker input-item-picker-region"
         style="{{props.itemStyle||''}}"
-        disabled="{{props.disabled||''}}"
+        disabled="{{props.readonly || props.disabled||''}}"
         data-address="{{props.uAddress}}"
         data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel'])}}"
       >
@@ -665,18 +666,19 @@
     </block>
     <block wx:else>
       <picker 
+        id="{{props.id}}"
         bindchange="{{props.__form ? 'pickersChange' : (props['bindchange']||'')}}" 
         bindcancel="{{props.__form ? 'pickersChange' : (props['bindcancel']||'')}}" 
-        value="{{props.value||[0]}}" 
+        value="{{props.value}}" 
         range="{{props.values || props.titles||[]}}" 
         class="input-item-picker {{props.itemClass}}"
-        disabled="{{props.disabled||''}}"
+        disabled="{{props.readonly || props.disabled||''}}"
         data-address="{{props.uAddress}}"
         data-evt="{{util.dataEvt(props, ['bindchange', 'bindcancel'])}}"
       >
-        <view wx:if="{{!props.value.length}}" class='place-holder'>{{props.placeholder||'请选择'}}</view>
+        <view wx:if="{{(!props.value && props.value!==0)}}" class='place-holder'>{{props.placeholder||'请选择'}}</view>
         <block wx:else>
-          {{ (props.values && props.values[props.value]) || (props.titles && props.titles[props.value]) }}
+          {{ (props.titles && props.titles[props.value]) || (props.values && props.values[props.value]) }}
         </block>
       </picker>
     </block>

@@ -772,6 +772,13 @@ export const commonBehavior = (app, mytype) => {
             // delete ds.methods
             // delete this.originalDataSource.methods
           }
+
+          for (let ky in ds) {
+            const val = ds[ky]
+            if (lib.isFunction(val)) {
+              this[ky] = val
+            }
+          }
         }
 
         let preSet = {

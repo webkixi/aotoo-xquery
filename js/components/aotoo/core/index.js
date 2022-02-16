@@ -112,7 +112,9 @@ function mkFind(context, app){
                 } else {
                   /** 此处的数据为非实例处理数据，需要封装 */
                   datas[`data[${idx}]`] = item
-                  findIt = findIt.concat(listInstDelegate(item, listInst))
+                  const targetItem = listInstDelegate(item, listInst)
+                  targetItem.__realIndex = idx
+                  findIt = findIt.concat(targetItem)
                 }
               })
 

@@ -847,9 +847,12 @@ export const listBehavior = function(app, mytype) {
 
       findAndUpdate: function (params, cb) {
         const that = this
-        const res = this.find(params)
+        const index = this.findIndex(params)
+        const res = this.getData().data[index]
         const isFun = lib.isFunction(cb)
-        const index = res.__realIndex
+
+        // const res = this.find(params)
+        // const index = res.__realIndex
         let context = {
           update(param){
             if (lib.isObject(param)){
