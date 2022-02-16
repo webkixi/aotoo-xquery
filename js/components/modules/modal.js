@@ -14,7 +14,8 @@ module.exports = function modal(params={}){
     footerClass: 'message-modal-footer',
     showCancel: true,
     showConfirm: true,
-    editable: false
+    editable: false,
+    mask: true
   }
   let   options = {...defaultConfig, ...params}
   const width = options.width || '90%'   // width|height必须带单位
@@ -86,12 +87,12 @@ module.exports = function modal(params={}){
         this._success = null
         this._complete = null
         const bg = this.parent().find('.message-modal-bg')
-        bg.addClass('active')
 
         /**
          * title
          * content: '' || string || {}
          * showCancel: true
+         * mask: true,
          * cancelColor: '#000000'
          * cancelText: '取消'
          * confirmText: '确定'
@@ -104,18 +105,21 @@ module.exports = function modal(params={}){
          */
 
         const opts = Object.assign({}, options, param)
+        if (opts.mask) {
+          bg.addClass('active')
+        }
 
         const cancelButton = {
           title: opts.cancelText||'取消',
           itemStyle: 'color: '+ opts.cancelColor||'#000000',
-          itemClass: 'modal-cancel-button',
+          itemClass: 'modal-button modal-cancel-button',
           tap: 'onCancel'
         }
 
         const confirmButton = {
           title: opts.confirmText||'确定',
           itemStyle: 'color: '+ opts.confirmColor||'#000000',
-          itemClass: 'modal-confirm-button',
+          itemClass: 'modal-button modal-confirm-button',
           tap: 'onConfirm'
         }
 
@@ -129,35 +133,40 @@ module.exports = function modal(params={}){
           bindinput: 'onBindInput',
           bindkeyboardheightchange: 'onKeyboardPush',
           maxlength: 50,
+          'cursor-spacing': '0.6em'
           // content: opts.content||' '
         }
 
         if (opts.editable) {
-          // if (typeof (opts.editable) === 'boolean' && (lib.isString(opts.content) || lib.isNumber(opts.content)) ) {
-          if (typeof (opts.editable) === 'boolean' ) {
-            tmpInput.value = ((lib.isString(opts.content) || lib.isNumber(opts.content)) && opts.content) || ''
-            tmpInput.type = 'text'
-            tmpInput._type = 'text'
-            tmpInput = {'@input': tmpInput}
-          } else if (opts.editable === 'textarea') {
-            tmpInput.maxlength = 140
 
-            if (!lib.isObject(opts.content)) {
-              opts.content = {value: opts.content||''}
+          // 自定义
+          if (lib.isObject(opts.editable)) {
+            const customConfig = opts.editable
+            tmpInput = customConfig
+          } else {
+            if (typeof (opts.editable) === 'boolean' ) {
+              tmpInput.value = ((lib.isString(opts.content) || lib.isNumber(opts.content)) && opts.content) || ''
+              tmpInput.type = 'text'
+              tmpInput._type = 'text'
+              tmpInput = {'@input': tmpInput}
+            } else if (opts.editable === 'textarea') {
+              tmpInput.maxlength = -1
+  
+              if (!lib.isObject(opts.content)) {
+                opts.content = {value: opts.content||''}
+              }
+              if (lib.isObject(opts.content)) {
+                tmpInput = Object.assign(tmpInput, opts.content)
+                tmpInput._type = 'textarea'
+                tmpInput.bindinput = 'onBindInput?inputtype=textarea',
+                tmpInput = {'@textarea': tmpInput}
+              }
             }
-            if (lib.isObject(opts.content)) {
-              tmpInput = Object.assign(tmpInput, opts.content)
-              tmpInput._type = 'textarea'
-              tmpInput.bindinput = 'onBindInput?inputtype=textarea',
-              tmpInput = {'@textarea': tmpInput}
-            }
+            this.value = ((tmpInput['@input']||tmpInput['@textarea']||tmpInput).value) || ''
+            this.oldValue = this.value
           }
-          this.value = ((tmpInput['@input']||tmpInput['@textarea']).value) || ''
-          this.oldValue = this.value
         } else {
-          if (lib.isString(opts.content)) {
-            tmpInput = opts.content
-          }
+          tmpInput = opts.content
         }
 
         let itemCls = (title ? 'message-modal active ' : 'message-modal without-title active ') + (opts.itemClass||'')
@@ -195,7 +204,7 @@ module.exports = function modal(params={}){
       onCancel(){
         const theSuccess = this._success
         const bg = this.parent().find('.message-modal-bg')
-        bg.removeClass('active')
+        bg && bg.removeClass('active')
         this.reset()
         if (lib.isFunction(theSuccess)) {
           theSuccess({
@@ -209,8 +218,6 @@ module.exports = function modal(params={}){
       onConfirm(){
         const theSuccess = this._success
         const bg = this.parent().find('.message-modal-bg')
-        bg.removeClass('active')
-        this.reset()
         if (lib.isFunction(theSuccess)) {
           theSuccess({
             content: this.value,
@@ -218,6 +225,8 @@ module.exports = function modal(params={}){
             cancel: false
           })
         }
+        bg && bg.removeClass('active')
+        this.reset()
       },
 
       onKeyboardConfirm(e){
