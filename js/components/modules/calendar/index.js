@@ -328,7 +328,8 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
     }
     options.data = []
     options.header['@list'].header = {
-      title: `${startPoint.year}-${startPoint.month}`, 
+      // title: `${startPoint.year}-${startPoint.month}`, 
+      title: ' ',
       itemClass: 'calendar-weektils-header', 
       $$id: 'calendar-weektils-header',
       dot: [
@@ -350,18 +351,18 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
     calendarMode = Object.assign(calendarMode, options.mode)
   }
 
-  // if ([3, '3'].includes(calendarMode.is)){
-  //   calendarMode.is = 'swiper-loop'
-  //   options.mode = 3
-  // }
-  // if ([2, '2'].includes(calendarMode.is)){
-  //   calendarMode.is = 'flatswiper'
-  //   options.mode = 2
-  // }
-  // if ([1, '1'].includes(calendarMode.is)){
-  //   calendarMode.is = 'flatlist'
-  //   options.mode = 1
-  // }
+  if ([3, '3'].includes(calendarMode.is)){
+    calendarMode.is = 'swiper-loop'
+    options.mode = 3
+  }
+  if ([2, '2'].includes(calendarMode.is)){
+    calendarMode.is = 'flatswiper'
+    options.mode = 2
+  }
+  if ([1, '1'].includes(calendarMode.is)){
+    calendarMode.is = 'flatlist'
+    options.mode = 1
+  }
 
   let validMonth = getValidMonth.call(this, startPoint, total, options, $value)
 
@@ -415,6 +416,8 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
         optionsReady.call(this)
       }
 
+      this.changeCalendarHeader(`${startPoint.year}-${startPoint.month}`)
+
       app.hooks.once('goto-today', function(){
         that.reset(function(){
           if (current === that.swiperCurrent) {
@@ -428,22 +431,52 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
       getValue(){
         return this.value
       },
+      gotoToday(){
+        app.hooks.emit('goto-today')
+      },
       changeCalendarHeader(screenId, params={}){
         const title = params.title
         clearTimeout(timmer_change_month)
         screenId = screenId.replace('box-', '')
         const $$ = this.activePage.getElementsById.bind(this.activePage)
-        const monthStr = $$(screenId).getData()['@list'].id
+        let monthStr = screenId
+        if (monthStr.indexOf('mon-') > -1) {
+          monthStr = $$(screenId).getData()['@list'].id
+        }
         const header = $$('calendar-weektils-header')
         this.currentTimepoint = getYmd(monthStr+'-1')
         timmer_change_month = setTimeout(() => {
           if (lib.isFunction(options.bindchange)) {
-            const result = options.bindchange.call(header, {title: monthStr}) || {title: monthStr}
-            header.update(result)
+            let customChangeHeaderStat = false
+            const ctx = {
+              changeHeaderTitle(param){
+                customChangeHeaderStat = true
+                if (lib.isString(param)) {
+                  param = {title: param}
+                }
+                if (lib.isObject(param)) {
+                  header.update(param)
+                }
+              }
+            }
+            this.changeHeaderTitle = function(param){
+              customChangeHeaderStat = true
+              if (lib.isString(param)) {
+                param = {title: param}
+              }
+              if (lib.isObject(param)) {
+                header.update(param)
+              }
+            }
+            options.bindchange.call(this, this.currentTimepoint)
+            if (!customChangeHeaderStat) {
+              header.update({title: monthStr})
+            }
+            // const result = options.bindchange.call(ctx, {title: monthStr}) || {title: monthStr}
+            // header.update(result)
           } else {
             header.update({title: monthStr})
           }
-          
         }, 50);
       },
       swiperChange(e){
