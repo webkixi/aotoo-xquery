@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/echarts/index",
     "pages/calendar/longcalendar",
     "pages/calendar/multipy",
     "pages/calendar/single",
@@ -68,6 +69,9 @@
       "b05/index",
       "b06/index"
     ]
+  }, {
+    "root": "ec-canvas/",
+    "pages": []
   }],
   "window": {
     "backgroundTextStyle": "light",

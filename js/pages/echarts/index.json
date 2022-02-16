@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "ec-canvas": "../../ec-canvas/ec-canvas"
+  },
+  "componentPlaceholder": {
+    "ec-canvas": "ui-item"
+  }
+}

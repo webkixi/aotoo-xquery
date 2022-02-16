@@ -1,0 +1,5 @@
+<view class="container">
+  <ec-canvas wx:if="{{ec}}" id="mychart-dom-bar" canvas-id="mychart-bar" ec="{{ ec }}" style="width: 100vw; height: 300px;"></ec-canvas>
+</view>
+<ui-item item="{{codeButton}}" />
+<ui-pop item="{{readme}}" />
