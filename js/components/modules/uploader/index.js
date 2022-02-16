@@ -78,9 +78,12 @@ function adapterUploader(data, options) {
   if (guideImages.length<count) {
     const lastGuidItem = guideImages[(guideImages.length-1)]
     for(let ii=0; ii<count; ii++) {
-      if (ii >= guideImages.length) {
+      if (!guideImages[ii]) {
         guideImages.push(lastGuidItem)
       }
+      // if (ii >= guideImages.length) {
+      //   guideImages.push(lastGuidItem)
+      // }
     }
   }
 
@@ -96,15 +99,32 @@ function adapterUploader(data, options) {
     myData = myData.splice(0, 9)
   } else {
     // 小于9张图片，自动补一个 + 按钮在最后
+    // if (isMultiUpload && myData.length < 9) {  // max = 9
+    //   myData.push( (guideImages[myData.length] || guideImages[0]) )
+    // }
+
+    // 小于9张图片，自动补一个 + 按钮在最后
     if (isMultiUpload && myData.length < 9) {  // max = 9
-      myData.push(guideImages[0])
+      if (options.count === 1) {
+        if (myData.length < options.limit) {
+          myData.push( (guideImages[myData.length] || guideImages[0] ))
+        }
+      } else {
+        myData.push( (guideImages[myData.length] || guideImages[0]) )
+      }
     }
   }
 
   myData.forEach((item, ii)=>{
     const uindex = lib.suid('up-item-')
-    if (item === guideImages[ii] || item === guideImages[0]) {
-      item = {title: item, itemClass: 'upload-guid-item'}
+    let   isActionButton = false
+    if (
+      item === guideImages[ii] || 
+      item === guideImages[0] || 
+      (lib.isObject(item) && item.isActionButton)) 
+    {
+      isActionButton = true
+      if (!lib.isObject(item)) item = {title: item, itemClass: 'upload-guid-item', isActionButton: true}
     } else {
       if (lib.isString(item)) {
         item = {img: {src: item, mode: 'aspectFill'}}
@@ -123,7 +143,37 @@ function adapterUploader(data, options) {
     }
     if (typeof item === 'object') {
       item.uindex = uindex
-      item.aim = `onChooseMedia?uindex=${uindex}&index=${ii}`  // 准备上传图片
+      if (isActionButton) {
+        item.aim = `onChooseMedia?uindex=${uindex}&index=${ii}`  // 准备上传图片
+      } else {
+        if (options.previewTap && lib.isString(options.previewTap)) {
+          item.aim = options.previewTap
+        } else {
+          item.aim = `onChooseMedia?uindex=${uindex}&index=${ii}`  // 准备上传图片
+        }
+      }
+
+      if (item.callback) {
+        const callback = item.callback
+        const oriContext = item.context
+        delete item.callback
+        delete item.context
+        const tempContext = {
+          deleteSelf(){
+            oriContext.onDeleteSelf({}, {uindex}, null)
+          },
+          preview(_content={}){
+            if (_content) {
+              const keys = Object.keys(_content)
+              if (keys.length > 0) {
+                _content.uindex = uindex
+                _content && oriContext.findAndUpdate({uindex}, _content)
+              }
+            }
+          }
+        }
+        callback.call(tempContext, item)
+      }
       rightData.push(item)
     }
   })
@@ -134,7 +184,11 @@ function _preview(options) {
   const onPreview = options.onPreview
   const res = this.chooseResult
   const {tempFiles} = res
-  const data = this.getData().data
+  let   data = this.getData().data
+  if (options.sortByDesc) {
+    data = data.reverse()   // 转成正序后处理数据，输出时再倒叙输出
+  }
+
   if (this.selectPoint) {
     const {uindex, index} = this.selectPoint
     let   selectIndex = index
@@ -151,7 +205,13 @@ function _preview(options) {
       const {previewPath, path, size} = file
       let   previewContent = previewPath || {title: file.name}
       if (lib.isFunction(onPreview)) {
-        previewContent = onPreview.call(this, file) || previewContent
+        previewContent = onPreview.call(this, file, selectIndex) || previewContent
+        if (lib.isFunction(previewContent)) {
+          const callback = previewContent
+          previewContent = previewPath ? {img: {src: previewPath, mode: 'aspectFill'}} : {title: file.name}
+          previewContent.context = this
+          previewContent.callback = callback
+        }
       }
       if (options.count !== 1) {  // 限制了预览图片数及可上传图片数
         if (selectIndex < data.length) {
@@ -163,7 +223,20 @@ function _preview(options) {
       selectIndex++
     })
     const $data = adapterUploader(data, options)
-    this.update($data)
+
+
+    const that = this
+    function beforeUpload(){
+      if (lib.isFunction(options.beforeUpload)) {
+        options.beforeUpload.call(that, $data)
+      }
+    }
+
+    if (options.sortByDesc) {
+      this.update($data.reverse(), beforeUpload)
+    } else {
+      this.update($data, beforeUpload)
+    }
   }
 }
 
@@ -175,9 +248,12 @@ uploader({
   limit: n,   选择多少个上传图片
   type: '',  上传类型  
   guideImages: [],  data项为空时默认显示的内容，比如 + 号
-  onPreview: function(){},  点击上传按钮，选中文件后的回调  
+  onPreview: function(){},  点击上传按钮，选中文件后的回调，用户可自定义预览的内容(基于item)  
+  previewTap: string, 预览列表中，点击预览图片，用户自定义的方法名称
+  beforeUpload: function(){}, 上传之前，预览之后的最后一刻
   onUploaded: function(){},  上传完成后的回调  
   onDelete: function(){},  删除预览图片时的回调
+  sortByDesc: false,  是否倒叙预览图片列表
   {...}  小程序上传组件的参数，这些参数参考小程序官方组件说明，这些参数包含 图片上传参数，视频上传参数，文件上传参数
 
   后端上传参数，统一配置: 
@@ -225,9 +301,9 @@ export function uploader(options, cb){
     limit = options.count
   }
 
-  if (uploadType === 'video' || uploadType === 'file') {
-    limit = 1
-  }
+  // if (uploadType === 'video' || uploadType === 'file') {
+  //   limit = 1
+  // }
 
   return {
     $$id: (options.$$id || options.id),
@@ -238,6 +314,7 @@ export function uploader(options, cb){
         this.activePage[instanceName] = this
       }
     },
+    ready: options.ready,
     methods: {
       onDeleteSelf(e, param, inst){
         const that = this
@@ -255,7 +332,8 @@ export function uploader(options, cb){
           } else {
             this.delete({uindex}, function(){
               const data = that.getData().data
-              const rightData = data.filter(item=>!item.title)
+              // const rightData = data.filter(item=>!item.title)
+              const rightData = data.filter(item=>!item.isActionButton)
               const $data = adapterUploader(rightData, options)
               this.update({data: $data})
             })
@@ -354,7 +432,7 @@ export function uploader(options, cb){
 
           // res = ['tempFilePath', 'width', 'height', 'duration', 'size', 'thumbTempFilePath']
           wx.chooseMedia({
-            count: 1,
+            count: limit,
             mediaType: ['video'],
             maxDuration: options.maxDuration||60,
             camera: options.camera||'back',
@@ -371,6 +449,10 @@ export function uploader(options, cb){
                 },
                 fail(err){
                   console.log(err);
+                  res = Object.assign(res, {path: res.thumbTempFilePath}, {previewPath: res.thumbTempFilePath})
+                  _res.tempFiles[0] = res
+                  that.chooseResult = _res
+                  that.preview()
                 },
                 complete(res){
 
@@ -444,7 +526,7 @@ export function uploader(options, cb){
                 wx.uploadFile({
                   url,
                   filePath: tempFilePath,
-                  name: options.name || 'xcxfile',  // 后端接收到文件的字段
+                  name: options.name || 'file',  // 后端接收到文件的字段
                   success: function(res){
                     if (typeof successCb === 'function') successCb.call(that, res)
                     if (typeof onUploaded === 'function') onUploaded.call(that, res)
@@ -461,7 +543,7 @@ export function uploader(options, cb){
                   wx.uploadFile({
                     url,
                     filePath: path,
-                    name: options.name || 'xcxfile',
+                    name: options.name || 'file',
                     success: function(res){
                       if (typeof successCb === 'function') successCb.call(that, res, ii)
                       if (typeof onUploaded === 'function') onUploaded.call(that, res, ii)
