@@ -139,6 +139,7 @@ const inputAttributs = {
   'end': undefined,
   'range': undefined,  // 在rating中作为范围
   'customItem': undefined,
+  'value-separator': undefined,  // 显示picker.value值时，每个值之间的间隔符
 
   // picker-view
   'indicator-style': undefined,
@@ -157,7 +158,8 @@ const inputAttributs = {
   'adjust-position': undefined,
 
   // textarea
-  'strCount': undefined
+  'strCount': undefined,
+  'maxcount': undefined,  // 是否显示统计以及统计字数上限
 }
 
 const inputAttributsAccessKeys = Object.keys(inputAttributs)
@@ -183,12 +185,13 @@ function resetUIitem(params, cls='input-item-title') {
 
 // 依照依赖规范输出配置
 function normAsset(params, normAst=[]) {
-  let nInput = {}
-  if (params.type === 'span') {
-    return params
-  }
-  Object.keys(params).forEach(key => normAst.includes(key) ? nInput[key] = params[key] : '')
-  return nInput
+  return params
+  // let nInput = {}
+  // if (params.type === 'span') {
+  //   return params
+  // }
+  // Object.keys(params).forEach(key => normAst.includes(key) ? nInput[key] = params[key] : '')
+  // return nInput
 }
 
 function resetPickersValues(params, e) {
@@ -199,39 +202,64 @@ function resetPickersValues(params, e) {
     let len = values.length
     let column = e && e.detail.column
 
-    for (let ii = 0; ii < len; ii++) {
-      let columnVals = values[ii]
-      if (!lib.isArray(columnVals)) {
-        console.log('picker类型的组件要求input.values为二维数组! 类似[[], []]')
-        break;
-      }
-      let _titles = []
-      let _select = -1
-      columnVals.forEach((item, jj) => {
-        if (item.select) _select = jj
-        if (typeof item == 'string' || typeof item == 'number') {
-          item = {title: item.toString()}
+    if (lib.isArray(values[0])) {
+      //二维数组，多重picker
+      for (let ii = 0; ii < len; ii++) {
+        let columnVals = values[ii]
+        if (!lib.isArray(columnVals)) {
+          // console.log('picker类型的组件要求input.values为二维数组! 类似[[], []]')
+          break;
         }
-        if (item.title) {
-          _titles.push(item.title)
-        }
-      })
-      if (value[ii] || value[ii]===0) {
-        if (e) {
-          if ((column || column === 0) && ii <= column) {
+        let _titles = []
+        let _select = -1
+        columnVals.forEach((item, jj) => {
+          if (item.select) _select = jj
+          if (typeof item == 'string' || typeof item == 'number') {
+            item = {title: item.toString()}
+          }
+          if (item.title) {
+            _titles.push(item.title)
+          }
+        })
+        if (value[ii] || value[ii]===0) {
+          if (e) {
+            if ((column || column === 0) && ii <= column) {
+              _select = value[ii]
+            }
+          } else {
             _select = value[ii]
           }
-        } else {
-          _select = value[ii]
         }
-      }
-      if (_select > -1) {
-        value[ii] = _select;
+        if (_select > -1) {
+          value[ii] = _select;
+        }
         titles[ii] = _titles;
       }
+      params.value = value
+      params.titles = titles
+    } else {
+      // 单列picker
+      const _titles = []
+      let   _select = (params.value||params.value===0) ? params.value : ''
+      values.forEach((item, ii)=>{
+        let valueStr = ''
+        if (lib.isObject(item)) {
+          valueStr = item.title || ''
+        }
+        if (lib.isString(item)) {
+          valueStr = item
+        }
+        if (params.value === valueStr) {
+          _select = ii
+        }
+        if (lib.isString(_select) && valueStr === _select) {
+          _select = ii
+        }
+        _titles.push(valueStr)
+      })
+      params.value = _select
+      params.titles = _titles
     }
-    params.value = value
-    params.titles = titles
   }
   return params
 }
@@ -263,6 +291,7 @@ function normInput(params, profile) {
       if (union.target || union.id) {
         const selfId = params.id || params.name
         const target = union.target || union.id
+        const event = union.event
         const cb = union.callback
         if (typeof cb == 'function') {
           let tmp = {
@@ -270,14 +299,12 @@ function normInput(params, profile) {
             address: '',
             assets: {},
             inputData: {},
-            setData: function() {
-              that.setData.apply(that, arguments)
-            },
+            // setData: function() {
+            //   that.setData.apply(that, arguments)
+            // },
             save: function(param) {
               if (param && lib.isObject(param)) {
-                this.setData({ [tmp.address]: param })
-              } else {
-                that.setData({[tmp.address]: tmp.inputData })
+                that.setData({ [tmp.address]: Object.assign(tmp.inputData, param)})
               }
             }
           }
@@ -288,7 +315,7 @@ function normInput(params, profile) {
               tmp.assets = that.getAddressInfo(params.uAddress).inputData
               tmp.inputData = tmp.assets
               tmp.address = res.address
-              cb.call(tmp, {value: point.value})
+              cb.call(tmp, {...point})
             }
           })
           // _watcher = Object.assign(_watcher, tmp)
@@ -330,7 +357,15 @@ function normInput(params, profile) {
       }
 
       if (params.type == 'textarea') {
-        params.maxlength = params.maxlength || 0
+        params.maxcount = params.maxcount || 0
+        if (params.value && params.value.length && params.maxcount > 0) {
+          let counter = lib.strlen(params.value)
+          if (counter > params.maxcount) {
+            counter = params.maxcount
+            params.value = lib.subcontent(params.value, params.maxcount)
+          }
+          params.strCount = counter
+        }
       }
   
       if (params.type == 'dropdown') {
@@ -722,7 +757,7 @@ Component({
      * @param {String} id 表单id
      * @param {Object} val 表单配置
      */
-    profile: function (id, val) {
+    profile(id, val) {
       const allocation = this.allocation
       const ipData = allocation[id]  // id必须为string类型
       const address = ipData['uAddress']
@@ -752,23 +787,24 @@ Component({
         clsnm = clsnm.replace(/\./g, '')
         let ipData = this.getInputData(inputId)
         let inputType = ipData.type
-        if (inputType === 'span') {
-          // ipData = ipData.value
-          let value = ipData.value
-          let itCls = value.itemClass && value.itemClass.split(' ') || ''
-          let itemClass = itCls[(itCls.length-1)]
-          let feature = value.$$id || value.id || itemClass
-          if(feature) {
-            let target = this.find(feature)
-            target&&target.addClass(clsnm)
-          }
-          return
-        }
+        // if (inputType === 'span') {
+        //   // ipData = ipData.value
+        //   let value = ipData.value
+        //   let itCls = value.itemClass && value.itemClass.split(' ') || ''
+        //   let itemClass = itCls[(itCls.length-1)]
+        //   let feature = value.$$id || value.id || itemClass
+        //   if(feature) {
+        //     let target = this.find(feature)
+        //     target&&target.addClass(clsnm)
+        //   }
+        //   return
+        // }
         let inputCls = ipData.inputClass || ipData.itemClass || ''
         let ary = clsnm.split(' ')
         let clsAry = ary.filter(cls => inputCls.indexOf(cls) === -1)
         inputCls = inputCls + ' ' + clsAry.join(' ')
-        return inputType === 'span' ? {itemClass: inputCls} : {inputClass: inputCls}
+        return {inputClass: inputCls}
+        // return inputType === 'span' ? {itemClass: inputCls} : {inputClass: inputCls}
       }
 
       if (lib.isObject(id)) {
@@ -786,7 +822,7 @@ Component({
         let inputCls = addInputClass(id, clsName)
         if (inputCls) {
           this.value({
-            [id]: { inputClass: inputCls }
+            [id]: { ...inputCls }
           })
         }
       }
@@ -802,22 +838,23 @@ Component({
         clsnm = clsnm.replace(/\./g, '')
         let ipData = this.getInputData(id)
         let inputType = ipData.type
-        if (inputType === 'span') {
-          let value = ipData.value
-          let itCls = value.itemClass && value.itemClass.split(' ') || ''
-          let itemClass = itCls[(itCls.length - 1)]
-          let feature = value.$$id || value.id || itemClass
-          if (feature) {
-            let target = this.find(feature)
-            target&&target.removeClass(clsnm)
-          }
-          return
-        }
+        // if (inputType === 'span') {
+        //   let value = ipData.value
+        //   let itCls = value.itemClass && value.itemClass.split(' ') || ''
+        //   let itemClass = itCls[(itCls.length - 1)]
+        //   let feature = value.$$id || value.id || itemClass
+        //   if (feature) {
+        //     let target = this.find(feature)
+        //     target&&target.removeClass(clsnm)
+        //   }
+        //   return
+        // }
         let inputCls = ipData.inputClass || ''
         let ary = inputCls.split(' ')
         let clsAry = ary.filter(cls => clsnm.indexOf(cls) === -1)
         inputCls = clsAry.join(' ')
-        return inputType === 'span' ? {itemClass: inputCls} : {inputClass: inputCls}
+        return {inputClass: inputCls}
+        // return inputType === 'span' ? {itemClass: inputCls} : {inputClass: inputCls}
       }
 
       if (lib.isObject(id)) {
@@ -835,7 +872,7 @@ Component({
         let inputCls = rmvInputClass(id, clsName)
         if (inputCls) {
           this.value({
-            [id]: { inputClass: inputCls }
+            [id]: { ...inputCls }
           })
         }
       }
@@ -856,24 +893,100 @@ Component({
           }
         })
       } else {
-        Object.keys(val).forEach(ky=>{
-          if (val[ky]) {
-            let element = val[ky]
-            let tmp = {}
-            Object.keys(element).forEach(key=>{
-              if (element[key]!==undefined) {
-                tmp[key] = element[key]
-              }
-            })
-            tmpValue[ky] = tmp
-          }
+        Object.keys(val).forEach(inputId=>{
+          tmpValue[inputId] = this.getValue(inputId, true)
         })
+
+        // Object.keys(val).forEach(ky=>{
+        //   if (val[ky]) {
+        //     let element = val[ky]
+        //     let tmp = {}
+        //     Object.keys(element).forEach(key=>{
+        //       if (element[key]!==undefined) {
+        //         tmp[key] = element[key]
+        //       }
+        //     })
+        //     tmpValue[ky] = tmp
+        //   }
+        // })
       }
 
       if (id) {
         if (val.type === 'dropdown') {
           // return forData ? {type: val.type, id: (val.id||val.name), text: val.text, value: val.value} : val.value
           return {type: tmpValue.type, id: (tmpValue.id||tmpValue.name), text: tmpValue.text, value: tmpValue.value}
+        }
+
+        if (val.type === 'picker') {
+          if (val.values && val.values.length) {
+            let _values = val.values
+            let _value = [].concat(val.value)
+            let _val = []
+            // if (_value[0] === undefined) _value[0] = 0
+
+            for (let ii=0; ii<_value.length; ii++) {
+              const sub = _value[ii]||0
+              if (lib.isArray(_values[ii])) {  // 二维数组
+                let tmp = _values[ii][sub]
+                if (!lib.isObject(tmp)) {
+                  tmp = {title: tmp}
+                }
+                if (lib.isObject(tmp)) {
+                  tmp.sub = sub  // value中的值，指向 values 的下标
+                  if (!tmp.title && tmp.title !== 0 ) {
+                    tmp.sub = -1
+                  }
+                }
+                _val.push(tmp)
+              }
+            }
+            if (!_val.length) {
+              _val = _value
+            }
+            tmpValue.value = _val
+          }
+        }
+
+        if (val.type === 'picker') {
+          if (val.values && val.values.length) {
+            let _values = val.values
+            let _value = [].concat(val.value)
+            let _val = []
+
+            for (let ii=0; ii<_value.length; ii++) {
+              const sub = _value[ii]||0
+              // 多维picker
+              if (lib.isArray(_values[ii])) {  // 二维数组
+                let tmp = _values[ii][sub]
+                if (!lib.isObject(tmp)) {
+                  tmp = {title: tmp}
+                }
+                if (lib.isObject(tmp)) {
+                  tmp.sub = sub  // value中的值，指向 values 的下标
+                  if (!tmp.title && tmp.title !== 0) {
+                    tmp.sub = -1
+                  }
+                }
+                _val.push(tmp)
+              } else {
+                // 一维picker   @1 
+                let tmp = _values[ii]
+                if (!lib.isObject(tmp)) {
+                  tmp = {title: tmp}
+                }
+                if (lib.isObject(tmp)) {
+                  tmp.sub = sub  // value中的值，指向 values 的下标
+                }
+                _val.push(tmp)
+              }
+            }
+
+            if (!_val.length) {
+              // _val = _value
+              _val = val.value   // 这个才是正确的 @2    @1与@2要同时放开才正确
+            }
+            tmpValue.value = _val
+          }
         }
         return forData ? tmpValue : tmpValue.value
       } else {
@@ -887,7 +1000,12 @@ Component({
      * @param {String|Object} val 
      */
     setValue(id, val){
-      this.value(id, val)
+      if (val) {
+        if (!lib.isObject(val)) {
+          val = {value: val}
+        }
+        this.value(id, val)
+      }
     },
 
     updateDropdownOptions(id, options){
@@ -934,9 +1052,36 @@ Component({
                   willUpdate = {[res.address]: resault}
                 } else {
                   // 下拉菜单允许数组
-                  if (lib.isArray(val) && inputType === 'dropdown') {
-                    val = {titles: {data: buildDropdownOptions(val, address)}}
+                  if (inputType === 'dropdown') {
+                    if (lib.isObject(val)) {
+                      if (val.titles && lib.isArray(val.titles)) {
+                        val = Object.assign({}, val, {titles: {data: buildDropdownOptions(val.titles, address)}})
+                      }
+                    }
+                    if (lib.isArray(val)) {
+                      val = {titles: {data: buildDropdownOptions(val, address)}}
+                    }
                   }
+
+                  // 更新picker的values
+                  if (inputType === 'picker') {
+                    if (lib.isObject(val)) {
+                      if (val.values && lib.isArray(val.values)) {
+                        val = Object.assign({}, val, resetPickersValues(val))
+                      }
+                    }
+                    if (lib.isArray(val)) {
+                      val = resetPickersValues({values: val})
+                    }
+                  }
+
+                  // if (lib.isArray(val) && inputType === 'dropdown') {
+                  //   val = {titles: {data: buildDropdownOptions(val, address)}}
+                  // }
+                  // if (lib.isArray(val) && inputType === 'picker') {
+                  //   val = resetPickersValues({values: val})
+                  // }
+
                   if (lib.isObject(val)) {
                     let resault = Object.assign({}, res.inputData, val)
                     res.inputData = resault = normInput.call(this, resault, res.profile)
@@ -949,34 +1094,51 @@ Component({
             }
           }
         } else {
-          if (lib.isObject(id)) {
-            let willUpdate = {}
-            Object.keys(id).forEach($id=>{
-              const myval = id[$id]
-              const ipData = allocation[$id]
-              if (ipData) {
-                const inputType = ipData.type
-                const address = ipData['uAddress']
-                let res = this.getAddressInfo(address)
-                if (res) {
-                  if (lib.isString(myval)) {
-                    res.inputData.value = myval
-                    willUpdate[res.address] = res.inputData
-                  } else {
-                    if (lib.isObject(myval)) {
-                      let resault = Object.assign({}, res.inputData, myval)
-                      res.inputData = resault
-                      willUpdate[res.address] = resault
-                    }
-                  }
-                  allocation[$id] = res.inputData
-                }
-              }
-            })
-            this.setData(willUpdate)
-          } else {
+
+          // 取单个表单的配置
+          if (lib.isString(id)) {
             return allocation[id]
           }
+
+          // 批量赋值
+          if (lib.isObject(id)) {
+            const _param = id
+            Object.keys(_param).forEach(inputId=>{
+              const _val = _param[inputId]
+              if (_val || _val === 0) {
+                this.value(inputId, _val)
+              }
+            })
+          }
+
+          // if (lib.isObject(id)) {
+          //   let willUpdate = {}
+          //   Object.keys(id).forEach($id=>{
+          //     const myval = id[$id]
+          //     const ipData = allocation[$id]
+          //     if (ipData) {
+          //       const inputType = ipData.type
+          //       const address = ipData['uAddress']
+          //       let res = this.getAddressInfo(address)
+          //       if (res) {
+          //         if (lib.isString(myval)) {
+          //           res.inputData.value = myval
+          //           willUpdate[res.address] = res.inputData
+          //         } else {
+          //           if (lib.isObject(myval)) {
+          //             let resault = Object.assign({}, res.inputData, myval)
+          //             res.inputData = resault
+          //             willUpdate[res.address] = resault
+          //           }
+          //         }
+          //         allocation[$id] = res.inputData
+          //       }
+          //     }
+          //   })
+          //   this.setData(willUpdate)
+          // } else {
+          //   return allocation[id]
+          // }
         }
       } else {
         return allocation
@@ -1189,7 +1351,7 @@ Component({
           }
           setAllocation.call(this, res, {value: (value||''), text, __param: param })
           // res.inputData.value = text||''
-          res.inputData.value = {title: text, value}
+          // res.inputData.value = {title: text, value}
           res.param = param
         }
         if (!fromMenu) {
@@ -1292,13 +1454,13 @@ Component({
           break;
 
         case 'input':
-          if (!res.inputData.readonly && (detail.value || detail.value === '')) {
+          if ((!res.inputData.readonly&&!res.inputData.disabled) && (detail.value || detail.value === '')) {
             if (res.inputData.type === 'textarea') {
-              if (res.inputData.maxlength >0) {
+              if (res.inputData.maxcount >0) {
                 let counter = lib.strlen(detail.value)
-                if (counter > res.inputData.maxlength) {
-                  counter = res.inputData.maxlength
-                  detail.value = lib.subcontent(detail.value, res.inputData.maxlength)
+                if (counter > res.inputData.maxcount) {
+                  counter = res.inputData.maxcount
+                  detail.value = lib.subcontent(detail.value, res.inputData.maxcount)
                 }
                 res.inputData.strCount = counter
               }
@@ -1358,7 +1520,7 @@ Component({
       const res = this.getAddressInfo(dataset.address)
       if (res) {
         const type = res.inputData.type
-        res.inputData.value = detail.value
+        // res.inputData.value = detail.value
         setAllocation.call(this, res, {value: detail.value, checked: detail.value})
 
         res.inputData.bindchange && runFormBindFun.call(this, 'bindchange', res, e)
@@ -1403,7 +1565,6 @@ Component({
     },
 
     pickersChange: function(e) {
-      // console.log('修改的列为', e.detail.column, '，值为', e.detail.value);
       const dataset = e.currentTarget.dataset
       const detail = e.detail
       const res = this.getAddressInfo(dataset.address)
@@ -1411,12 +1572,8 @@ Component({
         const type = res.inputData.type
         const column = detail.column
         const value = detail.value
-        if (column || column === 0) {
-          res.inputData.value[column] = value
-        } else {
-          res.inputData.value = value
-        }
-        setAllocation.call(this, res, {value: res.inputData.value})
+        // setAllocation.call(this, res, {value: res.inputData.value})
+        setAllocation.call(this, res, {value: detail.value, column})
         if (column || column === 0) {
           runFormBindFun.call(this, 'bindcolumnchange', res, e, 'pickers')
         } else {
@@ -1424,6 +1581,36 @@ Component({
         }
       } else {
         runFormBindFun.call(this, 'bindcancel', res, e, 'cancel')
+      }
+    },
+
+    _union(param){
+      const that = this
+      if (lib.isObject(param)) {
+        const {id, event, callback} = param
+        const target = id
+        if (id && lib.isFunction(callback)) {
+          this.hooks.on('change', function(param) {
+            const {id, point} = param   // point为观察的点的inputData
+            if (id == target) {
+              callback.call(that, {...point})
+            }
+          })
+        }
+      }
+    },
+
+    union(param){
+      if (lib.isObject(param)) {
+        this._union(param)
+      }
+
+      if (lis.isArray(param)) {
+        param.forEach(item=>{
+          if (lib.isObject(item)) {
+            this._union(item)
+          }
+        })
       }
     }
   }
@@ -1433,19 +1620,46 @@ function setAllocation(res, val) {
   var id = res.inputData.id || res.inputData.name
   let itemInput = this.allocation[id]
   const itemInputValue = itemInput.value
+  const column = val.column
+  let hasChanged = false
+
   if (itemInput) {
-    if (lib.isObject(val)) {
-      this.allocation[id] = Object.assign({}, itemInput, val)
-      if (val.value) {
-        if (itemInputValue != val.value) {
-          if (itemInput.type === 'dropdown') {
-            this.allocation[id].value = {title: val.text, value: val.value}
-          }
-          itemInput = this.allocation[id]
-          this.hooks.emit('change', {id, point: itemInput})
+    if (lib.isArray(itemInputValue)) {
+      if (column || column === 0) {
+        hasChanged = (JSON.stringify(itemInputValue[column]) !== JSON.stringify((val.value)))  
+      } else {
+        hasChanged = (JSON.stringify(itemInputValue) !== JSON.stringify((val.value)))
+      }
+    } else {
+      hasChanged = itemInputValue !== (val.value)
+    }
+
+    if (hasChanged) {
+      if (itemInput.type === 'dropdown') {
+        this.allocation[id].value = {title: val.text, value: val.value}
+      } 
+      else if (['picker', 'pickers', 'picker-view'].includes(itemInput.type)){
+        if (column || column === 0) {
+          this.allocation[id].value[column] = val.value
+        } else {
+          this.allocation[id].value = val.value
         }
       }
+      else {
+        this.allocation[id] = Object.assign({}, itemInput, val)
+      }
+
+      itemInput = this.allocation[id]
+      this.hooks.emit('change', {id, point: itemInput})
     }
+
+    // if (itemInputValue !== val.value) {
+    //   if (itemInput.type === 'dropdown') {
+    //     this.allocation[id].value = {title: val.text, value: val.value}
+    //   }
+    //   itemInput = this.allocation[id]
+    //   this.hooks.emit('change', {id, point: itemInput})
+    // }
   }
 }
 
@@ -1483,6 +1697,56 @@ function runFormBindFun(fn, res, e, from) {
   res.values = res.inputData.values
   res.id = id
   res.type = res.inputData.type
+
+  if (from === 'cancel') {
+    if (lib.isFunction((res && res.inputData && res.inputData['cancel']))) {
+      res.inputData['cancel'].call()
+    }
+    return 
+  }
+
+
+  // 设置picker的值
+  // 多重picker如果绑定了 bindchange事件，则bindcolumnchange不会即时更新
+  function updatePickers(data){
+    // if (fn === 'bindcolumnchange') {
+    //   if (res.inputData['bindchange']) {
+    //     return
+    //   }
+    // }
+    that.setData({[res.address]: data})
+  }
+
+  // 定义picker(多重)的bindcolumnchange的更新方法
+  function reDefinePickerColumnCallback(e, res, context) {
+    let column = e.detail.column
+    let value = e.detail.value
+    if (from === 'picker-view') {
+      e.param.columnValue = e.detail.columnValue
+      column = e.detail.columnValue.column
+      value = e.detail.columnValue.value
+    }
+    context.updateNextColumn = function(col, param) {
+      if (lib.isArray(col)) {
+        param = col
+        col = undefined
+      }
+      let $column = column + 1
+      if (lib.isNumber(col)) {
+        $column = col
+      }
+      if (column > -1 && lib.isArray(param)) {
+        if (res.inputData.values[$column]) {
+          res.inputData.values[$column] = param
+          res.inputData._titles = [...(res.inputData.titles)||[]]
+          const resData = resetPickersValues(res.inputData, e)
+          // that.setData({[res.address]: res.inputData})
+          updatePickers(resData)
+        }
+      }
+    }
+  }
+
   if (lib.isString(res.inputData[fn])) {
     let funName = res.inputData[fn]
     // let targetObj = (!lib.isEmpty(this.componentInst) && this.componentInst) || activePage
@@ -1495,82 +1759,88 @@ function runFormBindFun(fn, res, e, from) {
     if (from === 'pickers' || from === 'picker-view') {
       let value = res.inputData.value
       let _values = res.inputData.values
-      if (fn !== 'bindcolumnchange') {
-        const values = []
-        value.forEach((idx, ii) => {
-          values.push({
-            title: _values[ii][idx].title,
-            id: _values[ii][idx].id
+      if (fn !== 'bindcolumnchange' && res.inputData.mode !== 'region') {
+        if (lib.isArray(value)) {
+          const values = []
+          value.forEach((idx, ii) => {
+            values.push({
+              title: (_values[ii] && _values[ii][idx] && _values[ii][idx].title)||'',
+              id: (_values[ii] && _values[ii][idx] && _values[ii][idx].id) || ''
+            })
           })
-        })
-        e.detail = e.detail || {}
-        e.detail.pickerValue = values
-        e.param.pickerValue = values
-        res.pickerValue = values
+          e.detail = e.detail || {}
+          e.detail.pickerValue = values
+          e.param.pickerValue = values
+          res.pickerValue = values
+        }
         if (from === 'picker-view') {
-          e.param.columnValue = e.detail.columnValue
-          let {column, value} = e.detail.columnValue
-          context.updateNextColumn = function(col, param) {
-            if (lib.isArray(col)) {
-              param = col
-              col = undefined
-            }
-            let $column = column + 1
-            if (lib.isNumber(col)) {
-              $column = col
-            }
-            if (column > -1 && lib.isArray(param)) {
-              if (res.inputData.values[$column]) {
-                res.inputData.values[$column] = param
-                that.setData({[res.address]: res.inputData})
-              }
-            }
-          }
+          reDefinePickerColumnCallback(e, res, context)
         }
       } else {
-        let column = e.detail.column
-        context.updateNextColumn = function(col, param) {
-          if (lib.isArray(col)) {
-            param = col
-            col = undefined
-          }
-          let $column = column + 1
-          if (lib.isNumber(col)) {
-            $column = col
-          }
-          if (column > -1 && lib.isArray(param)) {
-            if (res.inputData.values[$column]) {
-              res.inputData.values[$column] = param
-              let resData = resetPickersValues(res.inputData, e)
-              that.setData({[res.address]: resData})
-            }
-          }
-        }
+        reDefinePickerColumnCallback(e, res, context)
       }
     }
     
+
     if (lib.isFunction(fun)) {
       let resData = null
       let result = fun.call(context, e, res, this)
-      if (result) {
-        resData = result.inputData ? result.inputData : result
-        if (from == 'pickers') {
+      res.inputData = this.allocation[id]
+      if (from === 'pickers') {
+        if (result) {
+          resData = result.inputData ? result.inputData : result
           resData = resetPickersValues(resData, e)
+          updatePickers(resData)
+          // this.setData({[res.address]: resData})
+        } else {
+          updatePickers(res.inputData)
+          // this.setData({[res.address]: res.inputData})
         }
-        from == 'cancel' ? '' : this.setData({[res.address]: resData})
       } else {
-        /** 什么都不做 ? */
-        if (inputType === 'rating') {
-          from == 'cancel' ? '' : this.setData({[res.address]: res.inputData})
+        if (result) {
+          resData = result.inputData ? result.inputData : result
+          this.setData({[res.address]: resData})
+        } else {
+          if (inputType === 'rating') {
+            this.setData({[res.address]: res.inputData})
+          }
+          if (inputType === 'textarea' && fn === 'bindinput') {
+            this.setData({[res.address]: res.inputData})
+          }
         }
+
+        // if (result) {
+        //   resData = result.inputData ? result.inputData : result
+        //   if (from == 'pickers') {
+        //     resData = resetPickersValues(resData, e)
+        //   }
+        //   from == 'cancel' ? '' : this.setData({[res.address]: resData})
+        // } else {
+        //   res.inputData = this.allocation[id]
+        //   /** 什么都不做 ? */
+        //   if (inputType === 'rating') {
+        //     from == 'cancel' ? '' : this.setData({[res.address]: res.inputData})
+        //   }
+        //   if (from == 'pickers') {
+        //     this.setData({[res.address]: res.inputData})
+        //   }
+        // }
       }
     } else {
-      from == 'cancel' ? '' : this.setData({[res.address]: res.inputData})
+      if (from === 'pickers') {
+        updatePickers(res.inputData)
+      } else {
+        this.setData({[res.address]: res.inputData})
+      }
     }
   } else {
     let selfUpdate = ['picker-view', 'picker', 'pickers', 'dropdown', 'checkbox', 'radio', 'textarea']
-    if (selfUpdate.indexOf(res.inputData['type'])>-1) {
-      from == 'cancel' ? '' : this.setData({[res.address]: res.inputData})
+    if (from === 'pickers') {
+      updatePickers(res.inputData)
+    } else {
+      if (selfUpdate.indexOf(res.inputData['type'])>-1) {
+        this.setData({[res.address]: res.inputData})
+      }
     }
   }
 }

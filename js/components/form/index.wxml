@@ -119,7 +119,7 @@
     >{{(util.isObject(input.value) ? (input.value.title||input.value.text) : input.value)||''}}</view>
   </block>
   <block wx:else>
-    <template is="@myinput" data="{{props: input, uniqId, __form: true, inputStyle: 'z-index: 639;'+(inputStyle||'') }}"/>
+    <template is="@myinput" data="{{props: {__form: true, ...input}, uniqId, inputStyle: 'z-index: 639;'+(inputStyle||'') }}"/>
   </block>
   <!-- <input 
     wx:else
@@ -353,9 +353,9 @@
   <block wx:else>
     <block wx:if="{{input.type === 'textarea'}}">
       <template is="{{'@'+input.type}}" data="{{ props: {__form: true, ...input} }}" />
-      <block wx:if="{{input.maxlength}}">
+      <block wx:if="{{input.maxcount}}">
         <cover-view class="counter">
-          {{input.strCount||0}}/{{input.maxlength}}
+          {{input.strCount||0}}/{{input.maxcount}}
         </cover-view>
       </block>
     </block>
