@@ -54,7 +54,7 @@
 
 <template name="listData">
   <block wx:if="{{util.isArray(list.data)}}">
-    <block wx:if="{{ list.type && list.type.slip}}">
+    <block wx:if="{{ list.type && list.type.slip && list.data.length}}">
       <movable-area 
         wx:for="{{list.data}}" 
         wx:if="{{item.show}}"
@@ -129,7 +129,7 @@
 
 
     </block>
-    <block wx:elif="{{ list.type && list.type.scrollbar}}">
+    <block wx:elif="{{ list.type && list.type.scrollbar && list.data.length}}">
       <movable-area 
         wx:if="{{list.show}}"
         scale-area="{{list.type.scrollbar['scale-area']||''}}"

@@ -203,7 +203,7 @@ function presetType(properties, isDidUpdate){
         bindchange: menus.length ? 'onSlipchange?gap='+totalWidth : type.slip.bindchange,
         areaStyle: `width: ${areaWidth}; height: auto; position: relative; ${totalWidth ? 'left: -'+totalWidth+'rpx' : ''}`,
         areaItemStyle: `${type.slip.areaItemStyle};width: calc(${areaWidth} - ${2* totalWidth}rpx)`,
-        direction: totalWidth ? type.slip.direction : 'none',
+        direction: totalWidth ? type.slip.direction : 'horizontal',
         totalMenusWidth: totalWidth
       }, item.slipOptions)
       return item

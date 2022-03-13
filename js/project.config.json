@@ -32,7 +32,7 @@
         "minifyWXML": true
     },
     "compileType": "miniprogram",
-    "libVersion": "2.21.4",
+    "libVersion": "2.22.1",
     "appid": "wxf3ea6bf81c6ef85a",
     "projectname": "miaoUI",
     "debugOptions": {
