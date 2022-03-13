@@ -4,7 +4,7 @@ import { formatDate } from "./formatdate";
 import { newDate } from "./newdate";
 import { sortDates } from "./sortdates";
 import { isLeapYear } from "./isleapyear";
-import { getWeekday } from "./getweekday";
+import { getWeekday, weeksInMonth, weeksInYear } from "./getweekday";
 import { getMonthData } from "./monthcount";
 import { calendar as lunar } from '../common/lunar'
 export {
@@ -16,7 +16,9 @@ export {
   isLeapYear,
   getWeekday,
   getMonthData,
-  lunar
+  lunar,
+  weeksInMonth,
+  weeksInYear
 }
 
 wx.clendarUtil = {

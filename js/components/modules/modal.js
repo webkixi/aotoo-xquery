@@ -216,13 +216,18 @@ module.exports = function modal(params={}){
       },
 
       onConfirm(){
+        const that = this
         const theSuccess = this._success
         const bg = this.parent().find('.message-modal-bg')
         if (lib.isFunction(theSuccess)) {
           theSuccess({
             content: this.value,
             confirm: true,
-            cancel: false
+            cancel: false,
+            close(){
+              bg && bg.removeClass('active')
+              that.reset()
+            },
           })
         }
         bg && bg.removeClass('active')

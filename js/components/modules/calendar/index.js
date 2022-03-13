@@ -26,6 +26,9 @@ import {
   getFestival,
   setLunarFestival,
   getLunarFestival,
+
+  weeksInMonth,
+  weeksInYear
 } from './util/index'
 
 import { fillMonth } from './common/fillmonth'
@@ -38,7 +41,9 @@ export {
   getMonthData,
   getYmd,
   rightDate,
-  lunar
+  lunar,
+  weeksInMonth,
+  weeksInYear
 }
 
 const defaultWeekStr = '一二三四五六日';
