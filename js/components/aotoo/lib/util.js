@@ -88,8 +88,11 @@ export function isEmpty(params) {
 }
 
 //计算字符变量的长度，包含处理中文
-export function strlen(str) {
-  return str.replace(/[^\x00-\xff]/g, "aa").length;
+export function strlen(str, cnfusion) {
+  if (!cnfusion) return str.replace(/[^\x00-\xff]/g, "aa").length;
+  else {
+    return str.length
+  }
 }
 
 /* 2007-11-28 XuJian */
