@@ -359,7 +359,7 @@ function normInput(params, profile) {
       if (params.type == 'textarea') {
         params.maxcount = params.maxcount || 0
         if (params.value && params.value.length && params.maxcount > 0) {
-          let counter = lib.strlen(params.value)
+          let counter = lib.strlen(params.value, true)
           if (counter > params.maxcount) {
             counter = params.maxcount
             params.value = lib.subcontent(params.value, params.maxcount)
@@ -1457,7 +1457,7 @@ Component({
           if ((!res.inputData.readonly&&!res.inputData.disabled) && (detail.value || detail.value === '')) {
             if (res.inputData.type === 'textarea') {
               if (res.inputData.maxcount >0) {
-                let counter = lib.strlen(detail.value)
+                let counter = lib.strlen(detail.value, true)
                 if (counter > res.inputData.maxcount) {
                   counter = res.inputData.maxcount
                   detail.value = lib.subcontent(detail.value, res.inputData.maxcount)

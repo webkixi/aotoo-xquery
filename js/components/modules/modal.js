@@ -19,7 +19,7 @@ module.exports = function modal(params={}){
   }
   let   options = {...defaultConfig, ...params}
   const width = options.width || '90%'   // width|height必须带单位
-  const height = options.height || '20%'
+  const height = options.height || '30%'
   if (lib.isNumber(width)) width = `${width}%`
   if (lib.isNumber(height)) height = `${height}%`
   delete options.width
@@ -170,7 +170,7 @@ module.exports = function modal(params={}){
         }
 
         let itemCls = (title ? 'message-modal active ' : 'message-modal without-title active ') + (opts.itemClass||'')
-        let itemSty = opts.editable === 'textarea' ? buildupInitStyle({width: 90, height: title ? 35 : 28, options: opts}) : buildupInitStyle({height: title ? 20 : 16, options: opts})
+        let itemSty = opts.editable === 'textarea' ? buildupInitStyle({width: 90, height: title ? 35 : 28, options: opts}) : buildupInitStyle({height: title ? 30 : 25, options: opts})
         if (!opts.showCancel) {
           itemSty+=';grid-template-columns: 1fr;'
         }
@@ -230,6 +230,12 @@ module.exports = function modal(params={}){
             },
           })
         }
+        bg && bg.removeClass('active')
+        this.reset()
+      },
+
+      closeModal(){
+        const bg = this.parent().find('.message-modal-bg')
         bg && bg.removeClass('active')
         this.reset()
       },

@@ -150,8 +150,16 @@
 .message-modal.announce .message-modal-body{
   font-size: 1.1em;
   margin-top: 1em;
-  color: #999;
+  color: #212121;
+  font-weight: 200;
+  line-height: 2;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  box-sizing: border-box;
+  padding: 1em;
 }
 .message-modal.announce .htitle{
-  font-size: 1.4em;
+  font-size: 2em;
+  color: #555;
+  font-weight: 700;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
