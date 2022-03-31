@@ -79,7 +79,7 @@ function mkFind(context, app){
       let findIt = []
       findScope.forEach(inst => {
         // let inst = item[1] 
-        let $data = inst.getData()
+        let $data = (inst && inst.getData()) || null
         if ($data) {
           if ((inst.$$is === 'list' || inst.$$is === 'fakelist') && !$data.isItem) {
             let listInst = inst
@@ -285,9 +285,9 @@ function core(params, _page) {
       let myData = params.data
       var {eles, acts, nData} = pageDataElement(myData)
       params.data = nData
-      if (!app['_vars']) {
-        app['_vars'] = {}
-      }
+      // if (!app['_vars']) {
+      //   app['_vars'] = {}
+      // }
     }
 
     function doneActivePage(ctx){

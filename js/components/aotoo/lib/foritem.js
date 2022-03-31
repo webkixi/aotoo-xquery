@@ -8,8 +8,8 @@ import {
   suid,
   resetSuidCount,
 } from './util'
-
 import { ad } from "./ad";
+const app = require('../core/getapp')()
 
 const eventName = ['tap', 'catchtap', 'aim', '_tap', '_aim', 
 'longpress', '_longpress', 'catchlongpress', 'longtap', '_longtap', 'catchlongtap',
@@ -208,9 +208,23 @@ export function itemTouchoption(item){
   return item
 }
 
+function setAppVars(context){
+  if (!app['_vars'][context.uniqId]) {
+    app['_vars'][context.uniqId] = context
+  }
+}
+
+let treeid = ''
 export function resetItem(data, context, loop, attrkey) {
   if (typeof data == 'string' || typeof data == 'number' || typeof data == 'boolean') return data
   if (isObject(data)) {
+
+    if (data && !loop) {
+      treeid = ''
+      if ( data.attr && ( data.attr['data-treeid'] || data.attr['treeid']) ) {
+        treeid = data.attr['data-treeid'] || data.attr['treeid']
+      }
+    }
     
     if (data.touchoption) {
       data = itemTouchoption(data)
@@ -221,6 +235,10 @@ export function resetItem(data, context, loop, attrkey) {
     data['__sort'] = []
     data.show = data.hasOwnProperty('show') ? data.show : true
     data.__relationId = data.__relationId || suid('relation_')
+
+    if (loop && treeid) {
+      data.__relationId = treeid + '__' + data.__relationId
+    }
 
     if (attrkey!=='url' && data.url) {
       data = formatUrl(data)
@@ -263,10 +281,12 @@ export function resetItem(data, context, loop, attrkey) {
     }
     
     Object.keys(data).forEach(function (key) {
-      // if (data.hasOwnProperty(key)) {
       if (data[key] || data[key]===0 || typeof data[key] === 'boolean') {
-        if (accessKey.indexOf(key) > -1 || (key.indexOf('@') == 0 && key.length > 1)) {
+        if (accessKey.indexOf(key) > -1 || (key.indexOf('@') === 0 && key.length > 1)) {
           incAttrs.push(key)
+          if (key.indexOf('@') === 0) {
+            setAppVars(context)
+          }
         } else {
           if (key == 'aim') {
             data.catchtap = data[key]
@@ -276,7 +296,16 @@ export function resetItem(data, context, loop, attrkey) {
             extAttrs[key] = data[key]
           }
 
-          if (eventName.includes(key) && context) {
+          if (eventName.includes(key)) {
+            if (context) {
+              if (context.$$is === 'list') {
+                setAppVars(context)
+              } else {
+                if (loop) {
+                  setAppVars(context)
+                }
+              }
+            }
             if (key === 'aim') key = 'catchtap'
             let val = data[key]
             if (isFunction(val)) {
@@ -296,7 +325,12 @@ export function resetItem(data, context, loop, attrkey) {
     for (var attr of incAttrs) {
       const sonItem = data[attr]
       if (isArray(sonItem)) {
-        data[attr] = sonItem.filter(item => resetItem(item, context, 'itemSubArray'))
+        data[attr] = sonItem.filter(item => {
+          // if (item.__key && item.__relationId) {
+          //   return item
+          // }
+          return resetItem(item, context, 'itemSubArray')
+        })
       } else {
         if (attrkey && attrkey.indexOf('@') > -1) {
           /** 不去污染内部的父级链，只做表层 */
@@ -304,9 +338,6 @@ export function resetItem(data, context, loop, attrkey) {
         else {
           data[attr] = resetItem(sonItem, context, true, attr)
         }
-        // if (/^[^@]/.test(attr) && sonItem) {
-        //   data[attr] = resetItem(sonItem, context, true)
-        // } 
       }
     }
     if (!data.parent && !loop) data.itemDataRoot = true // 标识该item是最顶层item，class style用作容器描述

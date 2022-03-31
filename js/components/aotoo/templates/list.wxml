@@ -37,14 +37,11 @@
         <template is="item" data="{{ item: {__drop: type.option, ...item} }}" />
       </block>
     </block>
-    <block wx:elif="{{type && util.isObject(type) && type.isItem}}">
-      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId') || '' }}"/>
-    </block>
-    <block wx:elif="{{item.type && util.isObject(item.type) && item.type.isItem}}">
-      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId') || '' }}"/>
+    <block wx:elif="{{(type || item.type) && (util.isObject(type)||util.isObject(item.type)) && (type.isItem||item.type.isItem)}}">
+      <ui-item id="{{item.id}}" item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId') || '' }}"/>
     </block>
     <block wx:elif="{{item.$$id}}">
-      <ui-item item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId') || '' }}"/>
+      <ui-item id="{{item.id}}" item="{{item}}" class="ui-item" fromComponent="{{ item.fromComponent || inner.store('fromComponent') || inner.store('uniqId') || '' }}"/>
     </block>
     <block wx:else>
       <template is="item" data="{{item}}" />

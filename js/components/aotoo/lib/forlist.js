@@ -46,10 +46,6 @@ export function reSetItemAttr(item, list){
     item = {title: item}
   }
 
-  if (list.itemMethod && !list.__itemMethod) {
-    list = dealwithItemMethod.call(this, list)
-  }
-
   if (isObject(item)) {
     const clsIndex = suid('treeid-index-') // 将data-index置入每条数据的class中，这样不用去动结构
     const $ii = clsIndex
@@ -144,6 +140,10 @@ export function reSetArray(data, list) {
             console.warn('在Page环境中定义onSlipMenus方法');
           }
         }
+      }
+
+      if (list.itemMethod && !list.__itemMethod) {
+        list = dealwithItemMethod.call(this, list)
       }
 
       list.data = data.map((item) => {

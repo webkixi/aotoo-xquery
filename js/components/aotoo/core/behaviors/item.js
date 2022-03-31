@@ -98,6 +98,14 @@ export const itemBehavior = function(app, mytype) {
           }
         }
       },
+      loading(param){
+        if (param === true) {
+          this.addClass('item-loading')
+        }
+        if (param === false) {
+          this.removeClass('item-loading')
+        }
+      },
       _reset: function(param, cb) {
         // this.setData({$item: JSON.parse(this.originalDataSource)})
         if (lib.isFunction(param)) {
@@ -193,7 +201,7 @@ export const itemBehavior = function(app, mytype) {
         const that = this
         let param = lib.clone(_param)
         // const $tmp = lib.clone(this.data.$item)
-        let $tmp = this.data.$item
+        let $tmp = this.data.$item||{}
         $tmp = syncChildData(this, $tmp)
 
         this.setData({$tmp})

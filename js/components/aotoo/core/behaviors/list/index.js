@@ -343,6 +343,14 @@ export const listBehavior = function(app, mytype) {
       }
     },
     methods: {
+      loading(param){
+        if (param === true) {
+          this.addClass('list-loading')
+        }
+        if (param === false) {
+          this.removeClass('list-loading')
+        }
+      },
       _reset: function(param, cb) {
         // this.setData({$list: JSON.parse(this.originalDataSource)})
         if (lib.isFunction(param)) {
@@ -388,40 +396,27 @@ export const listBehavior = function(app, mytype) {
       },
 
       forEach(cb, callback){
-        this.__foreachUpdata = {}
+        // this.__foreachUpdata = {}
         let that = this
         let upData = {}
         let data = this.getData().data
-        data.forEach(function(item, ii){
-          let attr = item.attr || {}
-          let treeid = attr.treeid || attr['data-treeid']
-          let it = listInstDelegate(treeid, that, 'foreach')
-          cb(it, ii)
-          // let key = `data[${ii}]`
-          // if (lib.isFunction(cb)) {
-          //   let context = {
-          //     data: item,
-          //     addClass(cls) {
-          //       let clsData = _addClass(key, cls, item)
-          //       upData = Object.assign(upData, clsData)
-          //     },
-          //     removeClass(cls) {
-          //       let clsData = _removeClass(key, cls, item)
-          //       upData = Object.assign(upData, clsData)
-          //     },
-          //     hasClass(cls) {
-          //       return _hasClass(cls, item)
-          //     },
-          //     update(param) {
-          //       let keyData = {[key]: param}
-          //       upData = Object.assign(upData, keyData)
-          //     }
-          //   }
-          //   cb(context, ii)
-          // }
-        })
+        for (let ii=0; ii<data.length; ii++) {
+          const item = data[ii]
+          const attr = item.attr || {}
+          const treeid = attr.treeid || attr['data-treeid']
+          const it = listInstDelegate(treeid, that, 'foreach')
+          const res = cb(it, ii)
+          if (res || res === 'STOP') break;
+        }
+
+        // data.forEach(function(item, ii){
+        //   let attr = item.attr || {}
+        //   let treeid = attr.treeid || attr['data-treeid']
+        //   let it = listInstDelegate(treeid, that, 'foreach')
+        //   cb(it, ii)
+        // })
         // this.update(upData)
-        this.update(this.__foreachUpdata, callback)
+        // this.update(this.__foreachUpdata, callback)
       },
 
       addClass: function(listCls, cb) {
@@ -799,50 +794,6 @@ export const listBehavior = function(app, mytype) {
 
       find: function (params, bywhat) {
         return wx.$$find(params, this)
-        // let index
-        // if (lib.isString(params)) {
-        //   let strNum = parseInt(params)
-        //   if (strNum && lib.isNumber(strNum)) {
-        //     params = strNum
-        //   }
-        // }
-
-        // // if (lib.isNumber(params)) {
-        // //   let $list = this.data.$list
-        // //   let $data = $list.data
-        // //   return $data[params]
-        // // } 
-
-        // if (params && lib.isString(params)) {
-        //   if (params.charAt(0) === '#') {
-        //     bywhat = 'id'
-        //   } 
-        //   if (params.charAt(0) === '.') {
-        //     bywhat = 'class'
-        //   }
-        // }
-
-        // index = this.findIndex(params, bywhat)
-        // if (index || index === 0) {
-        //   if (!lib.isArray(index)) index = [index]
-        //   if (lib.isArray(index)) {
-        //     // listInstDelegate
-        //     // return index.map((idx) => this.data.$list.data[idx])
-
-        //     let datas = {}
-        //     index.forEach(idx => {
-        //       let item = this.data.$list.data[idx]
-        //       item.__realIndex = idx
-        //       datas[`data[${idx}]`] = item
-        //     })
-        //     let tmpData = lib.clone(datas)
-        //     return fakeListInstance(tmpData, this)
-        //   }
-
-        //   let res = this.data.$list.data[index]
-        //   res.__realIndex = index
-        //   return res
-        // }
       },
 
       findAndUpdate: function (params, cb) {

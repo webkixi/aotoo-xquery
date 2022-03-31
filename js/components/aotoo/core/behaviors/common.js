@@ -106,6 +106,13 @@ export function _hasClass(params, data) {
 // tmpData 数据格式 {"data[1]": {}, "data[2]": {}}
 export function fakeListInstance(temp_data, listInst, listInstDelegate) {
   let theOldTempData = temp_data
+  listInst.changedTimer = null
+  function exec(forEachTmp, callback){
+    clearTimeout(listInst.changedTimer)
+    listInst.changedTimer = setTimeout(() => {
+      listInst.update(forEachTmp, callback)
+    }, 100);
+  }
   return {
     $$is: 'fakelist',
     parentInst: listInst,
@@ -132,7 +139,7 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
       let changed = false
       datas.forEach((key, ii) => {
         // let _data = {[key]: tmpData[key]}
-        let _data = tmpData[key]
+        let _data = lib.clone(tmpData[key])
         if (lib.isFunction(cb)) {
           let context = {
             data: _data,
@@ -144,7 +151,8 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
             },
             reset(){
               changed = true
-              forEachTmp = Object.assign(forEachTmp, {[key]: _data})
+              forEachTmp = Object.assign(forEachTmp, {[key]: tmpData[key]})
+              exec(forEachTmp, callback)
             },
             getChilds(){
               if (_data && _data.idf) {
@@ -157,11 +165,13 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
               changed = true
               let clsData = _addClass(key, cls, _data)
               forEachTmp = Object.assign(forEachTmp, clsData)
+              exec(forEachTmp, callback)
             },
             removeClass(cls) {
               changed = true
               let clsData = _removeClass(key, cls, _data)
               forEachTmp = Object.assign(forEachTmp, clsData)
+              exec(forEachTmp, callback)
             },
             hasClass(cls) {
               return _hasClass(cls, _data)
@@ -179,6 +189,7 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
                 [key]: param
               }
               forEachTmp = Object.assign(forEachTmp, keyData)
+              exec(forEachTmp, callback)
             }
           }
           cb(context, ii)
@@ -269,8 +280,8 @@ function syncChildData(ctx, data) {
   return data
 }
 
-let batchUpdateTimmer = null
 export function listInstDelegate(treeid, listInst, from){
+  listInst.batchUpdateTimmer = null
   let index = null
   if (treeid && (treeid.__realIndex || treeid.__realIndex===0)) {
     index = treeid.__realIndex
@@ -278,6 +289,22 @@ export function listInstDelegate(treeid, listInst, from){
   } else {
     index = listInst.findIndex(treeid)
   }
+  let __foreachUpdata = {}
+  function exec(inst, cb){
+    // 列表实例批量更新方法
+    // exec方法允许执行以下若干更新方法后，触发批量更新数据并渲染
+    // 本对象原来的使用环境是list.forEach场景中使用，由forEach方法批来量更新数据，脱离forEach后没有触发机制
+    // 在有些场景当中本对象会作为个体变量传递给外部，如 return [inst1, inst2, inst3]
+    // 此时即便应用了更新方法仍然不能更新数据、渲染，因为没有触发事件执行更新
+    clearTimeout(inst.batchUpdateTimmer)
+    inst.batchUpdateTimmer = setTimeout(() => {
+      if (lib.isEmpty(__foreachUpdata)) return 
+      inst.update(__foreachUpdata, function(){
+        if (lib.isFunction(cb)) cb()
+      })
+    }, 50);
+  }
+
   if (index || index === 0) {
     let data = (listInst.getData()).data[index]
     let key = `data[${index}]`
@@ -294,22 +321,10 @@ export function listInstDelegate(treeid, listInst, from){
         const $data = this.getData()
         return $data.attr
       },
-      exec(cb){
-        // 列表实例批量更新方法
-        // exec方法允许执行以下若干更新方法后，触发批量更新数据并渲染
-        // 本对象原来的使用环境是list.forEach场景中使用，由forEach方法批来量更新数据，脱离forEach后没有触发机制
-        // 在有些场景当中本对象会作为个体变量传递给外部，如 return [inst1, inst2, inst3]
-        // 此时即便应用了更新方法仍然不能更新数据、渲染，因为没有触发事件执行更新
-        clearTimeout(batchUpdateTimmer)
-        batchUpdateTimmer = setTimeout(() => {
-          if (!listInst.__foreachUpdata) return 
-          listInst.update(listInst.__foreachUpdata, cb)
-        }, 17);
-      },
       reset(param, cb){
         if (!param) param = {}
         const upData = {}
-        const $data = listInst.originalDataSource.data[index]
+        const $data = {...listInst.originalDataSource.data[index]}
         if ($data) {
           let tmpData = param
           if (lib.isFunction(param)) {
@@ -318,8 +333,8 @@ export function listInstDelegate(treeid, listInst, from){
           tmpData = Object.assign({}, $data, tmpData)
           upData[key] = tmpData
           if (from === 'foreach') {
-            listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
-            this.exec()
+            __foreachUpdata = Object.assign({}, __foreachUpdata, upData)
+            exec(listInst, cb)
           } else {
             listInst.update(upData, cb)
           }
@@ -335,7 +350,7 @@ export function listInstDelegate(treeid, listInst, from){
         //   }
         //   upData[key] = data
         //   if (from === 'foreach') {
-        //     listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
+        //     __foreachUpdata = Object.assign({}, __foreachUpdata, upData)
         //     this.exec()
         //   } else {
         //     listInst.update(upData, cb)
@@ -366,8 +381,8 @@ export function listInstDelegate(treeid, listInst, from){
         let styData = _css(key, params, data)
         if (styData) {
           if (from === 'foreach') {
-            listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, styData)
-            this.exec()
+            __foreachUpdata = Object.assign({}, __foreachUpdata, styData)
+            exec(listInst, cb)
           } else {
             listInst.update(styData, cb)
           }
@@ -393,9 +408,9 @@ export function listInstDelegate(treeid, listInst, from){
         }
         let clsData = _addClass(key, params, data)
         if (clsData) {
+          __foreachUpdata = Object.assign({}, __foreachUpdata, clsData)
           if (from === 'foreach') {
-            listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, clsData)
-            this.exec()
+            exec(listInst, cb)
           } else {
             listInst.update(clsData, cb)
           }
@@ -421,9 +436,9 @@ export function listInstDelegate(treeid, listInst, from){
           data = this.getData()
         }
         let clsData = _removeClass(key, params, data)
+        __foreachUpdata = Object.assign({}, __foreachUpdata, clsData)
         if (from === 'foreach') {
-          listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, clsData)
-          this.exec()
+          exec(listInst, cb)
         } else {
           listInst.update(clsData, cb)
         }
@@ -445,8 +460,8 @@ export function listInstDelegate(treeid, listInst, from){
           }
           upData[key] = data
           if (from === 'foreach') {
-            listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
-            this.exec()
+            __foreachUpdata = Object.assign({}, __foreachUpdata, upData)
+            exec(listInst, cb)
           } else {
             listInst.update(upData, cb)
           }
@@ -461,8 +476,8 @@ export function listInstDelegate(treeid, listInst, from){
           upData[key] = data
           // listInst.update(upData)
           if (from === 'foreach') {
-            listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
-            this.exec()
+            __foreachUpdata = Object.assign({}, __foreachUpdata, upData)
+            exec(listInst, cb)
           } else {
             listInst.update(upData, cb)
           }
@@ -477,16 +492,14 @@ export function listInstDelegate(treeid, listInst, from){
           upData[key] = data
           // listInst.update(upData)
           if (from === 'foreach') {
-            listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
-            this.exec()
+            __foreachUpdata = Object.assign({}, __foreachUpdata, upData)
+            exec(listInst)
           } else {
             listInst.update(upData, cb)
           }
         }
       },
       remove(cb) {
-        const that = this
-        // this.hide(cb)
         listInst.delete(treeid, cb)
       },
       delete(cb) {
@@ -647,7 +660,7 @@ export const commonBehavior = (app, mytype) => {
           return function(){
             if (that.activePage) {
               // 必须在页面稳定后执行
-              that.hooks.emit('didUpdate', {}, that)
+              // that.hooks.emit('didUpdate', {}, that)
               if (lib.isFunction(didUpdate)) {
                 didUpdate.call(ctx)
               }
@@ -695,7 +708,7 @@ export const commonBehavior = (app, mytype) => {
         this.init = true // 第一次进入
         this.mounted = false
         this.children = []
-        app['_vars'][this.uniqId] = this
+        // app['_vars'][this.uniqId] = this
         this._originalSetData = this.setData // 原始 setData
         this.setData = this._setData_ // 封装后的 setData
         this.selfDataChanging = false
@@ -725,7 +738,7 @@ export const commonBehavior = (app, mytype) => {
           })
         }
 
-        this.properties = lib.clone(this.properties)
+        // this.properties = lib.clone(this.properties)
         let properties = this.properties
         let ds = (properties.item || properties.list || properties.dataSource || {})
         if (lib.isObject(ds) || lib.isArray(ds)) this.originalDataSource = lib.clone(ds)
@@ -874,11 +887,15 @@ export const commonBehavior = (app, mytype) => {
     methods: {
       parent(param, ctx){
         if (!ctx) ctx = this
-        let res
-        
-        if (ctx.treeid && ctx.parentInst && ctx.parentInst.$$is === 'list') {
+        let res = null
+        let treeid = ctx.treeid
+        const relationId = ctx.getData().__relationId
+        if (relationId && relationId.indexOf('__') > -1) {
+          treeid = relationId.split('__')[0]
+        }
+        if (treeid && ctx.parentInst && ctx.parentInst.$$is === 'list') {
           if (param) {
-            res = listInstDelegate(ctx.treeid, ctx.parentInst)
+            res = listInstDelegate(treeid, ctx.parentInst)
             if (res) {
               if (res.hasClass(param)) {
                 return res
@@ -887,7 +904,7 @@ export const commonBehavior = (app, mytype) => {
               }
             }
           } else {
-            return listInstDelegate(ctx.treeid, ctx.parentInst)
+            return listInstDelegate(treeid, ctx.parentInst)
           }
         }
 
@@ -937,23 +954,22 @@ export const commonBehavior = (app, mytype) => {
             ) : []
           }
           if (this.parentInst.$$is === 'list') {
-            let parentInst = this.parentInst
-            if (this.treeid) {  // 存在this.treeid，表明该数据为(body, dot...)数据 正常父级应该是item，为list表明是混合结构
-              tmp = clstype ? this.parentInst.children.filter(
-                item => (item.treeid === this.treeid && item.uniqId !== this.uniqId)
-              ) : []
-            } else {
-              tmp = this.parentInst.children.filter( item => (
-                lib.isFunction(item.attr) && 
-                item.attr() && 
-                item.uniqId !== this.uniqId
-              ))
-            }
+            this.parentInst.forEach(item=>{
+              if (item.data.__relationId === this.data.item.__relationId) {
+                tmp = item
+                return item
+              }
+            })
+            return tmp.siblings()
           }
         }
 
         tmp = lib.isString(param) ? tmp.filter(item => item.hasClass(param)) : tmp
+        const that = this
         return {
+          parent: function(){
+            return that.parentInst
+          },
           addClass: params => tmp.forEach($inst => $inst.addClass(params)),
           removeClass: params => tmp.forEach($inst => $inst.removeClass(params)),
           update: params => tmp.forEach($inst => $inst.update(params)),
@@ -1125,19 +1141,19 @@ export const commonBehavior = (app, mytype) => {
         let $$id = $ds['$$id'] || $ds['id']
         let _id = this.data.id
         let pageDataKey = eles[$$id]
-        app['_vars'][uniqId] = this
-        if (id) {
-          elements[id] = this
-        }
-        if (this.data.id) {
-          elements[_id] = this
-        }
-        if ($$id) {
-          elements[$$id] = this
-        }
-        if (pageDataKey) {
-          elements[pageDataKey] = this
-        }
+        // app['_vars'][uniqId] = this
+        // if (id) {
+        //   elements[id] = this
+        // }
+        // if (this.data.id) {
+        //   elements[_id] = this
+        // }
+        // if ($$id) {
+        //   elements[$$id] = this
+        // }
+        // if (pageDataKey) {
+        //   elements[pageDataKey] = this
+        // }
         if (fromComponent) {
           this.componentInst = app['_vars'][fromComponent]
         }
