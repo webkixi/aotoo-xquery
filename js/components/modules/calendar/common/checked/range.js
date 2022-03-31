@@ -110,8 +110,6 @@ export default function({
         lastSelect = dateSelect[(dateSelect.length-1)]
       }
 
-
-
       if (lastSelect) {
         if (lastSelect.month < endAttr.month || lastSelect.year < endAttr.year) {
           inst.siblings().forEach(bro=>{
@@ -123,7 +121,6 @@ export default function({
           lastSelect = dateSelect[(dateSelect.length-1)]
         }
       }
-
 
       dateSelect.forEach(date=>{
         const bro = date.broInst
@@ -161,9 +158,12 @@ export default function({
     this.rangeChecked = []
     this.rangeSelect  = []
 
-    inst.toggleClass('selected', function(){
-      renderRangeTip(rangeTip, 0, inst)
-    })
+    setTimeout(() => {
+      inst.toggleClass('selected', function(){
+        renderRangeTip(rangeTip, 0, inst)
+      })
+    }, 100);
+
     params.range = 'start'
     rangeChecked = [{dateInst: inst, ...params}]
   }

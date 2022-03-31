@@ -27,7 +27,8 @@ function setDefaultValue({
     monInst1.forEach(bro=>{
       const broAttr = bro.attr()
       if (broAttr.timestr === value1.timestr) {
-        const inst = $$(broAttr.timestr)
+        // const inst = $$(broAttr.timestr)
+        const inst = bro
         inst.toggleClass('selected', function(){
           // if (rangeTip[0]) {
           //   const $data = inst.getData()
@@ -63,38 +64,42 @@ function setDefaultValue({
     monInst1.forEach(bro=>{
       const broAttr = bro.attr()
       if (broAttr.timestr === value1.timestr) {
-        const inst = $$(broAttr.timestr)
+        // const inst = $$(broAttr.timestr)
+        const inst = bro
         this.rangeChecked = [{dateInst: inst, date: broAttr.timestr, ...broAttr}]
       }
       if (mon1.timestr === mon2.timestr) {
         if (broAttr.timestr === value2.timestr) {
-          const inst = $$(broAttr.timestr)
+          // const inst = $$(broAttr.timestr)
+          const inst = bro
           this.rangeChecked[1] = {dateInst: inst, date: broAttr.timestr, ...broAttr}
         }
       }
     })
 
     if (mon1.timestr !== mon2.timestr) {
-      monInst1.forEach(bro=>{
+      const monInst2 = $$(`${mon2.year}-${mon2.month}`)
+      monInst2.forEach(bro=>{
         const broAttr = bro.attr()
         if (broAttr.timestr === value2.timestr) {
-          const inst = $$(broAttr.timestr)
+          // const inst = $$(broAttr.timestr)
+          const inst = bro
           this.rangeChecked[1] = {dateInst: inst, date: broAttr.timestr, ...broAttr}
         }
       })
     }
 
     if (this.rangeChecked.length === 2) {
+      const that = this
       const tempValue2 = this.rangeChecked[1]
       const tempInst = tempValue2.dateInst
       this.rangeChecked = this.rangeChecked.splice(0, 1)
       const inst = this.rangeChecked[0].dateInst
-      
       inst.toggleClass('selected', function(){
         if (rangeTip[0]) {
           const $data = inst.getData()
           let   tip = rangeTip[0]
-          let   $dot = $data.dot
+          let   $dot = $data.dot||[]
           let   $body = $data.body
           let   $footer = $data.footer
 
@@ -119,11 +124,13 @@ function setDefaultValue({
             inst.update({dot: $dot})
           }
         }
-      })
-      eventRange.call(this, {
-        inst: tempInst,
-        options,
-        $$
+        setTimeout(() => {
+          eventRange.call(that, {
+            inst: tempInst,
+            options,
+            $$
+          })
+        }, 100);
       })
     }
   }

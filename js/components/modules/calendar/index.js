@@ -207,7 +207,7 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
       val = {date: val}
     }
     if (lib.isObject(val)) {
-      return getYmd(val.date)
+      return getYmd((val.date||val.timestr))
     }
   })
 
@@ -439,6 +439,28 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
       gotoToday(){
         app.hooks.emit('goto-today')
       },
+      getMonthHandle(date){
+        const $$ = this.activePage.getElementsById.bind(this.activePage)
+        const tmpDate = getYmd(date)
+        return $$(`${tmpDate.year}-${tmpDate.month}`)
+      },
+      getDateHandle(date){
+        const $$ = this.activePage.getElementsById.bind(this.activePage)
+        const tmpDate = getYmd(date)
+        const monthHandle = $$(`${tmpDate.year}-${tmpDate.month}`)
+        let resItem = null
+        if (monthHandle) {
+          monthHandle.forEach(item=>{
+            const itemData = item.getData()
+            if (itemData.id === tmpDate.timestr) {
+              resItem = item
+              return 'STOP'
+            }
+          })
+          return resItem
+        }
+
+      },
       changeCalendarHeader(screenId, params={}){
         const title = params.title
         clearTimeout(timmer_change_month)
@@ -460,7 +482,7 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
                   param = {title: param}
                 }
                 if (lib.isObject(param)) {
-                  header.update(param)
+                  header && header.update(param)
                 }
               }
             }
@@ -470,17 +492,17 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
                 param = {title: param}
               }
               if (lib.isObject(param)) {
-                header.update(param)
+                header && header.update(param)
               }
             }
             options.bindchange.call(this, this.currentTimepoint)
             if (!customChangeHeaderStat) {
-              header.update({title: monthStr})
+              header && header.update({title: monthStr})
             }
             // const result = options.bindchange.call(ctx, {title: monthStr}) || {title: monthStr}
             // header.update(result)
           } else {
-            header.update({title: monthStr})
+            header && header.update({title: monthStr})
           }
         }, 50);
       },

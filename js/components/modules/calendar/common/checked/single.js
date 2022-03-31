@@ -9,7 +9,7 @@ export default function({
   const prevCheckedDate = rangeChecked[0]
   if (prevCheckedDate) {
     const prevCheckedInst = prevCheckedDate.dateInst
-    if (prevCheckedInst.uniqId !== inst.uniqId) {
+    if (prevCheckedInst.treeid !== inst.treeid) {
       inst.toggleClass('selected')
       prevCheckedInst && prevCheckedInst.reset()
       this.rangeChecked = [{dateInst: inst, ...params}]

@@ -205,7 +205,10 @@ function _preview(options) {
       const {previewPath, path, size} = file
       let   previewContent = previewPath || {title: file.name}
       if (lib.isFunction(onPreview)) {
-        previewContent = onPreview.call(this, file, selectIndex) || previewContent
+        const temp = onPreview.call(this, file, selectIndex)
+        if (temp && !lib.isEmpty(temp)) {
+          previewContent = temp
+        }
         if (lib.isFunction(previewContent)) {
           const callback = previewContent
           previewContent = previewPath ? {img: {src: previewPath, mode: 'aspectFill'}} : {title: file.name}

@@ -67,6 +67,7 @@ export function fillMonth(timepoint, options={}){
 
   pathcBeforeDays = pathcBeforeDays.map(date=>{
     date.itemClass = 'patch-before invalid'
+    date.position = 'patch-before'
     return date
   })
 
@@ -77,6 +78,7 @@ export function fillMonth(timepoint, options={}){
 
   pathcAfterDays = pathcAfterDays.map(date=>{
     date.itemClass = 'patch-after invalid'
+    date.position = 'patch-after'
     return date
   })
 
@@ -95,7 +97,8 @@ export function fillMonth(timepoint, options={}){
       itemClass, 
       timestamp, 
       timestr,
-      days
+      days,
+      position,
     } = item
 
     const lDate = lunar.solar2lunar(year, month, day)
@@ -131,7 +134,7 @@ export function fillMonth(timepoint, options={}){
     }
 
     let res = {
-      $$id: timestr,
+      // $$id: timestr,
       id: timestr,
       __key: timestr,
       title: today.timestr === timestr ? '今天' : day,
@@ -142,7 +145,7 @@ export function fillMonth(timepoint, options={}){
       solarDate: item
     }
 
-    if (today.timestr === timestr) {
+    if (today.timestr === timestr && !position) {
       res.itemClass = res.itemClass + ' today'
     }
 
@@ -234,6 +237,9 @@ export function fillMonth(timepoint, options={}){
       }
     }
 
+    if (position) {
+      delete res.$$id
+    }
 
     return res
   })
