@@ -21,6 +21,9 @@ function setDefaultValue({
     }
   })
 
+  /**
+   * 单选
+   */
   if (options.type === 'single') {
     const mon = checkedMonth[0]
     const monInst1 = $$(`${mon.year}-${mon.month}`)
@@ -42,6 +45,9 @@ function setDefaultValue({
     })
   }
 
+  /**
+   * 多选
+   */
   if (options.type === 'multiple') {
     checkedMonth.forEach(mon=>{
       const monInst = $$(`${mon.year}-${mon.month}`)
@@ -56,6 +62,9 @@ function setDefaultValue({
     })
   }
 
+  /**
+   * 区间选择
+   */
   if (options.type === 'range') {
     const mon1 = checkedMonth[0]
     const mon2 = checkedMonth[1] || mon1
@@ -95,43 +104,51 @@ function setDefaultValue({
       const tempInst = tempValue2.dateInst
       this.rangeChecked = this.rangeChecked.splice(0, 1)
       const inst = this.rangeChecked[0].dateInst
-      inst.toggleClass('selected', function(){
-        if (rangeTip[0]) {
-          const $data = inst.getData()
-          let   tip = rangeTip[0]
-          let   $dot = $data.dot||[]
-          let   $body = $data.body
-          let   $footer = $data.footer
+      // inst.toggleClass('selected', function(){
+      //   if (rangeTip[0]) {
+      //     const $data = inst.getData()
+      //     let   tip = rangeTip[0]
+      //     let   $dot = $data.dot||[]
+      //     let   $body = $data.body
+      //     let   $footer = $data.footer
 
-          if (typeof tip === 'string') {
-            tip = {title: tip}
-          }
-          if (tip.body || tip.footer || tip.ready || tip.created || tip.attached) {
-            $body = tip.body && ($body||[]).concat(tip.body)
-            $footer = tip.footer && ($footer||[]).concat((tip.footer))
-            $dot = tip.dot && ($dot||[]).concat((tip.dot))
+      //     if (typeof tip === 'string') {
+      //       tip = {title: tip}
+      //     }
+      //     if (tip.body || tip.footer || tip.ready || tip.created || tip.attached) {
+      //       $body = tip.body && ($body||[]).concat(tip.body)
+      //       $footer = tip.footer && ($footer||[]).concat((tip.footer))
+      //       $dot = tip.dot && ($dot||[]).concat((tip.dot))
 
-            $body ? $data.body = $body : ''
-            $footer ? $data.footer = $footer : ''
-            $dot ? $data.dot = $dot : ''
+      //       $body ? $data.body = $body : ''
+      //       $footer ? $data.footer = $footer : ''
+      //       $dot ? $data.dot = $dot : ''
 
-            tip.ready ? $data.ready  = tip.ready : ''
-            tip.created ? $data.created  = tip.created : ''
-            tip.attached ? $data.attached  = tip.attached : ''
-            inst.update($data)
-          } else {
-            $dot.push(tip)
-            inst.update({dot: $dot})
-          }
-        }
-        setTimeout(() => {
-          eventRange.call(that, {
-            inst: tempInst,
-            options,
-            $$
-          })
-        }, 100);
-      })
+      //       tip.ready ? $data.ready  = tip.ready : ''
+      //       tip.created ? $data.created  = tip.created : ''
+      //       tip.attached ? $data.attached  = tip.attached : ''
+      //       inst.update($data)
+      //     } else {
+      //       $dot.push(tip)
+      //       inst.update({dot: $dot})
+      //     }
+      //   }
+      //   setTimeout(() => {
+      //     eventRange.call(that, {
+      //       startInst: inst,
+      //       inst: tempInst,
+      //       options,
+      //       $$
+      //     })
+      //   }, 50);
+      // })
+      setTimeout(() => {
+        eventRange.call(that, {
+          inst: tempInst,
+          options,
+          $$
+        })
+      }, 50);
     }
   }
 }

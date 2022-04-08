@@ -23,6 +23,7 @@ export function eventIndex(e, {
 
   if (options.type === 'single') {
     deliverCustomCallback = eventSingle.call(this, {
+      e,
       inst,
       options
     })
@@ -30,6 +31,7 @@ export function eventIndex(e, {
 
   if (options.type === 'multiple') {
     deliverCustomCallback = eventMultiple.call(this, {
+      e,
       inst,
       options
     })
@@ -37,6 +39,7 @@ export function eventIndex(e, {
 
   if (options.type === 'range') {
     deliverCustomCallback = eventRange.call(this, {
+      e,
       inst, 
       options,
       $$

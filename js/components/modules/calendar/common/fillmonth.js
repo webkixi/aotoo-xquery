@@ -198,13 +198,13 @@ export function fillMonth(timepoint, options={}){
 
     // 全局配置指定日期内容
     if (lib.isObject(customDate)) {
-      res.dot = (res.dot || []).concat(customDate.dot)
+      res.dot = (res.dot || []).concat((customDate.dot||[]))
       delete customDate.dot
 
-      res.body = (res.body || []).concat(customDate.body)
+      res.body = (res.body || []).concat((customDate.body||[]))
       delete customDate.body
 
-      res.footer = (res.footer || []).concat(customDate.footer)
+      res.footer = (res.footer || []).concat((customDate.footer||[]))
       delete customDate.footer
 
       res = Object.assign({}, res, customDate)
@@ -219,13 +219,13 @@ export function fillMonth(timepoint, options={}){
     if (userDate) {
       const {timepoint, date, content} = userDate
       const {year, month, day, timestamp, timestr} = timepoint
-      res.dot = (res.dot || []).concat(content.dot)
+      res.dot = (res.dot || []).concat((content.dot||[]))
       delete content.dot
 
-      res.body = (res.body || []).concat(content.body)
+      res.body = (res.body || []).concat((content.body||[]))
       delete content.body
 
-      res.footer = (res.footer || []).concat(content.footer)
+      res.footer = (res.footer || []).concat((content.footer||[]))
       delete content.footer
 
       res = Object.assign({}, res, content)

@@ -188,7 +188,6 @@ function getChilds(item, datas, opts, index, init) {
     delete item.content
   }
 
-
   return item
 }
 
@@ -1178,7 +1177,7 @@ function mkCheckList(params, init) {
             let $content = _content
             that.currentContent = $content
             if ($content) {
-              $footer.reset()
+              $footer.reset({})
               if (lib.isObject($content)) {
                 if ($content.data) {
                   $footer.update({ "@list": $content })
@@ -1245,7 +1244,7 @@ function mkCheckList(params, init) {
                 clearTimeout(timmer)
                 timmer = setTimeout(() => {
                   it.addClass(checkedClass)
-                  it.exec()
+                  // it.exec()
                   this.footerInst.fillContent(item.content)
                 }, 17);
               } else {

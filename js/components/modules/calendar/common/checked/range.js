@@ -1,4 +1,5 @@
 function renderRangeTip(rangeTip, index, inst){
+  inst.toggleClass('selected')
   if (rangeTip[index]) {
     const $data = inst.getData()
     let   tip = rangeTip[index]
@@ -33,7 +34,8 @@ function renderRangeTip(rangeTip, index, inst){
 export default function({
   inst, 
   options,
-  $$
+  $$,
+  e
 }){
   let   deliverCustomCallback = true
   let   rangeChecked = this.rangeChecked
@@ -47,9 +49,7 @@ export default function({
   const rangeTip = options.rangeTip
 
   if (len === 0) {
-    inst.toggleClass('selected', function(){
-      renderRangeTip(rangeTip, 0, inst)
-    })
+    renderRangeTip(rangeTip, 0, inst)
     params.range = 'start'
     rangeChecked = [{dateInst: inst, ...params}]
   } 
@@ -70,9 +70,6 @@ export default function({
 
     // 区间日期
     if (endAttr.timestamp > startAttr.timestamp) {
-      inst.toggleClass('selected', function(){
-        renderRangeTip(rangeTip, 1, inst)
-      })
       const dateSelect = this.rangeSelect
       startInst.siblings().forEach(bro=>{
         const broAttr = bro.attr()
@@ -122,18 +119,27 @@ export default function({
         }
       }
 
-      dateSelect.forEach(date=>{
-        const bro = date.broInst
-        bro.addClass('range')
+      const tempSelect = [startInst, ...dateSelect, inst]
+      tempSelect.forEach((select, ii)=>{
+        const selectInst = select.broInst || select
+        if (select.broInst) {
+          selectInst.toggleClass('range')
+        } else {
+          if (ii === 0) {
+            if (!e) {
+              renderRangeTip(rangeTip, 0, selectInst)
+            }
+          } else {
+            renderRangeTip(rangeTip, 1, selectInst)
+          }
+        }
       })
 
       this.rangeSelect = dateSelect
       params.range = 'end'
       rangeChecked[rangeChecked.length] = {dateInst: inst, ...params}
     } else if(endAttr.timestamp < startAttr.timestamp) {
-      inst.toggleClass('selected', function(){
-        renderRangeTip(rangeTip, 0, inst)
-      })
+      renderRangeTip(rangeTip, 0, inst)
       startInst.reset()
       params.range = 'start'
       rangeChecked = [{dateInst: inst, ...params}]
@@ -148,21 +154,25 @@ export default function({
   } 
   
   else if (len >= 2) {
-    this.rangeChecked.forEach(checked=>{
-      checked.dateInst.reset()
+    const reStartInst = inst
+    let   lazeTime = 30
+    const tempSelect = [this.rangeChecked[0], ...this.rangeSelect, this.rangeChecked[1]]
+    tempSelect.forEach((selected, ii)=>{
+      const inst = selected.dateInst || selected.broInst
+      inst.reset()
+      if (inst.data.id === reStartInst.data.id) {
+        lazeTime = 100
+      }
     })
 
-    this.rangeSelect.forEach(bro=>{
-      bro.broInst.reset()
-    })
+    setTimeout(() => {
+      renderRangeTip(rangeTip, 0, reStartInst)
+    }, lazeTime);
+
     this.rangeChecked = []
     this.rangeSelect  = []
 
-    setTimeout(() => {
-      inst.toggleClass('selected', function(){
-        renderRangeTip(rangeTip, 0, inst)
-      })
-    }, 100);
+    
 
     params.range = 'start'
     rangeChecked = [{dateInst: inst, ...params}]

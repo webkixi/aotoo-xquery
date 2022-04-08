@@ -8,7 +8,7 @@ function adapter(params) {
     }
     if (lib.isObject(item)) {
       item._idx_ = ii
-      let content = {id: `pop-${ii}`, itemClass: 'dropdown-item-content' }
+      let content = {$$id: `pop-${ii}`, id: `pop-${ii}`, itemClass: 'dropdown-item-content' }
       if (item.contentStyle) {
         content.itemStyle = item.contentStyle
         delete item.contentStyle
@@ -42,9 +42,16 @@ module.exports = function mkDropdown(params) {
     footer: {$$id: opts.footerId, itemClass: 'dropdown-mask', itemStyle: opts.maskStyle, aim: 'closePop'},
     itemMethod: {
       aim(e, param, inst) {
+        const that = this
         let $data = inst.getData()
         let idx = $data._idx_
         this.currentMenu = inst
+        // inst.siblings().removeClass('.active', function(){
+        //   that.showMask()
+        //   inst.addClass('.active', function(){
+        //     that.fillContent(inst, idx)
+        //   })
+        // })
         this.forEach(it=>{
           if (it.data._idx_ === idx) {
             if (it.hasClass('.active')) {
