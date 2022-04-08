@@ -1,6 +1,6 @@
 <wxs src="../../util.wxs" module="util" />
 
-<template name="bindEvent">
+<template name="noTouchScrollBindEvent">
   <scroll-view 
     data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
     data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}" 
@@ -51,7 +51,7 @@
   </scroll-view>
 </template>
 
-<template name="catchEvent">
+<template name="noTouchScrollCatchEvent">
   <scroll-view 
     data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
     data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
@@ -97,7 +97,7 @@
   </scroll-view>
 </template>
 
-<template name="noEvent">
+<template name="noTouchScrollNoEvent">
   <scroll-view 
     data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid'] || item.attr['treeid']||'')}}" 
     data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
@@ -142,12 +142,12 @@
 
 
 <block wx:if="{{item.tap||item.longtap||item.longpress}}">
-  <template is="bindEvent" data="{{item}}"></template>
+  <template is="noTouchScrollBindEvent" data="{{item}}"></template>
 </block>
 <block wx:elif="{{item.catchtap||item.aim||item.catchlongtap || item.catchlongpress}}">
-  <template is="catchEvent" data="{{item}}"></template>
+  <template is="noTouchScrollCatchEvent" data="{{item}}"></template>
 </block>
 <block wx:else>
-  <template is="noEvent" data="{{item}}"></template>
+  <template is="noTouchScrollNoEvent" data="{{item}}"></template>
 </block>
 

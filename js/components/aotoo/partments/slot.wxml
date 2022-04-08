@@ -46,9 +46,9 @@
   <include src="./title.wxml" />
 </template>
 
-<template name="@img">
+<!-- <template name="@img">
   <include src="./img.wxml" />
-</template>
+</template> -->
 
 <template name="@li">
   <include src="./li.wxml" />

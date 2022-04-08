@@ -280,6 +280,7 @@ function syncChildData(ctx, data) {
   return data
 }
 
+let __foreachUpdata = {}
 export function listInstDelegate(treeid, listInst, from){
   listInst.batchUpdateTimmer = null
   let index = null
@@ -289,7 +290,6 @@ export function listInstDelegate(treeid, listInst, from){
   } else {
     index = listInst.findIndex(treeid)
   }
-  let __foreachUpdata = {}
   function exec(inst, cb){
     // 列表实例批量更新方法
     // exec方法允许执行以下若干更新方法后，触发批量更新数据并渲染
@@ -302,7 +302,8 @@ export function listInstDelegate(treeid, listInst, from){
       inst.update(__foreachUpdata, function(){
         if (lib.isFunction(cb)) cb()
       })
-    }, 50);
+      __foreachUpdata = {}
+    }, 20);
   }
 
   if (index || index === 0) {
@@ -614,6 +615,144 @@ export function listInstDelegate(treeid, listInst, from){
         // }
       }
     }
+  }
+}
+
+export function itemInstDelegate(subItemKey, ITEMINST, from) {
+  const tmp = subItemKey.split('-')
+  const subkey = tmp[0]
+  const subkeyIndex = tmp[1]
+  const data = ITEMINST.getData()
+  const subData = data[subkey]
+  const subItemData = data[subkey][subkeyIndex]
+  const $data = lib.clone(subItemData)
+  const key = `${subkey}['${subkeyIndex}']`
+  const exec = function(indexData){
+    subData[subkeyIndex] = indexData
+    ITEMINST.update({
+      [subkey]: subData
+    })
+  }
+  return {
+    data: subItemData,
+    css(params, cb){
+      if (!lib.isString(params)) return
+      const upData = {...subItemData, itemStyle: params}
+      exec(upData, cb)
+    },
+    addClass(params, cb){
+      if (!lib.isString(params)) return
+      let clsData = _addClass(key, params, subItemData)
+      const upData = {...subItemData, ...clsData[key]}
+      exec(upData, cb)
+    },
+    removeClass(params, cb){
+      if (!lib.isString(params)) return
+      let clsData = _removeClass(key, params, subItemData)
+      const upData = {...subItemData, ...clsData[key]}
+      exec(upData, cb)
+    },
+    hasClass(params){
+      return _hasClass(params, subItemData)
+    },
+    toggleClass(cls, cb){
+      if (cls && lib.isFunction(this.hasClass)) {
+        let clsAry = lib.isString(cls) ? cls.split(' ') : []
+        if (clsAry.length) {
+          cls = clsAry[0]
+          if (this.hasClass(cls)) {
+            this.removeClass(cls, cb)
+          } else {
+            this.addClass(cls, cb)
+          }
+        }
+      }
+    },
+    reset(param={}, cb){
+      let tmpData = param
+      if (lib.isFunction(param)) {
+        tmpData = param($data)||{}
+      }
+      const upData = {...$data, ...tmpData}
+      exec(upData, cb)
+    },
+    update(param={}, cb){
+      let tmpData = param
+      if (lib.isFunction(param)) {
+        tmpData = param(subItemData)||{}
+      }
+      const upData = {...subItemData, ...tmpData}
+      exec(upData, cb)
+    },
+    attr(key){
+      if (key) {
+        return subItemData.attr[key]
+      }
+      return subItemData.attr
+    },
+    show(cb){
+      subItemData.show = true
+      exec(subItemData, cb)
+    },
+    hide(cb){
+      subItemData.show = false
+      exec(subItemData, cb)
+    },
+    remove(){
+      subData.splice(subkeyIndex, 1)
+      ITEMINST.update({
+        [`data[${subkey}]`]: subData
+      })
+    },
+    siblings(cls){
+      const siblins = []
+      subData.forEach((item, ii)=>{
+        if (ii !== subkeyIndex && lib.isObject(item)) {
+          const _subItemKey = subkey+'-'+ii
+          const bro = itemInstDelegate(_subItemKey, ITEMINST)
+          if (cls) {
+            if (bro.hasClass && bro.hasClass(cls)) {
+              siblins.push(itemInstDelegate(_subItemKey, ITEMINST))
+            }
+          } else {
+            siblins.push(itemInstDelegate(_subItemKey, ITEMINST))
+          }
+        }
+      })
+      return {
+        data: siblins,
+        forEach(cb){
+          if (lib.isFunction(cb)) {
+            siblins.forEach(cb)
+          }
+        },
+        addClass(cls, cb){
+          siblins.forEach(item=>{
+            item.addClass && item.addClass(cls)
+          })
+          if (lib.isFunction(cb)) cb()
+        },
+        removeClass(cls, cb){
+          siblins.forEach(item=>{
+            item.removeClass && item.removeClass(cls)
+          })
+          if (lib.isFunction(cb)) cb()
+        },
+        toggleClass(cls){
+          siblins.forEach(item=>{
+            item.toggleClass && item.toggleClass(cls)
+          })
+          if (lib.isFunction(cb)) cb()
+        },
+        length: siblins.length,
+      }
+    },
+    parent(){
+      return ITEMINST
+    },
+    getData(){
+      return subItemData
+    },
   }
 }
 
@@ -1357,16 +1496,39 @@ export function reactFun(app, e, prefix) {
   let dataset = currentTarget.dataset
   let is = this.$$is
   let context = this
-  if (dataset && (dataset['treeid'] || dataset['data-treeid']) && is === 'list') {
-    let treeid = (dataset['treeid'] || dataset['data-treeid'])
-    if (this.$$type === 'tree') {
-      const that = this
-      context = this.find(treeid)
-      context.parent = function() {
-        return that
+  if (dataset) {
+    const treeid = (dataset['treeid'] || dataset['data-treeid'])
+    const relationId = dataset['relationid']
+    const subkey = dataset['subkey']
+    if (is === 'item' && subkey) {
+      context = itemInstDelegate(subkey, this)
+    }
+
+    if (is === 'list') {
+      if (treeid) {
+        if (this.$$type === 'tree') {
+          const that = this
+          context = this.find(treeid)
+          context.parent = function() {
+            return that
+          }
+        } else {
+          if (subkey) {
+            const ctx = listInstDelegate(treeid, this)
+            context = itemInstDelegate(subkey, ctx)
+          } else {
+            context = listInstDelegate(treeid, this)
+          }
+        }
       }
-    } else {
-      context = listInstDelegate(treeid, this)
+
+      if (subkey) {
+        if (relationId && relationId.indexOf('__') > -1) {
+          const treeid = relationId.split('__')[0]
+          const ctx = listInstDelegate(treeid, this)
+          context = itemInstDelegate(subkey, ctx)
+        }
+      }
     }
   }
   

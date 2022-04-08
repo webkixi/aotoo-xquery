@@ -5,16 +5,7 @@
   补全的属性为 style class data-id data-treeid及view属性对应的事件 touch tap longpress的冒泡及非冒泡事件
   touch > longtap > tap -->
 <block wx:if="{{item.text}}">
-  <text 
-    class="{{item.itemClass||''}}"
-    style="{{item.itemStyle||''}}"
-    id="{{item.id||''}}" 
-    data-treeid="{{item && util.isObject(item.attr) && (item.attr['data-treeid']||item.attr['treeid']||'')}}"
-    data-id="{{(item && util.isObject(item.attr) && (item.attr['id'] || item.attr['data-id']) || '')}}"
-    user-select="{{ item['user-select'] || item['selectable'] || util.strlen(item.text) > 50 || '' }}"
-    space="{{item.space||''}}"
-    decode="{{item.decode||''}}"
-  >{{item.text}}</text>
+  <template is="@text" data="{{props}}"/>
 </block>
 <block wx:elif="{{item['@image']}}">
   <template is="@image" data="{{ props: item['@image'] }}" />

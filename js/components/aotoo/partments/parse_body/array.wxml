@@ -1,23 +1,41 @@
 <wxs src="../../util.wxs" module="util" />
 <import src="../parse_common/index.wxml" />
 <import src="../../templates/inner_templates.wxml" />
+<wxs module="tmp">
+  function hasNormalParts(item){
+    if (typeof item.title === 'array' || typeof item.title === 'object' || item.body || item.footer || item.dot || item.li || item['$$id']) return true
+  }
+
+  module.exports = {
+    hasNormalParts: hasNormalParts
+  }
+</wxs>
 
 <template name="son-content">
   <block wx:if="{{util.isString(item)}}">
-    <view class="hb-item">
-      <text user-select="{{util.strlen(item) > 50}}">{{item}}</text>
-    </view>
+    <text class="hb-item" wx:if="{{util.strlen(item) > 60}}" user-select="{{true}}">{{item}}</text>
+    <view wx:else class="hb-item">{{item}}</view>
   </block>
   <block wx:elif="{{item.data && util.isArray(item.data)}}">
     <template is="@list"  data="{{ props: {...item, treeid: util.treeid(item), containerClass: 'hb-item '+(item.containerClass||'')} }}" />
   </block>
   <block wx:else>
-    <template is="@item" data="{{ props: {...item, treeid: util.treeid(item), containerClass: 'hb-item '+(item.containerClass||'')} }}" />
+    <block wx:if="{{tmp.hasNormalParts(item)}}" >
+      <template is="@item" data="{{ props: {...item, treeid: util.treeid(item), containerClass: 'hb-item '+(item.containerClass||'')} }}" />
+    </block>
+    <template wx:else is="@view" data="{{item, props: {...item, __subkey:'body-'+index, treeid: util.treeid(item), itemClass: 'hb-item '+(item.itemClass||'')} }}" />
+
+    <!-- <block wx:if="{{util.isString(item.title) && item.__sort && item.__sort.length===1 && !item['$$id']}}" >
+      <template is="@view" data="{{ props: {...item, __subkey:'body-'+index, treeid: util.treeid(item), itemClass: 'hb-item '+(item.itemClass||'')} }}" />
+    </block>
+    <block wx:else>
+      <template is="@item" data="{{ props: {...item, treeid: util.treeid(item), containerClass: 'hb-item '+(item.containerClass||'')} }}" />
+    </block> -->
   </block>
 </template>
 
 <view class="hbody {{item.bodyClass||''}}" style="{{item.bodyStyle||''}}">
   <block wx:for="{{item.body}}" wx:key="__key" wx:for-item="son">
-    <template is="son-content" data="{{item: son}}"/>
+    <template is="son-content" data="{{item: son, index}}"/>
   </block>
 </view>

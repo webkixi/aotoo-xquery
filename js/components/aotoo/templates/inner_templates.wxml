@@ -1,5 +1,5 @@
 <wxs src="../util.wxs" module="util" />
-<wxs module="inner">
+<wxs module="tmp">
   function has(item, type){
     if (item.form) return item.form[type]
   }
@@ -9,9 +9,14 @@
     }
     return input
   }
+
+  function ataAtZero(tname){
+    return tname.indexOf('@') === 0
+  }
   module.exports = { 
     has: has,
-    mixprops: mixprops
+    mixprops: mixprops,
+    ataAtZero: ataAtZero
   }
 </wxs>
 <import src="../../templates.wxml" />
@@ -348,6 +353,106 @@
   />
 </template>
 
+<template name="@text">
+  <text 
+    class="{{props.itemClass||''}}"
+    style="{{props.itemStyle||''}}"
+    id="{{props.id||''}}" 
+    data-treeid="{{props && util.isObject(props.attr) && (props.attr['data-treeid']||props.attr['treeid']||'')}}"
+    data-id="{{(props && util.isObject(props.attr) && (props.attr['id'] || props.attr['data-id']) || '')}}"
+    user-select="{{ props['user-select'] || props['selectable'] || util.strlen(props.text) > 50 || '' }}"
+    space="{{props.space||''}}"
+    decode="{{props.decode||''}}"
+  >{{props.text}}</text>
+</template>
+
+<template name="@view">
+  <block wx:if="{{props.text}}">
+      <template is="@text" data="{{props}}"/>
+  </block>
+  <block wx:elif="{{props.catchtap||props.aim||props.catchlongtap || props.catchlongpress||props.catchtouchstart||props.catchtouchmove||props.catchtouchend||props.catchtouchcancel}}">
+    <view 
+      data-treeid="{{props && util.isObject(props.attr) && (props.attr['data-treeid'] || props.attr['treeid']||'')}}" 
+      data-id="{{(props && util.isObject(props.attr) && (props.attr['id'] || props.attr['data-id']) || '')}}"
+      data-relationid="{{props.__relationId||''}}"
+      data-subkey="{{props.__subkey||''}}"
+      id="{{props.id||props['$$id']||''}}" 
+      class="{{props.itemClass || ''}}" 
+      style="{{props.itemStyle||''}}"
+
+      hover-class="{{props['hover-class']||''}}" 
+      hover-stop-propagation="{{props['hover-stop-propagation']||''}}" 
+      hover-start-time="{{props['hover-start-time']||''}}" 
+      hover-stay-time="{{props['hover-stay-time']||''}}" 
+      animation="{{props.animation||''}}"
+
+      catch:tap= "{{props.catchtap ? 'catchItemMethod' : ''}}" 
+      catch:longtap= "{{props.catchlongtap ? 'catchItemMethod' : ''}}"
+      catch:longpress= "{{props.catchlongpress ? 'catchItemMethod' : ''}}"
+
+      catch:touchstart= "{{props.catchtouchstart ? 'catchItemMethod' : ''}}" 
+      catch:touchmove= "{{props.catchtouchmove ? 'catchItemMethod' : ''}}"
+      catch:touchend= "{{props.catchtouchend ? 'catchItemMethod' : ''}}"
+      catch:touchcancel= "{{props.catchtouchcancel ? 'catchItemMethod' : ''}}"
+
+      data-evt="{{util.dataEvt(props, ['aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
+    >
+      <block wx:if="{{props.__sort && props.__sort.length}}">
+        <block wx:for="{{props['__sort']}}" wx:key="__key" wx:for-item="tempname">
+          <block wx:if="{{tempname === 'title'}}">
+            <text user-select="{{ util.strlen(props.title) > 50 || '' }}" class="htitle">{{props.title}}</text>
+          </block>
+          <block wx:elif="{{util.isObject(props[tempname]) || util.isArray(props[tempname]) }}">
+            <template is="{{tmp.ataAtZero(tempname) ? tempname : '@'+tempname}}" data="{{item: props, props: {...props[tempname], __subkey: props.__subkey, treeid: util.treeid(props)}, keyword: tempname }}" />
+          </block>
+        </block>
+      </block>
+      <block wx:else>
+        <text user-select="{{ util.strlen(props.title) > 50 || '' }}" class="htitle">{{props.title}}</text>
+      </block>
+    </view>
+  </block>
+  <view 
+    wx:else
+    data-treeid="{{props && util.isObject(props.attr) && (props.attr['data-treeid'] || props.attr['treeid']||'')}}" 
+    data-id="{{(props && util.isObject(props.attr) && (props.attr['id'] || props.attr['data-id']) || '')}}"
+    id="{{props.id||props['$$id']||''}}" 
+    class="{{props.itemClass||''}}" 
+    style="{{props.itemStyle||''}}"
+
+    hover-class="{{props['hover-class']||''}}" 
+    hover-stop-propagation="{{props['hover-stop-propagation']||''}}" 
+    hover-start-time="{{props['hover-start-time']||''}}" 
+    hover-stay-time="{{props['hover-stay-time']||''}}" 
+    animation="{{props.animation||''}}"
+
+    bind:tap= "{{props.tap ? 'itemMethod' : ''}}" 
+    bind:longtap= "{{props.longtap ? 'itemMethod' : ''}}"
+    bind:longpress= "{{props.longpress ? 'itemMethod' : ''}}"
+
+    bind:touchstart= "{{props.touchstart ? 'itemMethod' : ''}}"
+    bind:touchmove= "{{props.touchmove ? 'itemMethod' : ''}}"
+    bind:touchend= "{{props.touchend ? 'itemMethod' : ''}}"
+    bind:touchcancel= "{{props.touchcancel ? 'itemMethod' : ''}}"
+
+    data-evt="{{util.dataEvt(props, ['tap', 'longpress', 'longtap', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'touchcancel'])}}"
+  >
+    <block wx:if="{{props.__sort && props.__sort.length}}">
+      <block wx:for="{{props['__sort']}}" wx:key="__key" wx:for-item="tempname">
+        <block wx:if="{{tempname === 'title'}}">
+          <text user-select="{{ util.strlen(props.title) > 50 || '' }}" class="htitle">{{props.title}}</text>
+        </block>
+        <block wx:elif="{{util.isObject(props[tempname]) || util.isArray(props[tempname]) }}">
+          <template is="{{tmp.ataAtZero(tempname) ? tempname : '@'+tempname}}" data="{{item: props, props: {...props[tempname], __subkey: props.__subkey, treeid: util.treeid(props)}, keyword: tempname }}" />
+        </block>
+      </block>
+    </block>
+    <block wx:else>
+      <text user-select="{{ util.strlen(props.title) > 50 || '' }}" class="htitle">{{props.title}}</text>
+    </block>
+  </view>
+</template>
+
 <template name="@slider">
   <slider 
     id="{{props.id||props['$$id']||''}}" 
@@ -453,6 +558,29 @@
         data-evt="{{util.dataEvt(props, ['bindload', 'binderror', 'preview', 'tap', 'aim', 'catchtap', 'catchlongpress', 'catchlongtap', 'longtap', 'longpress', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'catchtouchstart', 'catchtouchmove', 'catchtouchend', 'catchtouchcancel'])}}"
       />
     </block>
+</template>
+
+<template name="@img">
+  <template name="img-content">
+    <block wx:if="{{util.isString(pic)}}">
+      <template is="@image" data="{{ props: {src: pic} }}"></template>
+    </block>
+    <block wx:elif="{{util.isObject(pic)}}">
+      <template is="@image" data="{{ props: pic}}"></template>
+    </block>
+  </template>
+
+
+  <block wx:if="{{util.isArray(props.img)}}">
+    <view class="ul {{props.imgClass||''}}" >
+      <block wx:for="{{props.img}}" wx:key="__key" wx:for-item="pic">
+        <template is="img-content" data="{{pic }}" />
+      </block>
+    </view>
+  </block>
+  <block wx:else >
+    <template is="img-content" data="{{pic: props}}" />
+  </block>
 </template>
 
 <template name="@video">

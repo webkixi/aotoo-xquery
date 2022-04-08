@@ -6,7 +6,10 @@
   var scopeData = {}
   function store(key, val){
     if (key) {
-      if (val) scopeData[key] = val
+      if (val) {
+        scopeData[key] = val
+        return val
+      }
       else {
         return scopeData[key]
       }
@@ -494,9 +497,8 @@
 </template>
 
 
-
 <block wx:if="{{$list.show}}">
-  {{fromComponent ? inner.store('fromComponent', fromComponent) : ''}}
-  {{uniqId ? inner.store('uniqId', uniqId) : ''}}
-  <template is="mylist" data="{{list: $list, id}}" />
+  <!-- {{fromComponent && inner.store('fromComponent', fromComponent)}}
+  {{uniqId && inner.store('uniqId', uniqId)}} -->
+  <template is="mylist" data="{{list: $list, id, uniqId: inner.store('uniqId', uniqId), fromComponent: inner.store('fromComponent', fromComponent)}}" />
 </block>

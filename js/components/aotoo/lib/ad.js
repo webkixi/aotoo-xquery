@@ -2,8 +2,6 @@ import {hooks} from './hooks'
 const app = require('../core/getapp')()
 const ADHOOKS = hooks('ADS', true)
 const sysInfo = wx.getSystemInfoSync()
-const accountInfo = wx.getAccountInfoSync()
-const envType = accountInfo.miniProgram.envVersion // develop  trial  release
 const isDevtool = sysInfo.platform === 'devtools'
 
 // 小程序广告id集合，手动输入

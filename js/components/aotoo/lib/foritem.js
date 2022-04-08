@@ -134,7 +134,7 @@ const attrKey = [
 
 // menus有特殊性，不会加入排序(__sort)
 const accessKey = [
-  'title', 'img',  
+  'title', 'img',  'text',
   'header', 'body', 'footer', 'dot', 'li', 'k', 'v', 'url', 'menus'
 ]
 
@@ -236,7 +236,7 @@ export function resetItem(data, context, loop, attrkey) {
     data.show = data.hasOwnProperty('show') ? data.show : true
     data.__relationId = data.__relationId || suid('relation_')
 
-    if (loop && treeid) {
+    if (loop && treeid && data.__relationId.indexOf(treeid) === -1) {
       data.__relationId = treeid + '__' + data.__relationId
     }
 

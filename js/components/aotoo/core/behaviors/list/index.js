@@ -359,21 +359,20 @@ export const listBehavior = function(app, mytype) {
         }
 
         this.children = []
-        this.setData({'$list': {}}, ()=>{
-          let oriData = lib.clone(this.originalDataSource)
-          if (lib.isArray(param)) {
-            oriData.data = param
+        let oriData = lib.clone(this.originalDataSource)
+        if (lib.isArray(param)) {
+          oriData.data = param
+        }
+        if (lib.isObject(param)) {
+          if (param.data && lib.isArray(param.data)) {
+            oriData.data = []
           }
-          if (lib.isObject(param)) {
-            if (param.data && lib.isArray(param.data)) {
-              oriData.data = []
-            }
-            oriData = Object.assign({}, oriData, param)
-          }
-          oriData = presetType.call(this, oriData, true)
-          oriData = reSetArray.call(this, oriData.data, oriData)
-          this.setData({$list: oriData}, cb)
-        })
+          oriData = Object.assign({}, oriData, param)
+        }
+        oriData = presetType.call(this, oriData, true)
+        oriData = reSetArray.call(this, oriData.data, oriData)
+        this.setData({$list: oriData}, cb)
+        
         return this
 
         // this.setData({'$list.data': []})
