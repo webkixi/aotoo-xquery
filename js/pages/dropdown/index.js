@@ -81,7 +81,8 @@ Pager({
   data: {
     tabConfig: mkDropdown({
       id: 'xxx',
-        data: [
+      $$id: 'xxx',
+      data: [
         {title: '选项-1'},  // tap => bind:tap
         {title: '选项-2'},  // aim => catch:tap
         {title: '选项-3'},
