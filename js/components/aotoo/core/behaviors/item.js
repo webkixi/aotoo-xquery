@@ -81,6 +81,11 @@ export const itemBehavior = function(app, mytype) {
           this.customLifeCycle.attached.call(this)
         }
       },
+      ready(){
+        if (this.data.$item.loading) {
+          this.loading(true)
+        }
+      }
     },
     methods: {
       attr: function (params) {

@@ -280,7 +280,6 @@ function syncChildData(ctx, data) {
   return data
 }
 
-let __foreachUpdata = {}
 export function listInstDelegate(treeid, listInst, from){
   listInst.batchUpdateTimmer = null
   let index = null
@@ -290,6 +289,8 @@ export function listInstDelegate(treeid, listInst, from){
   } else {
     index = listInst.findIndex(treeid)
   }
+  listInst.__foreachUpdata = listInst.__foreachUpdata || {}
+  let __foreachUpdata = listInst.__foreachUpdata
   function exec(inst, cb){
     // 列表实例批量更新方法
     // exec方法允许执行以下若干更新方法后，触发批量更新数据并渲染
@@ -303,6 +304,7 @@ export function listInstDelegate(treeid, listInst, from){
         if (lib.isFunction(cb)) cb()
       })
       __foreachUpdata = {}
+      listInst.__foreachUpdata = {}
     }, 20);
   }
 

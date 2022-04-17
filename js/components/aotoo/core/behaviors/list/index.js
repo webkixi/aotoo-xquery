@@ -326,6 +326,9 @@ export const listBehavior = function(app, mytype) {
 
       ready: function () { //组件布局完成，这时可以获取节点信息，也可以操作节点
         let that = this
+        if (this.data.$list.loading) {
+          this.loading(true)
+        }
         function setHeaderFooter() {
           that.children.forEach(child=>{
             let $data = child.getData()

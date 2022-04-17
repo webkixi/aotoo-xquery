@@ -176,8 +176,8 @@ export function resetSuidCount(){
 export function uuid(prefix, len) {
   const mydate = new Date()
   const randomNum = mydate.getDay() + mydate.getHours() + mydate.getMinutes() + mydate.getSeconds() + mydate.getMilliseconds() + Math.round(Math.random() * 10000);
-  const uuid = (prefix || 'uuid') + md5(randomNum)
-  if (len && typeof len == 'number' && len > 6) {
+  const uuid = (prefix || '') + md5(randomNum)
+  if (len && typeof len == 'number' && len >= 6) {
     const remainder = len - 5
     const pre = uuid.substr(0, 5)
     const aft = uuid.substr(uuid.length - remainder)
