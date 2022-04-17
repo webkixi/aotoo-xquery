@@ -20,10 +20,10 @@
 ## 小程序示例
 
 ### miaoui
-![miaoui](js/images/miaoui.png)  
+![miaoui](js/images/miaoui.jpg)  
 
 ### 魔芋日历
-![魔芋日历](js/images/miaoui.png)  
+![魔芋日历](js/images/xquery.png)  
 
 ## 完整DEMO列表
 
