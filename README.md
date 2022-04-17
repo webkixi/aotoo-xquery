@@ -17,6 +17,14 @@
 
 ## [更多文档](http://www.agzgz.com)
 
+## 小程序示例
+
+### miaoui
+![miaoui](js/images/miaoui.png)  
+
+### 魔芋日历
+![魔芋日历](js/images/miaoui.png)  
+
 ## 完整DEMO列表
 
 * 多形态日历组件
