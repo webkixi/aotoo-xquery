@@ -1,10 +1,10 @@
 const Pager = require('../aotoo/core/index')
 const lib = Pager.lib
 
-let modalInstance = null
 
 // 基于list组件定制
 module.exports = function modal(params={}){
+  let modalInstance = null
   const defaultConfig = {
     id: '',
     $$id: '',
@@ -73,14 +73,13 @@ module.exports = function modal(params={}){
       this._fail = null
       this._success = null
       this._complete = null
-    },
-    ready(){
       modalInstance = this
       const myid = options.$$id || options.id
       if (myid) {
         wx[myid] = this
       }
     },
+    ready(){},
     methods: {
       showModal(param={}){
         this._fail = null
@@ -109,16 +108,16 @@ module.exports = function modal(params={}){
           bg.addClass('active')
         }
 
-        const cancelButton = {
+        const cancelButton = opts.cancelButton || {
           title: opts.cancelText||'取消',
-          itemStyle: 'color: '+ opts.cancelColor||'#000000',
+          itemStyle: 'color: '+ (opts.cancelColor||'#000000'),
           itemClass: 'modal-button modal-cancel-button',
           tap: 'onCancel'
         }
 
-        const confirmButton = {
+        const confirmButton = opts.confirmButton || {
           title: opts.confirmText||'确定',
-          itemStyle: 'color: '+ opts.confirmColor||'#000000',
+          itemStyle: 'color: '+ (opts.confirmColor||'#000000'),
           itemClass: 'modal-button modal-confirm-button',
           tap: 'onConfirm'
         }
@@ -160,6 +159,10 @@ module.exports = function modal(params={}){
                 tmpInput._type = 'textarea'
                 tmpInput.bindinput = 'onBindInput?inputtype=textarea',
                 tmpInput = {'@textarea': tmpInput}
+                if (tmpInput['@textarea'].maxcount) {
+                  tmpInput.$$id = lib.uuid('textarea-', 10)
+                  tmpInput['@textarea'].bindinput = 'onBindInput?inputtype=textarea&textareaid='+tmpInput.$$id
+                }
               }
             }
             this.value = ((tmpInput['@input']||tmpInput['@textarea']||tmpInput).value) || ''
@@ -169,10 +172,11 @@ module.exports = function modal(params={}){
           tmpInput = opts.content
         }
 
-        let itemCls = (title ? 'message-modal active ' : 'message-modal without-title active ') + (opts.itemClass||'')
+        let itemCls = (title ? 'message-modal active ' : 'message-modal without-title active ') + (opts.itemClass||opts.className||'')
         let itemSty = opts.editable === 'textarea' ? buildupInitStyle({width: 90, height: title ? 35 : 28, options: opts}) : buildupInitStyle({height: title ? 30 : 25, options: opts})
         if (!opts.showCancel) {
-          itemSty+=';grid-template-columns: 1fr;'
+          itemCls += ' without-cancel'
+          // itemSty+=';grid-template-columns: 1fr;'
         }
 
         const updateConfig = {
@@ -202,15 +206,17 @@ module.exports = function modal(params={}){
       },
 
       onCancel(){
+        const that = this
+        this.closeModal()
         const theSuccess = this._success
-        const bg = this.parent().find('.message-modal-bg')
-        bg && bg.removeClass('active')
-        this.reset()
         if (lib.isFunction(theSuccess)) {
           theSuccess({
             content: this.oldValue,
             confirm: false,
-            cancel: true
+            cancel: true,
+            close(){
+              that.closeModal()
+            }
           })
         }
       },
@@ -218,20 +224,22 @@ module.exports = function modal(params={}){
       onConfirm(){
         const that = this
         const theSuccess = this._success
-        const bg = this.parent().find('.message-modal-bg')
+        let   theResponse = undefined
         if (lib.isFunction(theSuccess)) {
-          theSuccess({
+          theResponse = theSuccess({
             content: this.value,
             confirm: true,
             cancel: false,
             close(){
-              bg && bg.removeClass('active')
-              that.reset()
+              that.closeModal()
             },
           })
         }
-        bg && bg.removeClass('active')
-        this.reset()
+        if (theResponse === false || theResponse === 'keep' || theResponse === 'KEEP') {
+          /** 依然显示弹窗，等用户手动关闭 */
+        } else {
+          this.closeModal()
+        }
       },
 
       closeModal(){
@@ -249,6 +257,12 @@ module.exports = function modal(params={}){
       onBindBlur(){},
       onBindInput(e, param, inst){
         this.value = e.detail.value
+        if (param.textareaid) {
+          const textareaInst = this.activePage.getElementsById(param.textareaid)
+          textareaInst.update({
+            '@textarea.strCount': lib.strlen(e.detail.value, true)
+          })
+        }
       },
     }
   }

@@ -25,7 +25,7 @@
   'button1 button2';
   grid-template-columns: 1fr 1fr;
   /* grid-template-rows: minmax(0, 40px) minmax(1fr, auto) minmax(0, 50px); */
-  grid-template-rows: 80px calc(100% - 120px) 40px;
+  grid-template-rows: minmax(80px, 120px) calc(100% - 160px) 50px;
   box-sizing: border-box;
   justify-items: center;
   align-items: center;
@@ -77,27 +77,51 @@
   justify-content: center;
 }
 
+.message-modal > .htitles{
+  font-size: 1em;
+  width: 100%;
+  /* display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto; */
+  display: flex;
+  flex-direction: column;
+  color: #999;
+}
+
+.message-modal > .htitles .t-item:first-child{
+  font-size: 1.5em;
+  align-self: center;
+  justify-self: center;
+  color: #000;
+  margin-bottom: 0.5em;
+}
+
+.message-modal > .htitles .t-item:nth-child(2){
+  color: #999;
+}
+
 .message-modal .message-modal-body{
   grid-area: 'body';
   grid-column: 1 / 3;
   grid-row: 2 / 3;
   align-self: flex-start;
   width: 100%;
-  height: 100%;
+  height: 96%;
   color: #555;
+  overflow: auto;
 }
 
 .message-modal .message-modal-body input{
-  background-color: #e4e4e4;
+  background-color: #e9e9e9;
   height: 50px;
-  /* line-height: 1.3; */
-  padding: 0 5px;
+  padding: 0 0.5em;
   box-sizing: border-box;
   width: 100%;
+  border-radius: 5px;
 }
 
 .message-modal .message-modal-body textarea{
-  background-color: #e4e4e4;
+  background-color: #e9e9e9;
   padding: 5px;
   box-sizing: border-box;
   width: 100%;
@@ -106,6 +130,15 @@
   overflow-x: hidden;
   font-size: 1.1em;
   line-height: 1.4;
+  padding: 0.6em;
+  position: relative;
+  border-radius: 5px;
+}
+
+.message-modal .message-modal-body textarea .counter{
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
 }
 
 /* .message-modal .modal-cancel-button{ */
@@ -129,12 +162,6 @@
   border-right: none;
 }
 
-
-.message-modal.without-title{
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 40px;
-}
-
 .message-modal.without-title .message-modal-body{
   grid-row: 1 / 2;
 }
@@ -147,6 +174,14 @@
   grid-row: 2 / 3;
 }
 
+.message-modal.without-title{
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 40px;
+}
+
+.message-modal.without-cancel .modal-confirm-button{
+  grid-column: 1 / 3;
+}
 
 .message-modal.announce .message-modal-body{
   font-size: 1.1em;
