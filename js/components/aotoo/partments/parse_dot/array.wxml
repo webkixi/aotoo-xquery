@@ -6,8 +6,17 @@
     if (typeof item.title === 'array' || typeof item.title === 'object' || item.body || item.footer || item.dot || item.li || item['$$id']) return true
   }
 
+  function containerClass(item){
+    if (item.containerClass && item.containerClass.indexOf('hdot-item') > -1) {
+      var ctClass = item.containerClass.replace('hdot-item', '')
+      return 'hdot-item '+ ctClass
+    }
+    return 'hdot-item '+ (item.containerClass || '')
+  }
+
   module.exports = {
-    hasNormalParts: hasNormalParts
+    hasNormalParts: hasNormalParts,
+    containerClass: containerClass
   }
 </wxs>
 
@@ -17,13 +26,17 @@
     <view wx:else class="hdot-item">{{item}}</view>
   </block>
   <block wx:elif="{{item.data && util.isArray(item.data)}}">
-    <template is="@list"  data="{{ props: {...item, treeid: util.treeid(item), containerClass: 'hdot-item '+(item.containerClass||'')} }}" />
+    <template is="@list"  data="{{ props: {...item, treeid: util.treeid(item), containerClass: tmp.containerClass(item)} }}" />
   </block>
   <block wx:else>
     <block wx:if="{{tmp.hasNormalParts(item)}}" >
-      <template is="@item" data="{{ props: {...item, treeid: util.treeid(item), containerClass: 'hdot-item '+(item.containerClass||'')} }}" />
+      <template is="@item" data="{{ props: {...item, treeid: util.treeid(item), containerClass: tmp.containerClass(item)} }}" />
     </block>
-    <template wx:else is="@view" data="{{item, props: {...item, __subkey:'dot-'+index, treeid: util.treeid(item), itemClass: 'hdot-item '+(item.itemClass||'')} }}" />
+    <block wx:else>
+      <block wx:if="{{item.show}}">
+        <template is="@view" data="{{item, props: {...item, __subkey:'dot-'+index, treeid: util.treeid(item), itemClass: 'hdot-item '+(item.itemClass||'')} }}" />
+      </block>
+    </block>
 
     <!-- <block wx:if="{{util.isString(item.title) && item.__sort && item.__sort.length===1 && !item['$$id']}}" >
       <template is="@view" data="{{ props: {...item, __subkey:'dot-'+index, treeid: util.treeid(item), itemClass: 'hdot-item '+(item.itemClass||'')} }}" />

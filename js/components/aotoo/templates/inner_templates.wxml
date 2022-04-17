@@ -191,7 +191,7 @@
       <ui-item item="{{props.value}}" />
     </block>
     <block wx:else>
-      {{props.value}}
+      {{props.value||props.title}}
     </block>
   </button>
 </template>
@@ -330,6 +330,11 @@
     data-address="{{props.__form ? props.uAddress : ''}}"
     data-evt="{{util.dataEvt(props, ['tap', 'aim', 'catchtap', 'bindinput', 'bindfocus', 'bindblur', 'bindconfirm', 'bindkeyboardheightchange'])}}"
   >
+    <block wx:if="{{props.maxcount}}">
+      <cover-view class="counter">
+        {{props.strCount||0}}/{{props.maxcount}}
+      </cover-view>
+    </block>
   </textarea>
 </template>
 

@@ -6,8 +6,17 @@
     if (typeof item.title === 'array' || typeof item.title === 'object' || item.body || item.footer || item.dot || item.li || item['$$id']) return true
   }
 
+  function containerClass(item){
+    if (item.containerClass && item.containerClass.indexOf('hli-item') > -1) {
+      var ctClass = item.containerClass.replace('hli-item', '')
+      return 'hli-item '+ ctClass
+    }
+    return 'hli-item '+ (item.containerClass || '')
+  }
+
   module.exports = {
-    hasNormalParts: hasNormalParts
+    hasNormalParts: hasNormalParts,
+    containerClass: containerClass
   }
 </wxs>
 
@@ -17,11 +26,11 @@
     <view wx:else class="hli-item">{{item}}</view>
   </block>
   <block wx:elif="{{item.data && util.isArray(item.data)}}">
-    <template is="@list"  data="{{ props: {...item, treeid: util.treeid(item), containerClass: 'hli-item '+(item.containerClass||'')} }}" />
+    <template is="@list"  data="{{ props: {...item, treeid: util.treeid(item), containerClass: tmp.containerClass(item)} }}" />
   </block>
   <block wx:else>
     <block wx:if="{{tmp.hasNormalParts(item)}}" >
-      <template is="@item" data="{{ props: {...item, treeid: util.treeid(item), containerClass: 'hli-item '+(item.containerClass||'')} }}" />
+      <template is="@item" data="{{ props: {...item, treeid: util.treeid(item), containerClass: tmp.containerClass(item)} }}" />
     </block>
     <template wx:else is="@view" data="{{item, props: {...item, __subkey:'li-'+index, treeid: util.treeid(item), itemClass: 'hli-item '+(item.itemClass||'')} }}" />
 
@@ -29,7 +38,7 @@
       <template is="@view" data="{{ props: {...item, __subkey:'li-'+index, treeid: util.treeid(item), itemClass: 'hli-item '+(item.itemClass||'')} }}" />
     </block>
     <block wx:else>
-      <template is="@item" data="{{ props: {...item, treeid: util.treeid(item), containerClass: 'hli-item '+(item.containerClass||'')} }}" />
+      <template is="@item" data="{{ props: {...item, treeid: util.treeid(item), containerClass: tmp.containerClass(item)} }}" />
     </block> -->
   </block>
 </template>
