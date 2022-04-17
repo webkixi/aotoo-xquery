@@ -1,3 +1,5 @@
+@import '../../components/modules/modal.wxss';
+
 ::-webkit-scrollbar {
   width: 0;
   height: 0;

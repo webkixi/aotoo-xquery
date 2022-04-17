@@ -134,8 +134,9 @@ page {
   color: #333;
 }
 
+.date-list>.date-item,
 .date-list>ui-item.ui-item {
-  width: calc(100% / 7);
+  width: calc(100% / 7) !important;
 }
 
 .date-list .date-item {

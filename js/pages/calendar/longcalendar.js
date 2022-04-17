@@ -9,8 +9,8 @@ const today = getYmd()
 const lDate = lunar.solar2lunar(today.year, today.month, today.day)
 today.lunarDate = lDate
 
-const startDay = `${today.year}-${today.month}-${today.day+3}`
-const endDay = `${today.year}-${today.month}-${today.day+7}`
+const startDay = today.offset(3)
+const endDay = today.offset(7)
 
 Pager({
   data: {
