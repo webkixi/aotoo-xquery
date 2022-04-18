@@ -175,13 +175,14 @@
     </block>
     <view 
       wx:else
-      class="htitle {{item.itemClass||item.class||''}}"
-      style="{{item.itemStyle||item.style||''}}"
+      class="htitle"
     ><text user-select="{{true}}">{{item.title}}</text></view>
+    
     <!-- <view 
+      wx:else
       class="htitle {{item.itemClass||item.class||''}}"
       style="{{item.itemStyle||item.style||''}}"
-    >{{item.title}}</view> -->
+    ><text user-select="{{true}}">{{item.title}}</text></view> -->
   </block>
 </template>
 

@@ -32,7 +32,11 @@
     <block wx:if="{{tmp.hasNormalParts(item)}}" >
       <template is="@item" data="{{ props: {...item, treeid: util.treeid(item), containerClass: tmp.containerClass(item)} }}" />
     </block>
-    <template wx:else is="@view" data="{{item, props: {...item, __subkey:'title-'+index, treeid: util.treeid(item), itemClass: 't-item '+(item.itemClass||'')} }}" />
+    <block wx:else>
+      <block wx:if="{{item.show}}">
+        <template is="@view" data="{{item, props: {...item, __subkey:'title-'+index, treeid: util.treeid(item), itemClass: 't-item '+(item.itemClass||'')} }}" />
+      </block>
+    </block>
 
     <!-- <block wx:if="{{util.isString(item.title) && item.__sort && item.__sort.length===1 && !item['$$id']}}" >
       <template is="@view" data="{{ props: {...item, __subkey:'title-'+index, treeid: util.treeid(item), itemClass: 't-item '+(item.itemClass||'')} }}" />

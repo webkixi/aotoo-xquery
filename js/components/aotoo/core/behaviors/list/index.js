@@ -161,7 +161,7 @@ function presetType(properties, isDidUpdate){
       })
       // type.slip.width = type.slip.width || '100vw'   // movable-view的宽，movable-area的宽以此计算
       type.slip.width = type.slip.width || '100%'   // movable-view的宽，movable-area的宽以此计算
-      type.slip.height = type.slip.height || '200rpx' // movable-view的高, movable-area的高设置为auto
+      type.slip.height = type.slip.height || '100%' // movable-view的高, movable-area的高设置为auto
       type.slip.menuWidth = menuWidth
       type.slip.totalOffsetDistance = totalWidth
       type.slip.bindchange = 'onSlipchange?gap='+totalWidth
@@ -190,8 +190,11 @@ function presetType(properties, isDidUpdate){
         if (lib.isObject(menu)) {
           const mWidth = parseInt((menuWidth[ii] || menuWidth[0] || 120))
           totalWidth+=mWidth
-          menu.itemClass = 'slip-menus-item '+ (menu.itemClass||'')
-          menu.itemStyle = (menu.itemStyle||'')+`;width: ${mWidth}rpx;`
+
+          if (menu.itemClass.indexOf('slip-menus-item') === -1) {
+            menu.itemClass = 'slip-menus-item '+ (menu.itemClass||'')
+            menu.itemStyle = (menu.itemStyle||'')+`;width: ${mWidth}rpx;`
+          }
           menus.push(menu);
         }
       })

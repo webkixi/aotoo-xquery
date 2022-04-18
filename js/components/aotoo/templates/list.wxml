@@ -78,7 +78,7 @@
           scale-min="{{item.slipOptions['scale-min'] || list.type['scale-min'] ||0.5}}"
           scale-max="{{item.slipOptions['scale-max'] || list.type['scale-max'] ||10}}"
           scale-value="{{item.slipOptions['scale-value'] || list.type['scale-value'] ||1}}"
-          class="movable-view {{item.slipOptions.areaClass || ''}}"
+          class="movable-view {{item.slipOptions.areaItemClass || ''}}"
           style="z-index: 2; background-color: #fff; {{item.slipOptions.areaItemStyle}};"
           bindchange="{{item.slipOptions.bindchange ? '_movableMethod' : ''}}"
           bindscale="{{list.type&&list.type.slip&&list.type.slip.bindscale ? '_movableMethod' : ''}}"
@@ -145,7 +145,7 @@
           inertia="{{true}}"
           friction="{{1}}"
           out-of-bounds="{{  list.type.scrollbar['out-of-bounds'] === false ? false : true }}" 
-          class="movable-view {{list.type.scrollbar.viewClass || ''}}"
+          class="movable-view {{list.type.scrollbar.areaItemClass || ''}}"
           style="{{list.type.scrollbar.viewStyle}};"
 
           disabled="{{list.type.scrollbar.disabled||false}}"
