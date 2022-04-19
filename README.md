@@ -154,4 +154,4 @@ wxml模板
 
 #### 随意支持，谢谢
 
-![DEMO小程序](http://www.agzgz.com/imgs/wxzan.jpg)
+![DEMO小程序](js/images/wxzan.jpg)
