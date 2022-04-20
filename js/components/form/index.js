@@ -1523,10 +1523,14 @@ Component({
         // res.inputData.value = detail.value
         setAllocation.call(this, res, {value: detail.value, checked: detail.value})
 
-        res.inputData.bindchange && runFormBindFun.call(this, 'bindchange', res, e)
+        runFormBindFun.call(this, 'bindchange', res, e)
         if (type !== 'switch') {
-          res.inputData.bindchanging && runFormBindFun.call(this, 'bindchanging', res, e)
+          runFormBindFun.call(this, 'bindchanging', res, e)
         }
+        // res.inputData.bindchange && runFormBindFun.call(this, 'bindchange', res, e)
+        // if (type !== 'switch') {
+        //   res.inputData.bindchanging && runFormBindFun.call(this, 'bindchanging', res, e)
+        // }
       }
     },
 
