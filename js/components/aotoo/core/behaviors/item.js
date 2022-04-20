@@ -82,7 +82,7 @@ export const itemBehavior = function(app, mytype) {
         }
       },
       ready(){
-        if (this.data.$item.loading) {
+        if (this.data.$item && this.data.$item.loading) {
           this.loading(true)
         }
       }

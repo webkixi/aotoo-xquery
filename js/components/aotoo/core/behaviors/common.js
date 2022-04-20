@@ -111,7 +111,7 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
     clearTimeout(listInst.changedTimer)
     listInst.changedTimer = setTimeout(() => {
       listInst.update(forEachTmp, callback)
-    }, 100);
+    }, 50);
   }
   return {
     $$is: 'fakelist',
@@ -411,8 +411,8 @@ export function listInstDelegate(treeid, listInst, from){
         }
         let clsData = _addClass(key, params, data)
         if (clsData) {
-          listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, clsData)
           if (from === 'foreach') {
+            listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, clsData)
             exec(listInst, cb)
           } else {
             listInst.update(clsData, cb)
@@ -439,8 +439,8 @@ export function listInstDelegate(treeid, listInst, from){
           data = this.getData()
         }
         let clsData = _removeClass(key, params, data)
-        listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, clsData)
         if (from === 'foreach') {
+          listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, clsData)
           exec(listInst, cb)
         } else {
           listInst.update(clsData, cb)

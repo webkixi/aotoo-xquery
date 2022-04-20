@@ -209,8 +209,9 @@ export function itemTouchoption(item){
 }
 
 function setAppVars(context){
-  if (!app['_vars'][context.uniqId]) {
-    app['_vars'][context.uniqId] = context
+  const myApp = app || getApp()
+  if (!myApp['_vars'][context.uniqId]) {
+    myApp['_vars'][context.uniqId] = context
   }
 }
 

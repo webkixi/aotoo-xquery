@@ -173,16 +173,16 @@
     <block wx:if="{{item.url}}">
       <template is="@url" data="{{props: item}}"></template>
     </block>
-    <view 
+    <!-- <view 
       wx:else
       class="htitle"
-    ><text user-select="{{true}}">{{item.title}}</text></view>
+    ><text user-select="{{true}}">{{item.title}}</text></view> -->
     
-    <!-- <view 
+    <view 
       wx:else
       class="htitle {{item.itemClass||item.class||''}}"
       style="{{item.itemStyle||item.style||''}}"
-    ><text user-select="{{true}}">{{item.title}}</text></view> -->
+    ><text user-select="{{true}}">{{item.title}}</text></view>
   </block>
 </template>
 
