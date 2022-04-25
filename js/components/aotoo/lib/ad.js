@@ -42,7 +42,7 @@ function randomAd(type='insert'){
   const len = ids.length
   let   index = 0
   if (len > 1) {
-    index = Math.floor(Math.random()*(len+1));
+    index = Math.floor(Math.random()*(len));
   }
   selectedAd[type] = ids[index]
   return ids[index]
@@ -87,7 +87,7 @@ function createExcitationControler(longVideo, cb){
     cb = longVideo;
     longVideo = undefined
   }
-  const type = longVideo ? 'excitation30' : 'excitation15'
+  const type = longVideo ? 'excitation-long' : 'excitation'
   if (wx.createRewardedVideoAd) {
     const result = randomAd(type)
     if (!result) {
@@ -107,11 +107,13 @@ function createExcitationControler(longVideo, cb){
         ADHOOKS.emit('EXCITATION-ERROR')
         /** 广告加载错误回调 */
       })
-      adInstance.onClose(() => {
+      adInstance.onClose((status) => {
         /** 广告播放完成回调 */
-        ADHOOKS.emit('EXCITATION-CLOSE')
+        ADHOOKS.emit('EXCITATION-CLOSE', status)
       })
-      if (typeof cb === 'function') cb(adInstance)
+      adInstance.load().then(()=>{
+        if (typeof cb === 'function') cb(adInstance)
+      })
     }
   }
 }
@@ -152,18 +154,17 @@ export function excitationAD(param={}, cb){
   const longVideo = param.longVideo
 
   ADHOOKS.once('EXCITATION-ERROR', function(){
-    if (typeof cb === 'function') cb()
+    if (typeof cb === 'function') cb({isEnded:false})
   })
 
-  ADHOOKS.once('EXCITATION-CLOSE', function(){
-    if (typeof cb === 'function') cb()
+  ADHOOKS.once('EXCITATION-CLOSE', function(status){
+    if (typeof cb === 'function') cb(status)
+    // if (status.isEnded || status.isEnded === undefined) {
+    // }
   })
 
   createExcitationControler(longVideo, controler=>{
-    controler.show().catch(err=>{
-      console.warn('激励视频广告显示失败')
-      ADHOOKS.emit('EXCITATION-CLOSE')
-    })
+    controler.show()
   })
 }
 

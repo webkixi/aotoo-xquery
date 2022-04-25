@@ -49,5 +49,7 @@
 
 <!-- 这个key要小心 -->
 <view class="hfooter {{item.footerClass||''}}" style="{{item.footerStyle||''}}">
-  <template wx:if="{{son}}" is="son-content" data="{{item: son, index}}"/>
+  <block wx:for="{{item.footer}}" wx:key="__key" wx:for-item="son">
+    <template wx:if="{{son}}" is="son-content" data="{{item: son, index}}"/>
+  </block>
 </view>
