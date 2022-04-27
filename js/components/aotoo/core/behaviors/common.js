@@ -1361,6 +1361,7 @@ export const commonMethodBehavior = (app, mytype) => {
     behaviors: [],
     methods: {
       _rightEvent: function (e, prefix) {
+        const specialKey = ['error']
 
         let that = this
         let is = this.$$is
@@ -1369,6 +1370,9 @@ export const commonMethodBehavior = (app, mytype) => {
         let activePage = this.activePage
 
         let oType = e.__type || e.type
+        if (specialKey.includes(oType)) {
+          oType = 'bind'+oType
+        }
         let nType = (prefix ? prefix + oType : oType).replace('catchcatch', 'catch')
         let dsetEvtStr = dataset['evt'].replace(/_(tap|aim|catchtap|longpress|catchlongpress)/, '$1').replace(/aim=/g, 'catchtap=')
         // let dsetEvtStr = dataset['evt'].replace(/_/g, '').replace(/aim/g, 'catchtap')
