@@ -191,7 +191,7 @@ function presetType(properties, isDidUpdate){
           const mWidth = parseInt((menuWidth[ii] || menuWidth[0] || 120))
           totalWidth+=mWidth
 
-          if (menu.itemClass.indexOf('slip-menus-item') === -1) {
+          if (!menu.itemClass || menu.itemClass.indexOf('slip-menus-item') === -1) {
             menu.itemClass = 'slip-menus-item '+ (menu.itemClass||'')
             menu.itemStyle = (menu.itemStyle||'')+`;width: ${mWidth}rpx;`
           }

@@ -23,7 +23,7 @@
 <template name="son-content">
   <block wx:if="{{util.isString(item)}}">
     <text class="hli-item" wx:if="{{util.strlen(item) > 60}}" user-select="{{true}}">{{item}}</text>
-    <view wx:else class="hli-item">{{item}}</view>
+    <text wx:else class="hli-item">{{item}}</text>
   </block>
   <block wx:elif="{{item.data && util.isArray(item.data)}}">
     <template is="@list"  data="{{ props: {...item, treeid: util.treeid(item), containerClass: tmp.containerClass(item)} }}" />

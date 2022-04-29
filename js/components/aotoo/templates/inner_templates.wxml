@@ -69,7 +69,7 @@
         id="{{props.id||props['$$id']||''}}" 
         data-treeid="{{props && util.isObject(props.attr) && (props.attr['data-treeid']||props.attr['treeid']||'')}}"
         data-id="{{(props && util.isObject(props.attr) && (props.attr['id'] || props.attr['data-id']) || '')}}"
-        user-select="{{ props['user-select'] || props['selectable'] || util.strlen(props.text) > 50 || '' }}"
+        user-select="{{ props['user-select'] || '' }}"
         space="{{props.space||''}}"
         decode="{{props.decode||''}}"
       >{{props.text}}</text>
@@ -232,7 +232,7 @@
       style="{{props.itemStyle||props.style||''}}"
     >
       <block wx:if="{{util.isString(props.title)}}">
-        <text user-select="{{util.strlen(props.title) > 50}}">{{props.title}}</text>
+        <text user-select="{{ item['user-select'] || '' }}" >{{props.title}}</text>
       </block>
       <ui-item wx:elif="{{util.isArray(props.title)}}" item="{{ {title: props.title} }}" class="ui-item {{props.containerClass}}" style="{{props.containerStyle||''}}" />
       <block wx:else>
@@ -365,7 +365,7 @@
     id="{{props.id||''}}" 
     data-treeid="{{props && util.isObject(props.attr) && (props.attr['data-treeid']||props.attr['treeid']||'')}}"
     data-id="{{(props && util.isObject(props.attr) && (props.attr['id'] || props.attr['data-id']) || '')}}"
-    user-select="{{ props['user-select'] || props['selectable'] || util.strlen(props.text) > 50 || '' }}"
+    user-select="{{ props['user-select'] || '' }}"
     space="{{props.space||''}}"
     decode="{{props.decode||''}}"
   >{{props.text}}</text>
@@ -405,7 +405,7 @@
       <block wx:if="{{props.__sort && props.__sort.length}}">
         <block wx:for="{{props['__sort']}}" wx:key="__key" wx:for-item="tempname">
           <block wx:if="{{tempname === 'title'}}">
-            <text user-select="{{ util.strlen(props.title) > 50 || '' }}" class="htitle">{{props.title}}</text>
+            <text user-select="{{ item['user-select'] || '' }}" class="htitle">{{props.title}}</text>
           </block>
           <block wx:elif="{{util.isObject(props[tempname]) || util.isArray(props[tempname]) }}">
             <template is="{{tmp.ataAtZero(tempname) ? tempname : '@'+tempname}}" data="{{item: props, props: {...props[tempname], __subkey: props.__subkey, treeid: util.treeid(props)}, keyword: tempname }}" />
@@ -413,7 +413,7 @@
         </block>
       </block>
       <block wx:else>
-        <text user-select="{{ util.strlen(props.title) > 50 || '' }}" class="htitle">{{props.title}}</text>
+        <text user-select="{{ item['user-select'] || '' }}" class="htitle">{{props.title}}</text>
       </block>
     </view>
   </block>
@@ -445,7 +445,7 @@
     <block wx:if="{{props.__sort && props.__sort.length}}">
       <block wx:for="{{props['__sort']}}" wx:key="__key" wx:for-item="tempname">
         <block wx:if="{{tempname === 'title'}}">
-          <text user-select="{{ util.strlen(props.title) > 50 || '' }}" class="htitle">{{props.title}}</text>
+          <text user-select="{{ item['user-select'] || '' }}" class="htitle">{{props.title}}</text>
         </block>
         <block wx:elif="{{util.isObject(props[tempname]) || util.isArray(props[tempname]) }}">
           <template is="{{tmp.ataAtZero(tempname) ? tempname : '@'+tempname}}" data="{{item: props, props: {...props[tempname], __subkey: props.__subkey, treeid: util.treeid(props)}, keyword: tempname }}" />
@@ -453,7 +453,7 @@
       </block>
     </block>
     <block wx:else>
-      <text user-select="{{ util.strlen(props.title) > 50 || '' }}" class="htitle">{{props.title}}</text>
+      <text user-select="{{ item['user-select'] || '' }}" class="htitle">{{props.title}}</text>
     </block>
   </view>
 </template>
