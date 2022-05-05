@@ -19,9 +19,14 @@ export function eventIndex(e, {
   const date = attr.timestr
   let   params = {date, ...attr, lunarDate: $data.lunarDate}
   let   deliverCustomCallback = true
+  let   prevCheckedInst = null
   const $$ = this.activePage.getElementsById.bind(this.activePage)
 
   if (options.type === 'single') {
+    const prevCheckedDate = this.rangeChecked[0]
+    if (prevCheckedDate) {
+      prevCheckedInst = prevCheckedDate.dateInst
+    }
     deliverCustomCallback = eventSingle.call(this, {
       e,
       inst,
@@ -47,6 +52,10 @@ export function eventIndex(e, {
   }
 
   if (deliverCustomCallback) {
+    if (options.type === 'single') {
+      inst.prevCheckedInst = prevCheckedInst
+    }
+
     if (e.type === 'tap') {
       if (typeof options.tap === 'function') {
         if (typeof deliverCustomCallback === 'object') {

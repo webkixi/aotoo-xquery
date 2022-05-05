@@ -53,7 +53,7 @@ function weeksTils(weekStr) {
   const weekdefine = weekStr || defaultWeekStr
   const weeksData = weekdefine.split('').map(day=>day)
   return {
-    $$id: 'week-tils',
+    $$id: 'calendar-weektils',
     data: weeksData,
     listClass: 'calendar-weektils',
     itemClass: 'calendar-weektils-item'
@@ -111,7 +111,7 @@ function getOneMonthConfig(timestr, options, $value=[]){
         longpress: 'onDateSelect'
       },
       itemClass: 'date-item',
-      listClass: 'date-list '+scaleItemHeightClass,
+      listClass: 'date-list ' + scaleItemHeightClass,
       containerClass: 'date-list-wrap',
       ready(){
         if ($value.length) {
@@ -419,11 +419,17 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
       const screens = this.screens
       const current = calendarMode.current
       const $$ = this.activePage.getElementsById.bind(this.activePage)
-      if (lib.isFunction(optionsReady)) {
-        optionsReady.call(this)
+      const weekTiles = $$('calendar-weektils')
+      this.calendarWeekTile = weekTiles
+
+      if (screens[current]['@item']['@list'].data.length > 35) {
+        this.css('--append-date-item-height: var(--date-item-height);')
       }
 
       this.changeCalendarHeader(`${startPoint.year}-${startPoint.month}`)
+      if (lib.isFunction(optionsReady)) {
+        optionsReady.call(this)
+      }
 
       app.hooks.once('goto-today', function(){
         that.reset(function(){
@@ -440,6 +446,21 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
       },
       gotoToday(){
         app.hooks.emit('goto-today')
+      },
+      gotoDate(date){
+        // options.startPoint 关键属性
+        // options.endPoint 关键属性
+
+        // const targetDate = getYmd(date)
+        // const startDay = `${targetDate.year}-${targetDate.month}-1`
+        // options.data = [{date: startDay, content: {}}]
+        // for (let ii=1; ii<7; ii++) {
+        //   const nextDate = rightDate(targetDate, ii)
+        //   options.data.push({
+        //     date: `${nextDate.year}-${nextDate.month}-1`,
+        //     content: {}
+        //   })
+        // }
       },
       getMonthHandle(date){
         const $$ = this.activePage.getElementsById.bind(this.activePage)
@@ -463,32 +484,25 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
         }
 
       },
-      changeCalendarHeader(screenId, params={}){
-        const title = params.title
+      changeCalendarHeader(screenId, params){
         clearTimeout(timmer_change_month)
+        if (lib.isObject(screenId)) {
+          params = screenId
+          screenId = this.screens[calendarMode.current].id
+        }
         screenId = screenId.replace('box-', '')
         const $$ = this.activePage.getElementsById.bind(this.activePage)
         let monthStr = screenId
         if (monthStr.indexOf('mon-') > -1) {
           monthStr = $$(screenId).getData()['@list'].id
         }
+        const headerContent = params || monthStr
         const header = $$('calendar-weektils-header')
         this.currentTimepoint = getYmd(monthStr+'-1')
         timmer_change_month = setTimeout(() => {
           if (lib.isFunction(options.bindchange)) {
             let customChangeHeaderStat = false
-            const ctx = {
-              changeHeaderTitle(param){
-                customChangeHeaderStat = true
-                if (lib.isString(param)) {
-                  param = {title: param}
-                }
-                if (lib.isObject(param)) {
-                  header && header.update(param)
-                }
-              }
-            }
-            this.changeHeaderTitle = function(param){
+            this.alterCalendarHeader = function(param){
               customChangeHeaderStat = true
               if (lib.isString(param)) {
                 param = {title: param}
@@ -499,21 +513,28 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
             }
             options.bindchange.call(this, this.currentTimepoint)
             if (!customChangeHeaderStat) {
-              header && header.update({title: monthStr})
+              header && header.update({title: headerContent})
             }
-            // const result = options.bindchange.call(ctx, {title: monthStr}) || {title: monthStr}
-            // header.update(result)
           } else {
-            header && header.update({title: monthStr})
+            header && header.update({title: headerContent})
           }
         }, 50);
       },
       swiperChange(e){
         const detail = e.detail
-        const currentItemId = detail.currentItemId
-        setTimeout(() => {
-          this.changeCalendarHeader(currentItemId)
-        }, 100);
+        let   currentItemId = detail.currentItemId
+        this.changeCalendarHeader(currentItemId)
+
+        currentItemId = currentItemId.replace('box-', '')
+        const $$ = this.activePage.getElementsById.bind(this.activePage)
+        const monthInstData = $$(currentItemId).getData()
+        if (monthInstData['@list'].data.length > 35) {
+          this.css('--append-date-item-height: var(--date-item-height);')
+        } else {
+          this.css('--append-date-item-height: 0px;')
+        }
+        // setTimeout(() => {
+        // }, 100);
       },
       onDateSelect(e, param, inst){
         if (inst.hasClass('invalid')) return

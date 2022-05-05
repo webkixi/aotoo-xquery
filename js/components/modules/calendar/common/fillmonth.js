@@ -160,8 +160,19 @@ export function fillMonth(timepoint, options={}){
       }
 
       if (festival) {
-        res.dot.push({
-          title: festival,
+        const lunarFestival = lDate.lunarFestival
+        const term = lDate.Term
+        const sunerFestival = lDate.festival
+        lunarFestival && res.dot.push({
+          title: lunarFestival,
+          itemClass: 'lunar-date'
+        })
+        sunerFestival && res.dot.push({
+          title: sunerFestival,
+          itemClass: 'lunar-date'
+        })
+        term && res.dot.push({
+          title: term,
           itemClass: 'lunar-date'
         })
       }
@@ -197,7 +208,7 @@ export function fillMonth(timepoint, options={}){
     }
 
     // 全局配置指定日期内容
-    if (lib.isObject(customDate)) {
+    if (lib.isObject(customDate) && !position) {
       res.dot = (res.dot || []).concat((customDate.dot||[]))
       delete customDate.dot
 
@@ -210,7 +221,7 @@ export function fillMonth(timepoint, options={}){
       res = Object.assign({}, res, customDate)
     }
 
-    if (lib.isFunction(customDate)) {
+    if (lib.isFunction(customDate) && !position) {
       res = customDate(res) || res
     }
 
