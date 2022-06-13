@@ -26,22 +26,28 @@ Pager({
 
 ### 方式二
 下载或者克隆github/gitee项目，使用小程序开发者工具打开  
+GITHUB: \`https://github.com/webkixi/aotoo-xquery\`  
+GITEE: \`https://gitee.com/webkixi/aotoo-xquery\`  
 
-### 方式三，引入核心目录/文件   
-    components 
-      ├─ aotoo 核心代码必须有 ✔︎
-      ├─ markit  文档组件 ✔︎
+### 方式三  
+#### 1. clone queryUI项目并引入核心文件，打钩为必须引入   
+    components ✔︎
+      ├─ aotoo 核心代码(360k) ✔︎
+      ├─ markit  文档组件(156k)  支持markdown/html
+      ├─ modules 组件/模块集合 基于item/list组件构建的丰富的组件  
       ├─ templates 模板 ✔︎  
 
-#### 必须在app.json中定义全局组件  
+#### 2. 在app.json中定义全局组件  
 
     "usingComponents": {
       "ui-item": "/components/aotoo/item/index",
       "ui-list": "/components/aotoo/list/index",
       "ui-tree": "/components/aotoo/tree/index",
       "ui-markit": "/components/markit/index"
-    }
+    }  
 
+
+#### 3. 挑选modules目录中的组件  
 `
     },
   }

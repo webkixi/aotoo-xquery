@@ -22,7 +22,7 @@ module.exports = function(params) {
       {
         title: 'TEXTAREA',
         input: [
-          {id: 'aaa', type: 'textarea', title: '文本域', placeholder: '输入文字', bindblur: 'onBlur'},
+          {id: 'fff', type: 'textarea', title: '文本域', placeholder: '输入文字', bindblur: 'onBlur', maxcount: 10, maxlength: 10},
         ]
       },
     ],

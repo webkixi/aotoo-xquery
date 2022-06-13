@@ -2,7 +2,6 @@
 //获取应用实例
 const app = getApp()
 const Pager = require('../../components/aotoo/core/index')
-let source = require('../common/source')
 import createCalendar, {getYmd, lunar} from '../../components/modules/calendar/index'
 
 const today = getYmd()
@@ -24,6 +23,5 @@ Pager({
         console.log(param);
       }, 
     }),
-    ...source
   }
 })

@@ -1,5 +1,3 @@
-/* @import "../../css/calendar.wxss"; */
-@import "../common/source.wxss";
 page {
   --date-item-height: 140rpx;
   --append-date-item-height: 0rpx;
@@ -59,7 +57,7 @@ page {
 }
 
 .week-box {
-  --calendar-month-header: 136rpx;
+  --calendar-month-header: 80rpx;
   height: var(--calendar-month-header);
   font-size: 34rpx;
   font-weight: bold;
