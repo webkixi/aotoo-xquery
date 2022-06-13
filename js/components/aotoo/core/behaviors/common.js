@@ -245,6 +245,24 @@ export function fakeListInstance(temp_data, listInst, listInstDelegate) {
       })
       listInst.update(tmpData, cb)
     },
+    show(cb){
+      let tmpData = this.data
+      if (tmpData.show === true) return
+      tmpData.show = true
+      listInst.update(tmpData, cb)
+    },
+    hide(cb){
+      let tmpData = this.data
+      if (tmpData.show === false) return
+      tmpData.show = false
+      listInst.update(tmpData, cb)
+    },
+    bone(cb){
+      let tmpData = this.data
+      if (tmpData.show === 'bone') return
+      tmpData.show = 'bone'
+      listInst.update(tmpData, cb)
+    },
     update(params, cb) {
       let tmpData = this.data
       Object.keys(tmpData).forEach(key => {
@@ -502,6 +520,22 @@ export function listInstDelegate(treeid, listInst, from){
           }
         }
       },
+      bone(){
+        let upData = {}
+        if (data) {
+          data = this.getData()
+          if (data.show === 'bone') return
+          data.show = 'bone'
+          upData[key] = data
+          // listInst.update(upData)
+          if (from === 'foreach') {
+            listInst.__foreachUpdata = Object.assign({}, listInst.__foreachUpdata, upData)
+            exec(listInst)
+          } else {
+            listInst.update(upData, cb)
+          }
+        }
+      },
       remove(cb) {
         listInst.delete(treeid, cb)
       },
@@ -693,11 +727,18 @@ export function itemInstDelegate(subItemKey, ITEMINST, from) {
       return subItemData.attr
     },
     show(cb){
+      if(subItemData.show === true) return
       subItemData.show = true
       exec(subItemData, cb)
     },
     hide(cb){
+      if(subItemData.show === false) return
       subItemData.show = false
+      exec(subItemData, cb)
+    },
+    bone(){
+      if(subItemData.show === 'bone') return
+      subItemData.show = 'bone'
       exec(subItemData, cb)
     },
     remove(){
@@ -745,6 +786,21 @@ export function itemInstDelegate(subItemKey, ITEMINST, from) {
             item.toggleClass && item.toggleClass(cls)
           })
           if (lib.isFunction(cb)) cb()
+        },
+        show(cb){
+          siblins.forEach(item=>{
+            item.show && item.show(cb)
+          })
+        },
+        hide(cb){
+          siblins.forEach(item=>{
+            item.hide && item.hide(cb)
+          })
+        },
+        bone(cb){
+          siblins.forEach(item=>{
+            item.bone && item.bone(cb)
+          })
         },
         length: siblins.length,
       }
@@ -1113,6 +1169,9 @@ export const commonBehavior = (app, mytype) => {
           },
           addClass: params => tmp.forEach($inst => $inst.addClass(params)),
           removeClass: params => tmp.forEach($inst => $inst.removeClass(params)),
+          show: cb => tmp.forEach($inst => $inst.show && $inst.show(cb)),
+          hide: cb => tmp.forEach($inst => $inst.hide && $inst.hide(cb)),
+          bone: cb => tmp.forEach($inst => $inst.bone && $inst.bone(cb)),
           update: params => tmp.forEach($inst => $inst.update(params)),
           // setData: params => tmp.forEach($inst => $inst.setData(params)),
           forEach(cb){
@@ -1149,6 +1208,9 @@ export const commonBehavior = (app, mytype) => {
       },
 
       css: function (param = {}, cb) {
+        if (!param) {
+          return this.data.$list.itemStyle
+        }
         let cssStr = ''
         if (typeof param === 'string') {
           cssStr = param
@@ -1341,6 +1403,11 @@ export const commonBehavior = (app, mytype) => {
         let data = this.getData()
         if (!data.show) return
         lib.isFunction(this.update) && this.update({ show: false }, cb)
+      },
+      bone: function(cb) {
+        let data = this.getData()
+        if (data.show==='bone') return
+        lib.isFunction(this.update) && this.update({ show: 'bone' }, cb)
       },
       toggle: function(cb) {
         const data = this.getData()

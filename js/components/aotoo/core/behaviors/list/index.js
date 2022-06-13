@@ -480,8 +480,24 @@ export const listBehavior = function(app, mytype) {
 
       },
 
-      update(){
-        this._update.apply(this, arguments)
+      // update(){
+      //   this._update.apply(this, arguments)
+      // },
+
+      update(param, cb){
+        if (lib.isArray(param)) {
+          param = {data: param}
+        }
+        this.tempParam = Object.assign({}, (this.tempParam||{}), param)
+        clearTimeout(this.listBatchUpdateTimmer)
+        this.listBatchUpdateTimmer = setTimeout(() => {
+          this._update(this.tempParam, ()=>{
+            if (lib.isFunction(cb)) {
+              cb.call(this)
+              this.tempParam = {}
+            }
+          })
+        }, 20);
       },
 
       _update: function (_param, callback) {

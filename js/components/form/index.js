@@ -692,11 +692,17 @@ Component({
     },
     
     removeWarn: function(id) {
-      this.value(id, {error: null})
+      const inputConfig = this.value(id)
+      if (inputConfig.error) {
+        this.value(id, {error: null})
+      }
     },
     
     removeDesc: function(id) {
-      this.value(id, {desc: null})
+      const inputConfig = this.value(id)
+      if (inputConfig.desc) {
+        this.value(id, {desc: null})
+      }
     },
 
     disabled: function(id, val) {
@@ -1085,7 +1091,16 @@ Component({
                   if (lib.isObject(val)) {
                     let resault = Object.assign({}, res.inputData, val)
                     res.inputData = resault = normInput.call(this, resault, res.profile)
-                    willUpdate = { [res.address]: resault }
+
+                    const keys = Object.keys(val) 
+                    const updateBody = {}
+                    keys.forEach(ky=>{
+                      const updateKey = `${res.address}.${ky}`
+                      updateBody[updateKey] = resault[ky]
+                    })
+
+                    willUpdate = updateBody
+                    // willUpdate = { [res.address]: resault }
                   }
                 }
                 allocation[id] = res.inputData
@@ -1511,6 +1526,16 @@ Component({
         setTimeout(() => {
           this.setValue(id, res.inputData.value)
         }, 50);
+      }
+    },
+
+    onClearValue(e){
+      const dataset = e.currentTarget.dataset
+      const address = dataset.address
+      const res = this.getAddressInfo(address)
+      if (res) {
+        let id = res.inputData.id||res.inputData.name
+        this.empty(id)
       }
     },
 

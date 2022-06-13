@@ -5,7 +5,7 @@
 <wxs src="../aotoo/util.wxs" module="util" />
 <import src="../aotoo/templates/inner_templates.wxml" />
 <wxs module="tmp">
-  var inputType = ['text', 'password', 'number', 'idcard', 'digit', 'dropdown']
+  var inputType = ['text', 'password', 'number', 'idcard', 'digit', 'dropdown', 'textarea']
   var crType = ['radio', 'checkbox', 'radiobox']
 
   function isInput(mytype){
@@ -119,7 +119,17 @@
     >{{(util.isObject(input.value) ? (input.value.title||input.value.text) : input.value)||''}}</view>
   </block>
   <block wx:else>
-    <template is="@myinput" data="{{props: {__form: true, ...input}, uniqId, inputStyle: 'z-index: 639;'+(inputStyle||'') }}"/>
+    <block wx:if="{{input.type === 'textarea'}}">
+      <template is="{{'@'+input.type}}" data="{{ props: {__form: true, ...input} }}" />
+      <block wx:if="{{input.maxcount}}">
+        <cover-view class="counter">
+          {{input.strCount||0}}/{{input.maxcount}}
+        </cover-view>
+      </block>
+    </block>
+    <block wx:else>
+      <template is="@myinput" data="{{props: {__form: true, ...input}, uniqId, inputStyle: 'z-index: 639;'+(inputStyle||'') }}"/>
+    </block>
   </block>
   <!-- <input 
     wx:else
@@ -349,17 +359,24 @@
     <block wx:if="{{input.type=='dropdown'}}">
       <ui-list list="{{input.options || input.titles}}"  fromComponent="{{uniqId}}"/>
     </block>
+    <view 
+      wx:if="{{input.clear}}" 
+      class="input-clear"
+      catch:tap="onClearValue"
+      data-address="{{input.uAddress}}" 
+    >
+    </view>
   </block>
   <block wx:else>
-    <block wx:if="{{input.type === 'textarea'}}">
+    <!-- <block wx:if="{{input.type === 'textarea'}}">
       <template is="{{'@'+input.type}}" data="{{ props: {__form: true, ...input} }}" />
       <block wx:if="{{input.maxcount}}">
         <cover-view class="counter">
           {{input.strCount||0}}/{{input.maxcount}}
         </cover-view>
       </block>
-    </block>
-    <block wx:elif="{{input.type === 'button'}}">
+    </block> -->
+    <block wx:if="{{input.type === 'button'}}">
       <template is="{{'@'+input.type}}" data="{{ props: {__form: true, ...input} }}" />
     </block>
     <block wx:elif="{{input.type === 'switch'}}">

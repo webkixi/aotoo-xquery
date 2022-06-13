@@ -150,6 +150,18 @@ class _hooks {
     if (this.storage) {
       clearTimeout(this.syncTimmer)
       this.syncTimmer = setTimeout(() => {
+        this.storeData = Object.keys(this.storeData).reduce((p, n)=>{
+          if (this.storeData[n]) {
+            p[n] = this.storeData[n]
+          }
+          return p
+        }, {})
+        this.expireData = Object.keys(this.expireData).reduce((p, n)=>{
+          if (this.expireData[n]) {
+            p[n] = this.expireData[n]
+          }
+          return p
+        }, {})
         wx.setStorageSync(this.namespace, this.storeData)
         wx.setStorageSync(this.expireDataKey, this.expireData)
       }, 300);

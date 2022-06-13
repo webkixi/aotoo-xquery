@@ -110,14 +110,15 @@
 <!-- <slot name="header"></slot>
 <slot name="top"></slot>
 <slot></slot> -->
-
-<block wx:if="{{util.isObject(item)}}">
-  <template is="parse-part" data="{{item}}" />
-</block>
-
-<block wx:elif="{{util.isArray(item)}}">
-  <block wx:for="{{item}}" wx:key="__key" wx:for-item="son">
-    <template is="parse-part" data="{{son}}" />
+<block wx:if="{{item.show!=='bone'}}" >
+  <block wx:if="{{util.isObject(item)}}">
+    <template is="parse-part" data="{{item}}" />
+  </block>
+  
+  <block wx:elif="{{util.isArray(item)}}">
+    <block wx:for="{{item}}" wx:key="__key" wx:for-item="son">
+      <template is="parse-part" data="{{son}}" />
+    </block>
   </block>
 </block>
 

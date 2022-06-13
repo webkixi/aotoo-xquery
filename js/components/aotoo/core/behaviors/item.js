@@ -88,6 +88,9 @@ export const itemBehavior = function(app, mytype) {
       }
     },
     methods: {
+      bone(){
+        this.update({show: 'bone'})
+      },
       attr: function (params) {
         if (lib.isString(params)){
           return this.data.$item.attr[params]
@@ -198,8 +201,21 @@ export const itemBehavior = function(app, mytype) {
         }
       },
 
-      update(){
-        this._update.apply(this, arguments)
+      // update(){
+      //   this._update.apply(this, arguments)
+      // },
+
+      update(param, cb){
+        this.tempParam = Object.assign({}, (this.tempParam||{}), param)
+        clearTimeout(this.itemBatchUpdateTimmer)
+        this.itemBatchUpdateTimmer = setTimeout(() => {
+          this._update(this.tempParam, ()=>{
+            if (lib.isFunction(cb)) {
+              cb.call(this)
+              this.tempParam = {}
+            }
+          })
+        }, 20);
       },
 
       _update: function (_param, callback) {

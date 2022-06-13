@@ -193,6 +193,16 @@ function mkFind(context, app){
               cld.reset && cld.reset(param)
             })
           },
+          show(cb){
+            this.forEach(function (cld) {
+              cld.show && cld.show(cb)
+            })
+          },
+          hide(cb){
+            this.forEach(function (cld) {
+              cld.hide && cld.hide(cb)
+            })
+          },
           update(param) {
             this.forEach(function (cld) {
               cld.update && cld.update(param)
