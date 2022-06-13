@@ -1,7 +1,3 @@
-import {
-  calendar as lunar
-} from './lunar'
-
 import { 
   getYmd,
   rightDate,
@@ -11,6 +7,7 @@ import {
   isLeapYear,
   getWeekday,
   getMonthData,
+  lunar
 } from '../util/index'
 
 const Pager = require('../../../aotoo/core/index')
@@ -24,6 +21,10 @@ function adapterCustomDates(data=[]){
       obj = {date: date, content: null}
     }
     if (obj.date && obj.content && lib.isObject(obj.content)) {
+      if (obj.lunar) {  // lunar为true时表示当前自定义日期为农历，需转换农历为阳历日期
+        const fakeDate = getYmd(obj.date)
+        obj.date = lunar.lunar2solar(fakeDate.year, fakeDate.month, fakeDate.day, (lunar.leapMonth(fakeDate.year)>0) ).date
+      }
       obj.timepoint = getYmd(obj.date)
       tmpDates[obj.timepoint.timestr] = obj
     }

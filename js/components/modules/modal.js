@@ -201,7 +201,8 @@ module.exports = function modal(params={}){
           showConfirm: false,
           height: param.height || 50,
           width: param.width||86,
-          itemClass: 'announce'
+          itemClass: 'announce',
+          complete: param.complete
         })
       },
 
@@ -243,9 +244,13 @@ module.exports = function modal(params={}){
       },
 
       closeModal(){
+        const theComplete = this._complete
         const bg = this.parent().find('.message-modal-bg')
         bg && bg.removeClass('active')
         this.reset()
+        if (lib.isFunction(theComplete)) {
+          theComplete()
+        }
       },
 
       onKeyboardConfirm(e){

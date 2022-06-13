@@ -422,8 +422,10 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
       const weekTiles = $$('calendar-weektils')
       this.calendarWeekTile = weekTiles
 
-      if (screens[current]['@item']['@list'].data.length > 35) {
-        this.css('--append-date-item-height: var(--date-item-height);')
+      if ([2, 3].includes(options.mode)) {
+        if (screens[current]['@item']['@list'].data.length > 35) {
+          this.css('--append-date-item-height: var(--date-item-height);')
+        }
       }
 
       this.changeCalendarHeader(`${startPoint.year}-${startPoint.month}`)
@@ -431,13 +433,22 @@ function mkCalendarConfigs(timestart, total=30, opts={}){
         optionsReady.call(this)
       }
 
-      app.hooks.once('goto-today', function(){
-        that.reset(function(){
-          if (current === that.swiperCurrent) {
-            const currentItemId = screens[current].id
-            that.changeCalendarHeader(currentItemId)
-          }
-        })
+      app.hooks.once('goto-today', function(param){
+        if (param) {
+          that.reset(param, function(){
+            if (current === that.swiperCurrent) {
+              const currentItemId = screens[current].id
+              that.changeCalendarHeader(currentItemId)
+            }
+          })
+        } else {
+          that.reset(function(){
+            if (current === that.swiperCurrent) {
+              const currentItemId = screens[current].id
+              that.changeCalendarHeader(currentItemId)
+            }
+          })
+        }
       })
     },
     methods: {
